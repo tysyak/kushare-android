@@ -92,6 +92,7 @@ class KushareService : Service() {
     private var linkScope: CoroutineScope? = null
     private lateinit var nsd: LinkNsd
     private var btServer: BluetoothServerSocket? = null
+    private var transferServer: BluetoothServerSocket? = null
     private var scanJob: Job? = null
 
     /** Avisos de Bluetooth (sin acumular): uno por bucle, para que ninguno se pierda el aviso. */
@@ -202,6 +203,7 @@ class KushareService : Service() {
             }
         }
         scope.launch { bluetoothAcceptLoop(scope) }
+        scope.launch { transferAcceptLoop(scope) }
         scope.launch { bluetoothReconnectLoop(scope) }
         Log.i(TAG, "enlace activo")
     }
@@ -211,6 +213,8 @@ class KushareService : Service() {
         linkScope = null
         runCatching { btServer?.close() }
         btServer = null
+        runCatching { transferServer?.close() }
+        transferServer = null
         scanJob?.cancel()
         nsd.stopAdvertising()
         nsd.stopDiscovery()
@@ -298,6 +302,50 @@ class KushareService : Service() {
                         link.acceptBt(BluetoothSocketIo(socket), address)
                     } catch (e: Exception) {
                         Log.i(TAG, "conexión RFCOMM del enlace rechazada: ${e.message}")
+                        runCatching { socket.close() }
+                    }
+                }
+            }
+            runCatching { server.close() }
+        }
+    }
+
+    /**
+     * Archivos entrantes por Bluetooth (perfil de transferencias, otro UUID
+     * que el del enlace): se reciben siempre que kushare esté encendido, sin
+     * tener que abrir la pantalla Recibir.
+     */
+    private suspend fun transferAcceptLoop(scope: CoroutineScope) {
+        val downloadDir =
+            getExternalFilesDir(android.os.Environment.DIRECTORY_DOWNLOADS)
+                ?: java.io.File(filesDir, "Download").apply { mkdirs() }
+        while (scope.isActive) {
+            val helper = bluetoothHelper()
+            if (helper == null || !hasBluetoothPermission() || !helper.isEnabled()) {
+                withTimeoutOrNull(BT_RETRY_MAX_MS) { btWakeAccept.receive() }
+                continue
+            }
+            val server =
+                try {
+                    helper.listen()
+                } catch (e: Exception) {
+                    Log.w(TAG, "no se pudo escuchar transferencias por Bluetooth", e)
+                    delay(BT_RETRY_MIN_MS)
+                    continue
+                }
+            transferServer = server
+            while (scope.isActive) {
+                val socket = runCatching { server.accept() }.getOrNull() ?: break
+                scope.launch {
+                    try {
+                        uniffi.kushare_mobile.receiveOverBt(
+                            BluetoothSocketIo(socket),
+                            downloadDir.absolutePath,
+                            FileReceiveCallback(this@KushareService),
+                        )
+                    } catch (e: Exception) {
+                        Log.i(TAG, "transferencia Bluetooth fallida: ${e.message}")
+                    } finally {
                         runCatching { socket.close() }
                     }
                 }

@@ -225,7 +225,9 @@ private fun KushareApp(activity: ComponentActivity, openDevices: MutableState<Bo
             nsdHelper.advertise(endpointId, deviceName, handle.localPort().toInt())
             visible = true
         }
-        scope.launch { startBluetoothReceiving() }
+        // Bluetooth: el servicio de kushare ya recibe archivos siempre que
+        // está encendido (KushareService.transferAcceptLoop); escuchar aquí
+        // también chocaría con su socket.
     }
 
     fun stopVisibility() {
