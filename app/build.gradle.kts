@@ -38,8 +38,8 @@ android {
     sourceSets {
         getByName("main") {
             // Bindings de Kotlin generados por uniffi-bindgen a partir del
-            // crate Rust en ../rust (ver README.md: "Regenerar los
-            // bindings"). No se editan a mano.
+            // crate Rust en ../rust (ver README.md, sección "Compilar").
+            // No se editan a mano.
             kotlin.srcDir("src/main/java-generated")
         }
     }
