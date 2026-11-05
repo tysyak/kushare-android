@@ -1,6 +1,6 @@
 # kushare-android
 
-App Android de [kushare](https://github.com/mascrit/kushare): transferencia de archivos y **notificaciones sincronizadas** con el PC, al estilo de KDE Connect. La interfaz es Kotlin + Jetpack Compose. El protocolo, la criptografía y la lógica del enlace son **el mismo código Rust** que usa el cliente de escritorio, expuesto a Kotlin con [UniFFI](https://mozilla.github.io/uniffi-rs/).
+App Android de [kushare](https://github.com/mascrit/kushare): transferencia de archivos y **notificaciones sincronizadas** con el PC, al estilo de KDE Connect. La interfaz es Kotlin + Jetpack Compose con **Material 3 Expressive** (formas de `MaterialShapes`, tipografía enfática, esquema de movimiento expresivo y color dinámico). En *Ajustes* se elige el tema: Sistema, Claro, Oscuro u **Oscuro OLED** (negro puro). El protocolo, la criptografía y la lógica del enlace son **el mismo código Rust** que usa el cliente de escritorio, expuesto a Kotlin con [UniFFI](https://mozilla.github.io/uniffi-rs/).
 
 ## Qué hace
 
@@ -39,8 +39,11 @@ El enlace está pensado para quedarse abierto siempre por Bluetooth sin gastar:
 
 ```
 app/src/main/java/org/kushare/app/
-  MainActivity.kt                 pantallas Inicio / Enviar / Recibir
-  DevicesScreen.kt                pantalla Dispositivos (emparejar, PIN, direcciones, filtros)
+  MainActivity.kt                 navegación animada entre pantallas y lógica de enviar/recibir
+  ui/Theme.kt, ThemeSettings.kt   tema Expressive (color dinámico, OLED, tipografía, formas, movimiento)
+  ui/Components.kt                tarjetas asimétricas, iconos en MaterialShapes, microinteracciones
+  ui/HomeScreen.kt, SettingsScreen.kt, DevicesScreen.kt, TransferScreens.kt
+  ReceivedFiles.kt                archivos recibidos en segundo plano → Descargas + notificación
   KushareService.kt               servicio en primer plano: enlace, pausa sin radios, reconexión BT
   KushareNotificationListener.kt  lee notificaciones y ejecuta acciones/respuestas que pide el PC
   KushareLink.kt                  estado compartido + callbacks del enlace (espejos del PC, PIN)
@@ -58,7 +61,9 @@ rust/                             crate kushare_mobile (cdylib): puente UniFFI s
 
 ## Compilar
 
-Requisitos: Android SDK (con NDK), JDK 17, Rust con el target `aarch64-linux-android` y [`cargo-ndk`](https://github.com/bbqsrc/cargo-ndk).
+Requisitos: Android SDK con la plataforma **android-37** y el NDK, JDK 17, Rust con el target `aarch64-linux-android` y [`cargo-ndk`](https://github.com/bbqsrc/cargo-ndk). Toolchain: Gradle 9.4.1, AGP 9.1.1 (Kotlin integrado; ya no se aplica `org.jetbrains.kotlin.android`), Kotlin 2.2.21, Compose BOM 2026.09.00 y Material 3 **1.5.0-rc01** (Material 3 Expressive exige compileSdk 37 y AGP ≥ 9.1).
+
+Atajo: `make install` hace todo lo de abajo e instala en el teléfono (ver el `Makefile`).
 
 El crate Rust depende por **ruta relativa** de los crates de kushare: hay que clonar [kushare](https://github.com/mascrit/kushare) **al lado** de este repo (`../kushare`).
 

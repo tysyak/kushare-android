@@ -1,0 +1,48 @@
+package org.kushare.app.ui
+
+import android.content.Context
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+/** Cómo se elige entre claro y oscuro. */
+enum class ThemeMode(val label: String) {
+    SYSTEM("Sistema"),
+    LIGHT("Claro"),
+    DARK("Oscuro"),
+    OLED("Oscuro OLED"),
+}
+
+data class ThemeConfig(
+    val mode: ThemeMode = ThemeMode.SYSTEM,
+    /** Material You: colores sacados del fondo de pantalla (Android 12+). */
+    val dynamicColor: Boolean = true,
+    /** Con [ThemeMode.SYSTEM] en oscuro, usar negro puro (pantallas OLED). */
+    val oledWhenSystemDark: Boolean = true,
+)
+
+/** Preferencias de apariencia, persistidas en SharedPreferences. */
+object ThemeSettings {
+    private const val PREFS = "kushare_ui"
+    private val state = MutableStateFlow(ThemeConfig())
+    val config: StateFlow<ThemeConfig> = state
+
+    fun load(context: Context) {
+        val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        state.value =
+            ThemeConfig(
+                mode = runCatching { ThemeMode.valueOf(p.getString("mode", null) ?: "") }.getOrDefault(ThemeMode.SYSTEM),
+                dynamicColor = p.getBoolean("dynamic_color", true),
+                oledWhenSystemDark = p.getBoolean("oled_system_dark", true),
+            )
+    }
+
+    fun update(context: Context, transform: (ThemeConfig) -> ThemeConfig) {
+        val next = transform(state.value)
+        state.value = next
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putString("mode", next.mode.name)
+            .putBoolean("dynamic_color", next.dynamicColor)
+            .putBoolean("oled_system_dark", next.oledWhenSystemDark)
+            .apply()
+    }
+}
