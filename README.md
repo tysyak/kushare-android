@@ -1,6 +1,6 @@
 # kushare-android
 
-App Android de [kushare](https://github.com/mascrit/kushare): transferencia de archivos y **notificaciones sincronizadas** con el PC, al estilo de KDE Connect. La interfaz es Kotlin + Jetpack Compose con **Material 3 Expressive** (formas de `MaterialShapes`, tipografía enfática, esquema de movimiento expresivo y color dinámico). En *Ajustes* se elige el tema: Sistema, Claro, Oscuro u **Oscuro OLED** (negro puro). El protocolo, la criptografía y la lógica del enlace son **el mismo código Rust** que usa el cliente de escritorio, expuesto a Kotlin con [UniFFI](https://mozilla.github.io/uniffi-rs/).
+App Android de [kushare](https://github.com/tysyak/kushare): transferencia de archivos y **notificaciones sincronizadas** con el PC, al estilo de KDE Connect. La interfaz es Kotlin + Jetpack Compose con **Material 3 Expressive** (formas de `MaterialShapes`, tipografía enfática, esquema de movimiento expresivo y color dinámico). En *Ajustes* se elige el tema: Sistema, Claro, Oscuro u **Oscuro OLED** (negro puro). El protocolo, la criptografía y la lógica del enlace son **el mismo código Rust** que usa el cliente de escritorio, expuesto a Kotlin con [UniFFI](https://mozilla.github.io/uniffi-rs/).
 
 ## Qué hace
 
@@ -14,6 +14,10 @@ App Android de [kushare](https://github.com/mascrit/kushare): transferencia de a
   - encendido mantiene el enlace; apagado detiene kushare del todo;
   - debajo del nombre muestra por dónde está conectado ("PC · Bluetooth");
   - sin Bluetooth ni Wi-Fi kushare se pone **en pausa** solo y se reanuda cuando vuelve alguno.
+
+## Problemas comunes
+
+Ver el [FAQ de kushare](https://github.com/tysyak/kushare/blob/main/FAQ.md): firewall del PC, redes que aíslan dispositivos (usa Bluetooth), KDE Connect, acceso a notificaciones y batería.
 
 ## Permisos
 
@@ -65,7 +69,7 @@ Requisitos: Android SDK con la plataforma **android-37** y el NDK, JDK 17, Rust 
 
 Atajo: `make install` hace todo lo de abajo e instala en el teléfono (ver el `Makefile`).
 
-El crate Rust depende por **ruta relativa** de los crates de kushare: hay que clonar [kushare](https://github.com/mascrit/kushare) **al lado** de este repo (`../kushare`).
+El crate Rust depende por **ruta relativa** de los crates de kushare: hay que clonar [kushare](https://github.com/tysyak/kushare) **al lado** de este repo (`../kushare`).
 
 ```sh
 rustup target add aarch64-linux-android

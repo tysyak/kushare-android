@@ -6,6 +6,8 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.2.0] - 2026-11-05
+
 ### Añadido
 - **Enlace persistente con el PC** (mismo núcleo Rust `kushare-link` que el
   escritorio, vía UniFFI): emparejado con PIN por Wi-Fi o Bluetooth,
@@ -37,5 +39,6 @@ Todos los cambios notables de kushare-android. Formato basado en
 - App inicial: envío y recepción de archivos con kushare de escritorio por
   Wi-Fi (mDNS) y Bluetooth RFCOMM.
 
-[Sin publicar]: https://github.com/tysyak/kushare-android/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/tysyak/kushare-android/releases/tag/v0.1.0
+[Sin publicar]: https://github.com/tysyak/kushare-android/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/tysyak/kushare-android/releases/tag/v0.2.0
+[0.1.0]: https://github.com/tysyak/kushare-android/commit/8d1f720
