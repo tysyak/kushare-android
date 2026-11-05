@@ -886,6 +886,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_unpair(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_wake_reconnect(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_constructor_linkservice_new(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_receivecallback_on_incoming_request(
@@ -991,6 +993,8 @@ internal object UniffiLib {
     external fun uniffi_kushare_mobile_fn_method_linkservice_start_tcp_listener(`ptr`: Long,`port`: Short,
     ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_unpair(`ptr`: Long,`deviceId`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_wake_reconnect(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_init_callback_vtable_receivecallback(`vtable`: UniffiVTableCallbackInterfaceReceiveCallback,
     ): Unit
@@ -1201,10 +1205,13 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_set_direction() and 0xFFFF) != 3686) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_start_tcp_listener() and 0xFFFF) != 4055) {
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_start_tcp_listener() and 0xFFFF) != 2926) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_unpair() and 0xFFFF) != 2855) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_wake_reconnect() and 0xFFFF) != 46545) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_constructor_linkservice_new() and 0xFFFF) != 55608) {
@@ -1833,12 +1840,19 @@ public interface LinkServiceInterface {
     fun `setDirection`(`deviceId`: kotlin.String, `outgoing`: kotlin.Boolean, `enabled`: kotlin.Boolean)
     
     /**
-     * Escucha conexiones del enlace en `port` (0 = libre). Devuelve el
-     * puerto real, para anunciarlo por mDNS.
+     * Escucha conexiones del enlace en `port` (si está ocupado, en uno
+     * libre). Devuelve el puerto real, para anunciarlo por mDNS; también
+     * se manda en el `Hello` para que el PC pueda reconectar sin escanear.
      */
     suspend fun `startTcpListener`(`port`: kotlin.UShort): kotlin.UShort
     
     fun `unpair`(`deviceId`: kotlin.String)
+    
+    /**
+     * Reintentar ya la reconexión por Wi-Fi (p. ej. al volver la red), sin
+     * esperar al backoff.
+     */
+    fun `wakeReconnect`()
     
     companion object
 }
@@ -2264,8 +2278,9 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
 
     
     /**
-     * Escucha conexiones del enlace en `port` (0 = libre). Devuelve el
-     * puerto real, para anunciarlo por mDNS.
+     * Escucha conexiones del enlace en `port` (si está ocupado, en uno
+     * libre). Devuelve el puerto real, para anunciarlo por mDNS; también
+     * se manda en el `Hello` para que el PC pueda reconectar sin escanear.
      */
     @Throws(MobileException::class)
     @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
@@ -2297,6 +2312,22 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
         it,
         
         FfiConverterString.lower(`deviceId`),_status)
+}
+    }
+    
+    
+
+    
+    /**
+     * Reintentar ya la reconexión por Wi-Fi (p. ej. al volver la red), sin
+     * esperar al backoff.
+     */override fun `wakeReconnect`()
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_wake_reconnect(
+        it,
+        _status)
 }
     }
     

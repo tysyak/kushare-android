@@ -166,7 +166,7 @@ impl LinkService {
                     "notification-reply".into(),
                 ],
             },
-            LinkConfig::default(),
+            LinkConfig::mobile(),
         )?;
 
         let names = manager.clone();
@@ -184,14 +184,20 @@ impl LinkService {
         self.manager.device_id().to_string()
     }
 
-    /// Escucha conexiones del enlace en `port` (0 = libre). Devuelve el
-    /// puerto real, para anunciarlo por mDNS.
+    /// Escucha conexiones del enlace en `port` (si está ocupado, en uno
+    /// libre). Devuelve el puerto real, para anunciarlo por mDNS; también
+    /// se manda en el `Hello` para que el PC pueda reconectar sin escanear.
     pub async fn start_tcp_listener(&self, port: u16) -> Result<u16, MobileError> {
         let manager = self.manager.clone();
         let port = RUNTIME
             .spawn(async move {
-                let listener = TcpListener::bind(("0.0.0.0", port)).await?;
+                let listener = match TcpListener::bind(("0.0.0.0", port)).await {
+                    Ok(listener) => listener,
+                    Err(_) if port != 0 => TcpListener::bind(("0.0.0.0", 0)).await?,
+                    Err(err) => return Err(err.into()),
+                };
                 let port = listener.local_addr()?.port();
+                manager.set_tcp_port(port);
                 tokio::spawn(async move {
                     loop {
                         let Ok((stream, addr)) = listener.accept().await else { continue };
@@ -277,6 +283,12 @@ impl LinkService {
             .await
             .map_err(|e| anyhow::anyhow!("tarea interrumpida: {e}"))??;
         Ok(id)
+    }
+
+    /// Reintentar ya la reconexión por Wi-Fi (p. ej. al volver la red), sin
+    /// esperar al backoff.
+    pub fn wake_reconnect(&self) {
+        self.manager.wake_reconnect();
     }
 
     pub fn respond_pairing(&self, device_id: String, accept: bool) -> bool {

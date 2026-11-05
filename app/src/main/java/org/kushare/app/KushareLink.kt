@@ -45,6 +45,9 @@ object KushareLink {
 
     val peers = MutableStateFlow<List<MobilePeer>>(emptyList())
     val discovered = MutableStateFlow<Map<String, LinkSighting>>(emptyMap())
+
+    /** Hay una búsqueda de dispositivos en curso (solo bajo demanda). */
+    val scanning = MutableStateFlow(false)
     val pendingPairing = MutableStateFlow<PairingPrompt?>(null)
     val messages = MutableStateFlow<String?>(null)
 

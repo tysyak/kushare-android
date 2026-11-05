@@ -65,6 +65,7 @@ fun DevicesScreen(onBack: () -> Unit) {
     val discovered by KushareLink.discovered.collectAsState()
     val pairing by KushareLink.pendingPairing.collectAsState()
     val message by KushareLink.messages.collectAsState()
+    val scanning by KushareLink.scanning.collectAsState()
     var accessGranted by remember { mutableStateOf(notificationAccessGranted(context)) }
     var filterTarget by remember { mutableStateOf<AppFilterTarget?>(null) }
     var pairingInProgress by remember { mutableStateOf<String?>(null) }
@@ -130,8 +131,28 @@ fun DevicesScreen(onBack: () -> Unit) {
             )
         }
 
-        item { Text("Visibles en la red", style = MaterialTheme.typography.titleMedium) }
-        if (visible.isEmpty()) item { Text("(buscando…)") }
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Visibles en la red", style = MaterialTheme.typography.titleMedium)
+                OutlinedButton(enabled = !scanning, onClick = { KushareService.scan(context) }) {
+                    Text(if (scanning) "Buscando…" else "Buscar")
+                }
+            }
+        }
+        if (visible.isEmpty()) {
+            item {
+                Text(
+                    when {
+                        scanning -> "(buscando…)"
+                        else -> "Pulsa Buscar para encontrar dispositivos en esta red."
+                    },
+                )
+            }
+        }
         items(visible, key = { it.deviceId }) { sighting ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
