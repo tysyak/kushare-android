@@ -864,6 +864,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_note_sighting(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_pair_bt(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_pair_tcp(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_peers(
@@ -968,6 +970,8 @@ internal object UniffiLib {
     ): RustBuffer.ByValue
     external fun uniffi_kushare_mobile_fn_method_linkservice_note_sighting(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`host`: RustBuffer.ByValue,`port`: Short,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_pair_bt(`ptr`: Long,`io`: Long,`address`: RustBuffer.ByValue,
+    ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_pair_tcp(`ptr`: Long,`host`: RustBuffer.ByValue,`port`: Short,
     ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_peers(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
@@ -1168,6 +1172,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_note_sighting() and 0xFFFF) != 55198) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_pair_bt() and 0xFFFF) != 42244) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_pair_tcp() and 0xFFFF) != 44179) {
@@ -1796,6 +1803,13 @@ public interface LinkServiceInterface {
     fun `noteSighting`(`deviceId`: kotlin.String, `host`: kotlin.String, `port`: kotlin.UShort)
     
     /**
+     * Empareja (con PIN) por un `BluetoothSocket` que Kotlin ya conectó al
+     * servicio RFCOMM del enlace. Para redes que aíslan a los clientes
+     * entre sí, donde el Wi-Fi no sirve.
+     */
+    suspend fun `pairBt`(`io`: ByteStreamIo, `address`: kotlin.String): kotlin.String
+    
+    /**
      * Empareja con un peer visible en `host:port`. Vuelve cuando termina
      * (tras confirmar el PIN en ambos lados) o falla.
      */
@@ -2086,6 +2100,34 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
     }
     
     
+
+    
+    /**
+     * Empareja (con PIN) por un `BluetoothSocket` que Kotlin ya conectó al
+     * servicio RFCOMM del enlace. Para redes que aíslan a los clientes
+     * entre sí, donde el Wi-Fi no sirve.
+     */
+    @Throws(MobileException::class)
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+    override suspend fun `pairBt`(`io`: ByteStreamIo, `address`: kotlin.String) : kotlin.String {
+        return uniffiRustCallAsync(
+        callWithHandle { uniffiHandle ->
+            UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_pair_bt(
+                uniffiHandle,
+                
+        FfiConverterTypeByteStreamIo.lower(`io`),
+        FfiConverterString.lower(`address`),
+            )
+        },
+        { future, callback, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_poll_rust_buffer(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_complete_rust_buffer(future, continuation) },
+        { future -> UniffiLib.ffi_kushare_mobile_rust_future_free_rust_buffer(future) },
+        // lift function
+        { FfiConverterString.lift(it) },
+        // Error FFI converter
+        MobileException.ErrorHandler,
+    )
+    }
 
     
     /**

@@ -1,5 +1,6 @@
 package org.kushare.app
 
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
@@ -25,6 +26,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,9 +42,14 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uniffi.kushare_mobile.MobileApp
 import uniffi.kushare_mobile.MobilePeer
+
+private fun bluetoothHelper(context: Context): BluetoothHelper? =
+    context.getSystemService(BluetoothManager::class.java)?.adapter?.let { BluetoothHelper(it) }
 
 private fun notificationAccessGranted(context: Context): Boolean =
     NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
@@ -60,6 +68,12 @@ fun DevicesScreen(onBack: () -> Unit) {
     var accessGranted by remember { mutableStateOf(notificationAccessGranted(context)) }
     var filterTarget by remember { mutableStateOf<AppFilterTarget?>(null) }
     var pairingInProgress by remember { mutableStateOf<String?>(null) }
+    val bonded = remember { mutableStateListOf<BondedPeer>() }
+    LaunchedEffect(Unit) {
+        val list = runCatching { bluetoothHelper(context)?.bondedPeers() }.getOrNull().orEmpty()
+        bonded.clear()
+        bonded.addAll(list)
+    }
 
     // Volver de los ajustes del sistema: refrescar el estado del permiso.
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -144,6 +158,52 @@ fun DevicesScreen(onBack: () -> Unit) {
                         }
                     },
                 ) { Text(if (pairingInProgress == sighting.deviceId) "Esperando…" else "Emparejar") }
+            }
+        }
+
+        // Redes que aíslan a los clientes (Wi-Fi de oficina, universidad,
+        // hoteles) no dejan que el teléfono y el PC se vean: ahí se empareja
+        // por Bluetooth, con un dispositivo ya vinculado en los ajustes.
+        item {
+            Text("Emparejar por Bluetooth", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Para redes donde los dispositivos no se ven entre sí. El PC debe estar vinculado por Bluetooth.",
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        val pairedBt = peers.mapNotNull { it.btAddress }.toSet()
+        val bondedCandidates = bonded.filter { it.address !in pairedBt }
+        if (bondedCandidates.isEmpty()) item { Text("(ningún dispositivo Bluetooth vinculado)") }
+        items(bondedCandidates, key = { "bt-" + it.address }) { device ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(device.name)
+                    Text(device.address, style = MaterialTheme.typography.bodySmall)
+                }
+                Button(
+                    enabled = pairingInProgress == null,
+                    onClick = {
+                        pairingInProgress = device.address
+                        scope.launch {
+                            try {
+                                val helper = bluetoothHelper(context) ?: error("sin Bluetooth")
+                                val io = withContext(Dispatchers.IO) { helper.connectLink(device.address) }
+                                KushareLink.ensure(context).pairBt(io, device.address)
+                            } catch (e: Exception) {
+                                KushareLink.messages.value =
+                                    "No se pudo emparejar con ${device.name}: ${e.message} " +
+                                    "(¿está kushare corriendo en ese equipo?)"
+                            } finally {
+                                pairingInProgress = null
+                                KushareLink.refreshPeers()
+                            }
+                        }
+                    },
+                ) { Text(if (pairingInProgress == device.address) "Esperando…" else "Emparejar") }
             }
         }
 

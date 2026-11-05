@@ -25,6 +25,18 @@ private const val TAG = "KushareNotif"
 private const val ICON_SIZE = 64
 
 /**
+ * Apps que ya son puentes de notificaciones con el PC. Lo que publican
+ * suelen ser notificaciones del propio PC (o ecos de las nuestras):
+ * reenviarlas crea duplicados o un bucle infinito entre los dos puentes
+ * (visto en pruebas reales con KDE Connect).
+ */
+private val NOTIFICATION_BRIDGES =
+    setOf(
+        "org.kde.kdeconnect_tp", // KDE Connect
+        "com.microsoft.appmanager", // Enlace Móvil (Phone Link)
+    )
+
+/**
  * Lee las notificaciones del teléfono (requiere que el usuario conceda
  * "Acceso a notificaciones") y las reenvía por el enlace; también ejecuta
  * lo que pide el PC sobre ellas: descartar, pulsar una acción o responder.
@@ -72,7 +84,7 @@ class KushareNotificationListener : NotificationListenerService() {
 
     private fun shouldForward(sbn: StatusBarNotification): Boolean {
         val n = sbn.notification
-        if (sbn.packageName == packageName) return false
+        if (sbn.packageName == packageName || sbn.packageName in NOTIFICATION_BRIDGES) return false
         if (sbn.isOngoing) return false
         if (n.flags and Notification.FLAG_GROUP_SUMMARY != 0) return false
         val extras = n.extras

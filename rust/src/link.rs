@@ -262,6 +262,23 @@ impl LinkService {
         Ok(id)
     }
 
+    /// Empareja (con PIN) por un `BluetoothSocket` que Kotlin ya conectó al
+    /// servicio RFCOMM del enlace. Para redes que aíslan a los clientes
+    /// entre sí, donde el Wi-Fi no sirve.
+    pub async fn pair_bt(&self, io: Box<dyn ByteStreamIo>, address: String) -> Result<String, MobileError> {
+        let manager = self.manager.clone();
+        let id = RUNTIME
+            .spawn(async move {
+                let stream = CallbackStream::new(io);
+                manager
+                    .connect(stream, Transport::Bluetooth(address), ConnectIntent::Pair)
+                    .await
+            })
+            .await
+            .map_err(|e| anyhow::anyhow!("tarea interrumpida: {e}"))??;
+        Ok(id)
+    }
+
     pub fn respond_pairing(&self, device_id: String, accept: bool) -> bool {
         self.manager.respond_pairing(&device_id, accept)
     }
