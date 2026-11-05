@@ -882,6 +882,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_set_direction(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_shutdown(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_start_tcp_listener(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_unpair(
@@ -989,6 +991,8 @@ internal object UniffiLib {
     external fun uniffi_kushare_mobile_fn_method_linkservice_set_app_blocked(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outgoing`: Byte,`appId`: RustBuffer.ByValue,`blocked`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_set_direction(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outgoing`: Byte,`enabled`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_shutdown(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_start_tcp_listener(`ptr`: Long,`port`: Short,
     ): Long
@@ -1203,6 +1207,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_set_direction() and 0xFFFF) != 3686) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_shutdown() and 0xFFFF) != 33778) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_start_tcp_listener() and 0xFFFF) != 2926) {
@@ -1840,6 +1847,14 @@ public interface LinkServiceInterface {
     fun `setDirection`(`deviceId`: kotlin.String, `outgoing`: kotlin.Boolean, `enabled`: kotlin.Boolean)
     
     /**
+     * Apaga el enlace: cierra todas las conexiones y detiene la escucha, la
+     * reconexión y los eventos. Los peers emparejados se conservan. Tras
+     * esto el objeto no sirve; crear otro `LinkService` para volver a
+     * encender.
+     */
+    fun `shutdown`()
+    
+    /**
      * Escucha conexiones del enlace en `port` (si está ocupado, en uno
      * libre). Devuelve el puerto real, para anunciarlo por mDNS; también
      * se manda en el `Hello` para que el PC pueda reconectar sin escanear.
@@ -2271,6 +2286,24 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
         FfiConverterString.lower(`deviceId`),
         FfiConverterBoolean.lower(`outgoing`),
         FfiConverterBoolean.lower(`enabled`),_status)
+}
+    }
+    
+    
+
+    
+    /**
+     * Apaga el enlace: cierra todas las conexiones y detiene la escucha, la
+     * reconexión y los eventos. Los peers emparejados se conservan. Tras
+     * esto el objeto no sirve; crear otro `LinkService` para volver a
+     * encender.
+     */override fun `shutdown`()
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_shutdown(
+        it,
+        _status)
 }
     }
     

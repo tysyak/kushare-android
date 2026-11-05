@@ -75,8 +75,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         openDevices.value = intent?.getBooleanExtra(EXTRA_OPEN_DEVICES, false) == true
-        KushareLink.ensure(this)
-        KushareService.start(this)
+        KushareLink.attach(this)
+        KushareSwitch.isEnabled(this)
+        KushareService.start(this) // respeta el interruptor del usuario
         setContent {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {

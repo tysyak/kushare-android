@@ -66,6 +66,8 @@ fun DevicesScreen(onBack: () -> Unit) {
     val pairing by KushareLink.pendingPairing.collectAsState()
     val message by KushareLink.messages.collectAsState()
     val scanning by KushareLink.scanning.collectAsState()
+    val enabled by KushareSwitch.enabled.collectAsState()
+    val paused by KushareSwitch.paused.collectAsState()
     var accessGranted by remember { mutableStateOf(notificationAccessGranted(context)) }
     var filterTarget by remember { mutableStateOf<AppFilterTarget?>(null) }
     var pairingInProgress by remember { mutableStateOf<String?>(null) }
@@ -97,6 +99,28 @@ fun DevicesScreen(onBack: () -> Unit) {
         item {
             Text("Dispositivos", style = MaterialTheme.typography.headlineSmall)
             message?.let { Text(it, modifier = Modifier.padding(vertical = 4.dp)) }
+        }
+        item {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    ToggleRow("kushare activado", enabled) { on -> KushareSwitch.setEnabled(context, on) }
+                    Text(
+                        when {
+                            !enabled -> "Apagado: no se sincroniza nada ni se mantiene la conexión."
+                            paused -> "En pausa: sin Bluetooth ni Wi-Fi. Se reanudará solo al volver alguno."
+                            else -> "También puedes encenderlo y apagarlo desde los ajustes rápidos."
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+        }
+        if (!enabled) {
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("Volver") }
+            }
+            return@LazyColumn
         }
         if (!accessGranted) {
             item {
@@ -169,7 +193,8 @@ fun DevicesScreen(onBack: () -> Unit) {
                         pairingInProgress = sighting.deviceId
                         scope.launch {
                             try {
-                                KushareLink.ensure(context).pairTcp(sighting.host, sighting.port.toUShort())
+                                val link = KushareLink.service ?: error("kushare está apagado o en pausa")
+                                link.pairTcp(sighting.host, sighting.port.toUShort())
                             } catch (e: Exception) {
                                 KushareLink.messages.value = "No se pudo emparejar: ${e.message}"
                             } finally {
@@ -213,7 +238,8 @@ fun DevicesScreen(onBack: () -> Unit) {
                             try {
                                 val helper = bluetoothHelper(context) ?: error("sin Bluetooth")
                                 val io = withContext(Dispatchers.IO) { helper.connectLink(device.address) }
-                                KushareLink.ensure(context).pairBt(io, device.address)
+                                val link = KushareLink.service ?: error("kushare está apagado o en pausa")
+                                link.pairBt(io, device.address)
                             } catch (e: Exception) {
                                 KushareLink.messages.value =
                                     "No se pudo emparejar con ${device.name}: ${e.message} " +

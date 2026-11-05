@@ -54,8 +54,8 @@ class KushareNotificationListener : NotificationListenerService() {
 
     override fun onListenerConnected() {
         instance = this
-        KushareLink.ensure(this)
-        KushareService.start(this)
+        KushareLink.attach(this)
+        KushareService.start(this) // no hace nada si el usuario apagó kushare
         // Las ya presentes no se reenvían (evita inundar el PC en cada
         // reconexión), pero se recuerdan para poder actuar sobre ellas.
         runCatching { activeNotifications }.getOrNull()?.forEach { sbn ->

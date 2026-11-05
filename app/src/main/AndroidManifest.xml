@@ -82,6 +82,25 @@
             </intent-filter>
         </service>
 
+        <!-- Botón de ajustes rápidos: encender/apagar kushare. Activo: la
+             app le avisa cuándo redibujarse (requestListeningState). -->
+        <service
+            android:name=".KushareTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_tile"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.ACTIVE_TILE"
+                android:value="true" />
+            <meta-data
+                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+                android:value="true" />
+        </service>
+
         <receiver
             android:name=".LinkActionReceiver"
             android:exported="false" />

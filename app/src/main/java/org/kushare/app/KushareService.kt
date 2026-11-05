@@ -2,6 +2,7 @@ package org.kushare.app
 
 import android.Manifest
 import android.app.Notification
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
@@ -46,30 +47,37 @@ private const val BT_RETRY_MIN_MS = 60_000L
 private const val BT_RETRY_MAX_MS = 15 * 60_000L
 
 /**
- * Servicio en primer plano dueño del enlace persistente. Pensado para
- * gastar poca batería con un enlace Bluetooth siempre activo:
+ * Servicio en primer plano de kushare. Solo corre si el usuario lo tiene
+ * encendido ([KushareSwitch]); dentro, el **enlace** (escucha TCP/RFCOMM,
+ * anuncio mDNS, reconexión, notificaciones) se abre y se cierra según haya
+ * Bluetooth o Wi-Fi:
  *
- * - **No escanea la red de forma continua**: solo anuncia (pasivo) y busca
- *   cuando el usuario pulsa "Buscar" ([ACTION_SCAN], 30 s).
- * - **Reconexión por eventos**: se reintenta por Bluetooth cuando el
- *   sistema avisa de que un dispositivo se conectó (ACL) o se encendió el
- *   Bluetooth, y por Wi-Fi cuando vuelve la red; entre eventos solo hay un
- *   reintento de respaldo cada vez más espaciado (1 → 15 min).
- * - El enlace en sí no despierta la CPU: el lector bloquea en el socket y
- *   el keepalive por Bluetooth es de minutos (ver `LinkConfig`).
+ * - **En pausa** (Bluetooth apagado y sin Wi-Fi): el enlace está cerrado y
+ *   el servicio solo espera el evento del sistema para reanudar; no gasta
+ *   CPU ni radio.
+ * - **Activo**: pensado para un enlace Bluetooth siempre abierto con poco
+ *   consumo: sin escaneo continuo (solo [ACTION_SCAN], 30 s), reconexión
+ *   por eventos (ACL conectado, Bluetooth encendido, vuelve el Wi-Fi) con un
+ *   respaldo de 1 a 15 min, y keepalive por Bluetooth de minutos.
  */
 class KushareService : Service() {
     companion object {
         const val ACTION_SCAN = "org.kushare.app.SCAN"
 
         fun start(context: Context) {
+            if (!KushareSwitch.isEnabled(context)) return
             runCatching {
                 context.startForegroundService(Intent(context, KushareService::class.java))
             }.onFailure { Log.w(TAG, "no se pudo arrancar el servicio", it) }
         }
 
+        fun stop(context: Context) {
+            context.stopService(Intent(context, KushareService::class.java))
+        }
+
         /** Busca dispositivos kushare en la red durante unos segundos. */
         fun scan(context: Context) {
+            if (!KushareSwitch.isEnabled(context)) return
             runCatching {
                 context.startForegroundService(
                     Intent(context, KushareService::class.java).setAction(ACTION_SCAN),
@@ -78,7 +86,10 @@ class KushareService : Service() {
         }
     }
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
+    /** Tareas del enlace; se cancela entera al pausar o apagar. */
+    private var linkScope: CoroutineScope? = null
     private lateinit var nsd: LinkNsd
     private var btServer: BluetoothServerSocket? = null
     private var scanJob: Job? = null
@@ -97,10 +108,13 @@ class KushareService : Service() {
             override fun onReceive(context: Context, intent: Intent) {
                 when (intent.action) {
                     BluetoothDevice.ACTION_ACL_CONNECTED -> wakeBluetooth()
-                    BluetoothAdapter.ACTION_STATE_CHANGED ->
-                        if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_ON) {
-                            wakeBluetooth()
+                    BluetoothAdapter.ACTION_STATE_CHANGED -> {
+                        val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
+                        if (state == BluetoothAdapter.STATE_ON || state == BluetoothAdapter.STATE_OFF) {
+                            onRadiosChanged()
                         }
+                        if (state == BluetoothAdapter.STATE_ON) wakeBluetooth()
+                    }
                 }
             }
         }
@@ -108,7 +122,14 @@ class KushareService : Service() {
     private val networkCallback =
         object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                KushareLink.service?.wakeReconnect()
+                serviceScope.launch {
+                    onRadiosChanged()
+                    KushareLink.service?.wakeReconnect()
+                }
+            }
+
+            override fun onLost(network: Network) {
+                serviceScope.launch { onRadiosChanged() }
             }
         }
 
@@ -116,19 +137,12 @@ class KushareService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val link = KushareLink.ensure(this)
-        startForegroundCompat()
-
         nsd = LinkNsd(this)
-        scope.launch {
-            try {
-                val port = link.startTcpListener(LINK_PORT.toUShort()).toInt()
-                nsd.advertise(link.deviceId(), KushareLink.deviceName(this@KushareService), port)
-            } catch (e: Exception) {
-                Log.w(TAG, "no se pudo iniciar el enlace por Wi-Fi", e)
-            }
+        startForeground(paused = false)
+        if (!KushareSwitch.isEnabled(this)) {
+            stopSelf()
+            return
         }
-
         registerReceiver(
             bluetoothEvents,
             IntentFilter().apply {
@@ -142,9 +156,7 @@ class KushareService : Service() {
                 networkCallback,
             )
         }
-
-        scope.launch { bluetoothAcceptLoop() }
-        scope.launch { bluetoothReconnectLoop() }
+        onRadiosChanged()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -153,17 +165,61 @@ class KushareService : Service() {
     }
 
     override fun onDestroy() {
-        scope.cancel()
         runCatching { unregisterReceiver(bluetoothEvents) }
         runCatching { getSystemService(ConnectivityManager::class.java).unregisterNetworkCallback(networkCallback) }
-        runCatching { btServer?.close() }
-        nsd.stopAdvertising()
-        nsd.stopDiscovery()
-        KushareLink.scanning.value = false
+        stopLink()
+        serviceScope.cancel()
+        KushareSwitch.paused.value = false
+        KushareSwitch.refreshTile(this)
         super.onDestroy()
     }
 
+    /** Abre o cierra el enlace según haya Bluetooth o Wi-Fi. */
+    private fun onRadiosChanged() {
+        val available = KushareSwitch.radiosAvailable(this)
+        when {
+            available && linkScope == null -> startLink()
+            !available && linkScope != null -> {
+                Log.i(TAG, "sin Bluetooth ni Wi-Fi: enlace en pausa")
+                stopLink()
+            }
+        }
+        KushareSwitch.paused.value = !available
+        startForeground(paused = !available)
+        KushareSwitch.refreshTile(this)
+    }
+
+    private fun startLink() {
+        val link = KushareLink.ensure(this)
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        linkScope = scope
+        scope.launch {
+            try {
+                val port = link.startTcpListener(LINK_PORT.toUShort()).toInt()
+                nsd.advertise(link.deviceId(), KushareLink.deviceName(this@KushareService), port)
+            } catch (e: Exception) {
+                Log.w(TAG, "no se pudo iniciar el enlace por Wi-Fi", e)
+            }
+        }
+        scope.launch { bluetoothAcceptLoop(scope) }
+        scope.launch { bluetoothReconnectLoop(scope) }
+        Log.i(TAG, "enlace activo")
+    }
+
+    private fun stopLink() {
+        linkScope?.cancel()
+        linkScope = null
+        runCatching { btServer?.close() }
+        btServer = null
+        scanJob?.cancel()
+        nsd.stopAdvertising()
+        nsd.stopDiscovery()
+        KushareLink.scanning.value = false
+        KushareLink.shutdown()
+    }
+
     private fun startScan() {
+        val scope = linkScope ?: return
         if (scanJob?.isActive == true) return
         KushareLink.discovered.value = emptyMap()
         KushareLink.scanning.value = true
@@ -176,7 +232,7 @@ class KushareService : Service() {
             }
     }
 
-    private fun startForegroundCompat() {
+    private fun startForeground(paused: Boolean) {
         val open =
             PendingIntent.getActivity(
                 this,
@@ -186,15 +242,22 @@ class KushareService : Service() {
             )
         val notification =
             Notification.Builder(this, KushareLink.CHANNEL_SERVICE)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("kushare conectado en segundo plano")
-                .setContentText("Sincronizando notificaciones con tus dispositivos")
+                .setSmallIcon(R.drawable.ic_tile)
+                .setContentTitle(if (paused) "kushare en pausa" else "kushare conectado en segundo plano")
+                .setContentText(
+                    if (paused) {
+                        "Sin Bluetooth ni Wi-Fi; se reanudará al volver alguno"
+                    } else {
+                        "Sincronizando notificaciones con tus dispositivos"
+                    },
+                )
                 .setContentIntent(open)
                 .setOngoing(true)
                 .build()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(FOREGROUND_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
         } else {
+            getSystemService(NotificationManager::class.java).notify(FOREGROUND_ID, notification)
             startForeground(FOREGROUND_ID, notification)
         }
     }
@@ -209,7 +272,7 @@ class KushareService : Service() {
     }
 
     /** Conexiones RFCOMM entrantes del PC. `accept()` bloquea sin gastar CPU. */
-    private suspend fun bluetoothAcceptLoop() {
+    private suspend fun bluetoothAcceptLoop(scope: CoroutineScope) {
         while (scope.isActive) {
             val helper = bluetoothHelper()
             if (helper == null || !hasBluetoothPermission() || !helper.isEnabled()) {
@@ -231,7 +294,8 @@ class KushareService : Service() {
                 val address = socket.remoteDevice.address
                 scope.launch {
                     try {
-                        KushareLink.ensure(this@KushareService).acceptBt(BluetoothSocketIo(socket), address)
+                        val link = KushareLink.service ?: error("enlace apagado")
+                        link.acceptBt(BluetoothSocketIo(socket), address)
                     } catch (e: Exception) {
                         Log.i(TAG, "conexión RFCOMM del enlace rechazada: ${e.message}")
                         runCatching { socket.close() }
@@ -247,7 +311,7 @@ class KushareService : Service() {
      * Reacciona a eventos (ACL conectado, Bluetooth encendido); sin eventos,
      * reintenta con un intervalo que crece de 1 a 15 minutos.
      */
-    private suspend fun bluetoothReconnectLoop() {
+    private suspend fun bluetoothReconnectLoop(scope: CoroutineScope) {
         var backoff = BT_RETRY_MIN_MS
         while (scope.isActive) {
             val woken = withTimeoutOrNull(backoff) { btWakeReconnect.receive() } != null

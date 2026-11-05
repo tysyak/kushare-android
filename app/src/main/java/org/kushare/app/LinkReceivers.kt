@@ -15,7 +15,7 @@ class LinkActionReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        KushareLink.ensure(context)
+        KushareLink.attach(context)
         val deviceId = intent.getStringExtra(EXTRA_DEVICE_ID) ?: return
         when (intent.action) {
             ACTION_PAIR -> KushareLink.respondPairing(deviceId, intent.getBooleanExtra(EXTRA_ACCEPT, false))

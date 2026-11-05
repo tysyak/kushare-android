@@ -51,11 +51,19 @@ object KushareLink {
     val pendingPairing = MutableStateFlow<PairingPrompt?>(null)
     val messages = MutableStateFlow<String?>(null)
 
+    /** Prepara contexto y canales de notificación, sin abrir el enlace. */
+    @Synchronized
+    fun attach(context: Context) {
+        if (::appContext.isInitialized) return
+        appContext = context.applicationContext
+        createChannels()
+    }
+
+    /** Abre el enlace si no está abierto. Solo lo llama [KushareService]. */
     @Synchronized
     fun ensure(context: Context): LinkService {
         service?.let { return it }
-        appContext = context.applicationContext
-        createChannels()
+        attach(context)
         val svc =
             LinkService(
                 File(appContext.filesDir, "link").absolutePath,
@@ -75,13 +83,38 @@ object KushareLink {
             ?: "Android"
 
     fun refreshPeers() {
-        peers.value = service?.peers() ?: emptyList()
+        service?.let { peers.value = it.peers() }
+        if (::appContext.isInitialized) KushareSwitch.refreshTile(appContext)
+    }
+
+    /**
+     * Cierra el enlace (kushare apagado o en pausa): desconecta, detiene la
+     * escucha y la reconexión, y quita los espejos de notificaciones del PC
+     * (ya no se pueden mantener sincronizados). Los peers siguen emparejados.
+     */
+    @Synchronized
+    fun shutdown() {
+        val svc = service ?: return
+        service = null
+        runCatching { svc.shutdown() }
+        runCatching { svc.close() }
+        peers.value = peers.value.map { it.copy(connected = false, transport = null) }
+        pendingPairing.value = null
+        discovered.value = emptyMap()
+        if (::appContext.isInitialized) {
+            val nm = notificationManager()
+            nm.activeNotifications
+                .filter { it.tag?.startsWith("pc/") == true || it.tag?.startsWith("pair/") == true }
+                .forEach { nm.cancel(it.tag, it.id) }
+            KushareSwitch.refreshTile(appContext)
+        }
+        Log.i(TAG, "enlace cerrado")
     }
 
     fun respondPairing(deviceId: String, accept: Boolean) {
         service?.respondPairing(deviceId, accept)
         pendingPairing.update { if (it?.deviceId == deviceId) null else it }
-        notificationManager().cancel(pairingTag(deviceId), PAIRING_ID)
+        if (::appContext.isInitialized) notificationManager().cancel(pairingTag(deviceId), PAIRING_ID)
     }
 
     private fun notificationManager() = appContext.getSystemService(NotificationManager::class.java)

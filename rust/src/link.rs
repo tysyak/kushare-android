@@ -137,6 +137,9 @@ fn actions_from(actions: Vec<NotificationAction>) -> Vec<MobileAction> {
 #[derive(uniffi::Object)]
 pub struct LinkService {
     manager: LinkManager,
+    /// Tareas de fondo (eventos, reconexión, listener TCP), para poder
+    /// detenerlas en [`LinkService::shutdown`].
+    tasks: std::sync::Mutex<Vec<tokio::task::AbortHandle>>,
 }
 
 #[uniffi::export]
@@ -170,14 +173,17 @@ impl LinkService {
         )?;
 
         let names = manager.clone();
-        RUNTIME.spawn(async move {
+        let events_task = RUNTIME.spawn(async move {
             while let Some(event) = events.recv().await {
                 dispatch(&*callback, &names, event);
             }
         });
         let reconnect = manager.clone();
-        RUNTIME.spawn(async move { reconnect.run_reconnect(TcpDialer).await });
-        Ok(Arc::new(Self { manager }))
+        let reconnect_task = RUNTIME.spawn(async move { reconnect.run_reconnect(TcpDialer).await });
+        Ok(Arc::new(Self {
+            manager,
+            tasks: std::sync::Mutex::new(vec![events_task.abort_handle(), reconnect_task.abort_handle()]),
+        }))
     }
 
     pub fn device_id(&self) -> String {
@@ -198,7 +204,7 @@ impl LinkService {
                 };
                 let port = listener.local_addr()?.port();
                 manager.set_tcp_port(port);
-                tokio::spawn(async move {
+                let task = tokio::spawn(async move {
                     loop {
                         let Ok((stream, addr)) = listener.accept().await else { continue };
                         let manager = manager.clone();
@@ -207,10 +213,12 @@ impl LinkService {
                         });
                     }
                 });
-                anyhow::Ok(port)
+                anyhow::Ok((port, task.abort_handle()))
             })
             .await
             .map_err(|e| anyhow::anyhow!("tarea interrumpida: {e}"))??;
+        let (port, task) = port;
+        self.tasks.lock().expect("mutex envenenado").push(task);
         Ok(port)
     }
 
@@ -283,6 +291,17 @@ impl LinkService {
             .await
             .map_err(|e| anyhow::anyhow!("tarea interrumpida: {e}"))??;
         Ok(id)
+    }
+
+    /// Apaga el enlace: cierra todas las conexiones y detiene la escucha, la
+    /// reconexión y los eventos. Los peers emparejados se conservan. Tras
+    /// esto el objeto no sirve; crear otro `LinkService` para volver a
+    /// encender.
+    pub fn shutdown(&self) {
+        for task in self.tasks.lock().expect("mutex envenenado").drain(..) {
+            task.abort();
+        }
+        self.manager.disconnect_all();
     }
 
     /// Reintentar ya la reconexión por Wi-Fi (p. ej. al volver la red), sin
