@@ -42,15 +42,23 @@ object KushareSwitch {
     fun isBluetoothOn(context: Context): Boolean =
         context.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled == true
 
-    fun isWifiConnected(context: Context): Boolean {
-        val cm = context.getSystemService(ConnectivityManager::class.java) ?: return false
-        return cm.allNetworks.any { network ->
-            cm.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-        }
-    }
+    /**
+     * ¿Hay alguna red Wi-Fi conectada? Ante cualquier error (p. ej. falta de
+     * permisos) responde `true`: es preferible no pausar a dejar el servicio
+     * caído o el enlace en pausa para siempre.
+     */
+    fun isWifiConnected(context: Context): Boolean =
+        runCatching {
+            val cm = context.getSystemService(ConnectivityManager::class.java) ?: return true
+            @Suppress("DEPRECATION")
+            cm.allNetworks.any { network ->
+                cm.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+            }
+        }.getOrDefault(true)
 
     /** ¿Hay algún medio por el que sincronizar? */
-    fun radiosAvailable(context: Context): Boolean = isBluetoothOn(context) || isWifiConnected(context)
+    fun radiosAvailable(context: Context): Boolean =
+        runCatching { isBluetoothOn(context) }.getOrDefault(true) || isWifiConnected(context)
 
     /** Pide al sistema que vuelva a dibujar el botón de ajustes rápidos. */
     fun refreshTile(context: Context) {
