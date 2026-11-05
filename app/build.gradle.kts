@@ -15,9 +15,29 @@ android {
         versionName = "0.2.0"
     }
 
+    // Firma de release: la clave y sus contraseñas viven FUERA del repo, en
+    // ~/.gradle/gradle.properties (KUSHARE_RELEASE_*). Sin ellas, el APK de
+    // release sale sin firmar.
+    val releaseStore = providers.gradleProperty("KUSHARE_RELEASE_STORE_FILE").orNull
+    signingConfigs {
+        if (releaseStore != null) {
+            create("release") {
+                storeFile = file(releaseStore)
+                storePassword = providers.gradleProperty("KUSHARE_RELEASE_STORE_PASSWORD").get()
+                keyAlias = providers.gradleProperty("KUSHARE_RELEASE_KEY_ALIAS").get()
+                keyPassword = providers.gradleProperty("KUSHARE_RELEASE_KEY_PASSWORD").get()
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8: quita código y recursos no usados (p. ej. los miles de
+            // iconos de material-icons-extended) y ofusca.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 

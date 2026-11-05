@@ -92,6 +92,26 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Después de tocar los crates de kushare (`kushare-link`, `kushare-transfer`, …) hay que repetir el paso 1, y el 2 si cambió algo exportado con `#[uniffi::export]`.
 
+## Firma de release
+
+`make release` genera el APK de producción (`app/build/outputs/apk/release/app-release.apk`): con R8 (quita código y recursos sin usar), no depurable y firmado con tu clave. La clave **no está en el repo**; se lee de `~/.gradle/gradle.properties`:
+
+```properties
+KUSHARE_RELEASE_STORE_FILE=/home/<usuario>/.android/kushare-release.jks
+KUSHARE_RELEASE_STORE_PASSWORD=…
+KUSHARE_RELEASE_KEY_ALIAS=kushare
+KUSHARE_RELEASE_KEY_PASSWORD=…
+```
+
+Para crear una clave nueva:
+
+```sh
+keytool -genkeypair -keystore ~/.android/kushare-release.jks -storetype PKCS12 \
+  -alias kushare -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=kushare, O=kushare"
+```
+
+**Guarda una copia de la clave y de su contraseña**: las actualizaciones solo se instalan encima si están firmadas con la misma clave. Sin las propiedades, el APK de release sale sin firmar.
+
 ## Probar con adb
 
 ```sh

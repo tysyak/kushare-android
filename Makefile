@@ -4,15 +4,17 @@
 #   make install    lo anterior e instalarlo en el teléfono conectado por adb
 #   make native     solo la biblioteca Rust (tras tocar los crates de kushare)
 #   make bindings   regenerar los bindings Kotlin (tras cambiar la API #[uniffi::export])
+#   make release    APK de producción firmado (requiere la clave, ver README)
 
 ABI      ?= arm64-v8a
 TARGET   ?= aarch64-linux-android
 PROFILE  ?= release
 SO        = rust/target/$(TARGET)/$(PROFILE)/libkushare_mobile.so
 APK       = app/build/outputs/apk/debug/app-debug.apk
+APK_RELEASE = app/build/outputs/apk/release/app-release.apk
 PKG       = org.kushare.app
 
-.PHONY: all native bindings apk install run logs grant-listener clean
+.PHONY: all native bindings apk release install install-release run logs grant-listener clean
 
 all: apk
 
@@ -26,6 +28,15 @@ bindings: native
 
 apk: bindings
 	./gradlew assembleDebug
+
+# APK de producción: firmado con la clave de ~/.gradle/gradle.properties
+# (KUSHARE_RELEASE_*), con R8. Ver README, sección "Firma de release".
+release: bindings
+	./gradlew assembleRelease
+
+install-release: release
+	adb install -r $(APK_RELEASE)
+	$(MAKE) grant-listener
 
 install: apk
 	adb install -r $(APK)
