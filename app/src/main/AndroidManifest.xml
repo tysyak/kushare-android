@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <!-- Requerida desde Android 13 (API 33) para que NsdManager pueda
+         descubrir/anunciar servicios por Wi-Fi. neverForLocation: kushare
+         no usa esto para inferir ubicación, solo para hablar mDNS. -->
+    <uses-permission
+        android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation" />
+
+    <!-- Transporte alternativo por Bluetooth RFCOMM clásico (ver
+         BluetoothHelper.kt), para cuando no hay conectividad IP entre el
+         PC y el Android. BLUETOOTH/BLUETOOTH_ADMIN cubren Android <= 11
+         (API 30); BLUETOOTH_CONNECT es el permiso en tiempo de ejecución
+         desde Android 12 (API 31). -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!-- Solo para adapter.cancelDiscovery() antes de conectar, no para
+         escanear activamente; neverForLocation evita tener que pedir
+         también permiso de ubicación. -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation" />
+
+    <!-- Enlace persistente (notificaciones): servicio en primer plano de
+         tipo connectedDevice (Android 14+ exige el permiso del tipo;
+         CHANGE_WIFI_MULTICAST_STATE, ya declarado arriba, cumple el
+         requisito previo de ese tipo), notificaciones propias (espejos del
+         PC y el PIN) y arranque al encender el teléfono. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Nombre e icono de las apps cuyas notificaciones se reenvían (respaldo
+         si la notificación no trae su ApplicationInfo en los extras). -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+        </intent>
+    </queries>
+
+    <!-- allowBackup=false: files/link/identity.key es la clave privada de
+         identidad; restaurarla en otro teléfono clonaría la identidad
+         emparejada con el PC. -->
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".KushareService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+
+        <service
+            android:name=".KushareNotificationListener"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".LinkActionReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

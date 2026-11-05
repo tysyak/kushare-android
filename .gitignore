@@ -1,0 +1,15 @@
+# Gradle / Android Studio
+.gradle/
+.kotlin/
+build/
+app/build/
+.idea/
+*.iml
+local.properties
+captures/
+
+# Rust
+rust/target/
+
+# Biblioteca nativa compilada: se regenera con cargo-ndk (ver README).
+app/src/main/jniLibs/

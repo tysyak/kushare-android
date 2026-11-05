@@ -1,0 +1,36 @@
+[package]
+name = "kushare_mobile"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "kushare_mobile"
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
+required-features = ["cli"]
+
+[dependencies]
+anyhow = "1.0.104"
+tokio = { version = "1.53.1", features = ["rt-multi-thread", "net", "fs", "sync", "time", "io-util", "macros"] }
+uniffi = "0.32.1"
+kushare-core = { path = "../../kushare/crates/kushare-core" }
+kushare-proto = { path = "../../kushare/crates/kushare-proto" }
+kushare-crypto = { path = "../../kushare/crates/kushare-crypto" }
+# default-features = false: evita arrastrar `bluer` (feature "bluetooth"),
+# que enlaza contra BlueZ/D-Bus vía libdbus — específico de Linux de
+# escritorio y no compila para el target aarch64-linux-android. El lado
+# Android implementa su propio transporte Bluetooth clásico en Kotlin
+# (`BluetoothSocket`) y lo conecta al mismo handshake/framing de
+# `kushare_transfer` vía el puente `CallbackStream` en `src/bt_bridge.rs`.
+kushare-transfer = { path = "../../kushare/crates/kushare-transfer", default-features = false }
+thiserror = "2.0.20"
+kushare-link = { path = "../../kushare/crates/kushare-link" }
+
+[features]
+default = []
+# Solo para compilar el binario uniffi-bindgen (ver uniffi-bindgen.rs): así
+# el cdylib que termina en el APK no carga el CLI completo de uniffi.
+cli = ["uniffi/cli"]
