@@ -56,6 +56,7 @@ class KushareNotificationListener : NotificationListenerService() {
         instance = this
         KushareLink.attach(this)
         KushareService.start(this) // no hace nada si el usuario apagó kushare
+        PhoneFeatures.onListenerConnected()
         // Las ya presentes no se reenvían (evita inundar el PC en cada
         // reconexión), pero se recuerdan para poder actuar sobre ellas.
         runCatching { activeNotifications }.getOrNull()?.forEach { sbn ->
@@ -69,6 +70,11 @@ class KushareNotificationListener : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
+        if (sbn.notification.category == Notification.CATEGORY_CALL) {
+            // Nombre o número del llamante para el aviso de llamada del PC.
+            val caller = sbn.notification.extras.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty()
+            PhoneFeatures.onCallNotification(caller)
+        }
         if (!shouldForward(sbn)) return
         active[sbn.key] = sbn
         val service = KushareLink.service ?: return

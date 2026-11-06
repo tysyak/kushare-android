@@ -20,6 +20,8 @@ use std::time::Duration;
 use tokio::net::{TcpListener, TcpStream};
 
 use crate::bt_bridge::{ByteStreamIo, CallbackStream};
+use crate::features::{self, MobileAudioOutput, MobileBattery, MobilePhoto, MobilePlayer, SharedCache};
+use kushare_link::pb::{self, feature::Kind as F};
 use crate::{MobileError, RUNTIME};
 
 #[derive(Debug, Clone, uniffi::Record)]
@@ -95,6 +97,23 @@ pub trait LinkCallback: Send + Sync {
     fn on_dismiss_local(&self, device_id: String, key: String);
     fn on_action_requested(&self, device_id: String, key: String, action_id: String);
     fn on_reply_requested(&self, device_id: String, key: String, action_id: String, text: String);
+
+    // --- Funciones extra (ver `features.rs`) ---
+    fn on_peer_battery(&self, device_id: String, battery: MobileBattery);
+    fn on_peer_players(&self, device_id: String, players: Vec<MobilePlayer>);
+    fn on_peer_audio_outputs(&self, device_id: String, selectable: bool, outputs: Vec<MobileAudioOutput>);
+    /// El peer pide controlar un reproductor del teléfono (`player_id`
+    /// vacío = todos). `action`: play-pause|play|pause|next|previous|stop.
+    fn on_media_command(&self, device_id: String, player_id: String, action: String);
+    fn on_set_audio_output(&self, device_id: String, output_id: String);
+    /// `mode`: normal|vibrate|silent.
+    fn on_set_ringer(&self, device_id: String, mode: String);
+    /// `action`: answer|reject|hangup|mute|unmute.
+    fn on_call_command(&self, device_id: String, action: String);
+    /// Responder con [`LinkService::send_photo_list`].
+    fn on_photo_list_request(&self, device_id: String, request_id: u64, offset: u32, limit: u32);
+    /// Responder con [`LinkService::send_photo_data`] (uno o varios trozos).
+    fn on_photo_request(&self, device_id: String, request_id: u64, photo_id: String);
 }
 
 const TCP_DIAL_TIMEOUT: Duration = Duration::from_secs(4);
@@ -137,6 +156,8 @@ fn actions_from(actions: Vec<NotificationAction>) -> Vec<MobileAction> {
 #[derive(uniffi::Object)]
 pub struct LinkService {
     manager: LinkManager,
+    /// Último estado local publicado (se reenvía a cada peer que conecta).
+    cache: SharedCache,
     /// Tareas de fondo (eventos, reconexión, listener TCP), para poder
     /// detenerlas en [`LinkService::shutdown`].
     tasks: std::sync::Mutex<Vec<tokio::task::AbortHandle>>,
@@ -173,15 +194,18 @@ impl LinkService {
         )?;
 
         let names = manager.clone();
+        let cache = SharedCache::default();
+        let events_cache = cache.clone();
         let events_task = RUNTIME.spawn(async move {
             while let Some(event) = events.recv().await {
-                dispatch(&*callback, &names, event);
+                dispatch(&*callback, &names, &events_cache, event);
             }
         });
         let reconnect = manager.clone();
         let reconnect_task = RUNTIME.spawn(async move { reconnect.run_reconnect(TcpDialer).await });
         Ok(Arc::new(Self {
             manager,
+            cache,
             tasks: std::sync::Mutex::new(vec![events_task.abort_handle(), reconnect_task.abort_handle()]),
         }))
     }
@@ -399,6 +423,148 @@ impl LinkService {
             .collect()
     }
 
+    // --- Funciones extra: estado local del teléfono --------------------
+
+    pub fn publish_battery(&self, battery: MobileBattery) {
+        let b = pb::BatteryStatus {
+            present: battery.present,
+            percent: battery.percent.min(100),
+            charging: battery.charging,
+        };
+        features::publish(&self.manager, &self.cache, F::Battery(b));
+    }
+
+    pub fn publish_players(&self, players: Vec<MobilePlayer>) {
+        let players = pb::MediaPlayers {
+            players: players.into_iter().map(features::player_to_pb).collect(),
+        };
+        features::publish(&self.manager, &self.cache, F::MediaPlayers(players));
+    }
+
+    pub fn publish_audio_outputs(&self, selectable: bool, outputs: Vec<MobileAudioOutput>) {
+        let outputs = pb::AudioOutputs {
+            selectable,
+            outputs: outputs
+                .into_iter()
+                .map(|o| pb::AudioOutput {
+                    id: o.id,
+                    name: o.name,
+                    active: o.active,
+                })
+                .collect(),
+        };
+        features::publish(&self.manager, &self.cache, F::AudioOutputs(outputs));
+    }
+
+    /// `mode`: normal|vibrate|silent.
+    pub fn publish_ringer(&self, mode: String) {
+        let ringer = pb::RingerMode {
+            mode: features::ringer_from(&mode).into(),
+        };
+        features::publish(&self.manager, &self.cache, F::RingerMode(ringer));
+    }
+
+    /// `phase`: idle|ringing|active|dialing.
+    pub fn publish_call_state(&self, phase: String, number: String, name: String, muted: bool) {
+        let call = pb::CallState {
+            phase: features::call_phase_from(&phase).into(),
+            number,
+            name,
+            muted,
+        };
+        features::publish(&self.manager, &self.cache, F::CallState(call));
+    }
+
+    /// Respuesta a [`LinkCallback::on_photo_list_request`].
+    pub async fn send_photo_list(
+        &self,
+        device_id: String,
+        request_id: u64,
+        total: u32,
+        photos: Vec<MobilePhoto>,
+    ) -> Result<(), MobileError> {
+        let list = pb::PhotoList {
+            request_id,
+            total,
+            photos: photos
+                .into_iter()
+                .map(|p| pb::PhotoInfo {
+                    id: p.id,
+                    name: p.name,
+                    date_ms: p.date_ms,
+                    width: p.width,
+                    height: p.height,
+                    size: p.size,
+                    thumbnail: p.thumbnail,
+                })
+                .collect(),
+        };
+        let manager = self.manager.clone();
+        RUNTIME
+            .spawn(async move {
+                manager
+                    .send_feature_wait(&device_id, pb::Feature { kind: Some(F::PhotoList(list)) })
+                    .await
+            })
+            .await
+            .map_err(|e| anyhow::anyhow!(e))??;
+        Ok(())
+    }
+
+    /// Un trozo de la foto pedida en [`LinkCallback::on_photo_request`].
+    /// Espera a que haya sitio en la cola del enlace (no se pierde ningún
+    /// trozo). `error` no vacío = no se pudo leer (y cierra la respuesta).
+    #[allow(clippy::too_many_arguments)]
+    pub async fn send_photo_data(
+        &self,
+        device_id: String,
+        request_id: u64,
+        photo_id: String,
+        name: String,
+        offset: u64,
+        data: Vec<u8>,
+        last: bool,
+        error: String,
+    ) -> Result<(), MobileError> {
+        let chunk = pb::PhotoData {
+            request_id,
+            id: photo_id,
+            name,
+            offset,
+            data,
+            last: last || !error.is_empty(),
+            error,
+        };
+        let manager = self.manager.clone();
+        RUNTIME
+            .spawn(async move {
+                manager
+                    .send_feature_wait(&device_id, pb::Feature { kind: Some(F::PhotoData(chunk)) })
+                    .await
+            })
+            .await
+            .map_err(|e| anyhow::anyhow!(e))??;
+        Ok(())
+    }
+
+    // --- Funciones extra: control del peer (el PC) ------------------------
+
+    /// `player_id` vacío = todos. `action`: play-pause|play|pause|next|previous|stop.
+    pub fn send_media_command(&self, device_id: String, player_id: String, action: String) {
+        let cmd = pb::MediaCommand {
+            player_id,
+            action: features::media_action_from(&action).into(),
+        };
+        self.manager
+            .send_feature(&device_id, pb::Feature { kind: Some(F::MediaCommand(cmd)) });
+    }
+
+    pub fn send_set_audio_output(&self, device_id: String, output_id: String) {
+        let set = pb::SetAudioOutput { id: output_id };
+        self.manager
+            .send_feature(&device_id, pb::Feature { kind: Some(F::SetAudioOutput(set)) });
+    }
+
     pub fn local_apps(&self) -> Vec<MobileApp> {
         self.manager
             .local_apps()
@@ -408,8 +574,13 @@ impl LinkService {
     }
 }
 
-fn dispatch(callback: &dyn LinkCallback, manager: &LinkManager, event: LinkEvent) {
+fn dispatch(callback: &dyn LinkCallback, manager: &LinkManager, cache: &SharedCache, event: LinkEvent) {
     match event {
+        LinkEvent::PeerConnected { device_id, .. } => {
+            features::send_cached(manager, cache, &device_id);
+            callback.on_peers_changed();
+        }
+        LinkEvent::Feature { device_id, feature } => features::dispatch(callback, device_id, feature),
         LinkEvent::PairingRequested {
             device_id,
             device_name,
@@ -424,8 +595,7 @@ fn dispatch(callback: &dyn LinkCallback, manager: &LinkManager, event: LinkEvent
             callback.on_pairing_finished(device_id, device_name, accepted);
             callback.on_peers_changed();
         }
-        LinkEvent::PeerConnected { .. }
-        | LinkEvent::PeerDisconnected { .. }
+        LinkEvent::PeerDisconnected { .. }
         | LinkEvent::PeerUnpaired { .. }
         | LinkEvent::ConfigChanged { .. } => callback.on_peers_changed(),
         LinkEvent::NotificationPosted {

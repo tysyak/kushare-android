@@ -702,6 +702,33 @@ internal interface UniffiCallbackInterfaceLinkCallbackMethod6 : com.sun.jna.Call
 internal interface UniffiCallbackInterfaceLinkCallbackMethod7 : com.sun.jna.Callback {
     fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`key`: RustBuffer.ByValue,`actionId`: RustBuffer.ByValue,`text`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
 }
+internal interface UniffiCallbackInterfaceLinkCallbackMethod8 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`battery`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod9 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`players`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod10 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`selectable`: Byte,`outputs`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod11 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`playerId`: RustBuffer.ByValue,`action`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod12 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`outputId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod13 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`mode`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod14 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`action`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod15 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`offset`: Int,`limit`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod16 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`photoId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
 @Structure.FieldOrder("uniffiFree", "uniffiClone", "onIncomingRequest", "onCompleted", "onFailed")
 internal open class UniffiVTableCallbackInterfaceReceiveCallback(
     @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
@@ -771,7 +798,7 @@ internal open class UniffiVTableCallbackInterfaceByteStreamIo(
     }
 
 }
-@Structure.FieldOrder("uniffiFree", "uniffiClone", "onPairingRequested", "onPairingFinished", "onPeersChanged", "onNotificationPosted", "onNotificationRemoved", "onDismissLocal", "onActionRequested", "onReplyRequested")
+@Structure.FieldOrder("uniffiFree", "uniffiClone", "onPairingRequested", "onPairingFinished", "onPeersChanged", "onNotificationPosted", "onNotificationRemoved", "onDismissLocal", "onActionRequested", "onReplyRequested", "onPeerBattery", "onPeerPlayers", "onPeerAudioOutputs", "onMediaCommand", "onSetAudioOutput", "onSetRinger", "onCallCommand", "onPhotoListRequest", "onPhotoRequest")
 internal open class UniffiVTableCallbackInterfaceLinkCallback(
     @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
     @JvmField internal var `uniffiClone`: UniffiCallbackInterfaceClone? = null,
@@ -783,6 +810,15 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
     @JvmField internal var `onDismissLocal`: UniffiCallbackInterfaceLinkCallbackMethod5? = null,
     @JvmField internal var `onActionRequested`: UniffiCallbackInterfaceLinkCallbackMethod6? = null,
     @JvmField internal var `onReplyRequested`: UniffiCallbackInterfaceLinkCallbackMethod7? = null,
+    @JvmField internal var `onPeerBattery`: UniffiCallbackInterfaceLinkCallbackMethod8? = null,
+    @JvmField internal var `onPeerPlayers`: UniffiCallbackInterfaceLinkCallbackMethod9? = null,
+    @JvmField internal var `onPeerAudioOutputs`: UniffiCallbackInterfaceLinkCallbackMethod10? = null,
+    @JvmField internal var `onMediaCommand`: UniffiCallbackInterfaceLinkCallbackMethod11? = null,
+    @JvmField internal var `onSetAudioOutput`: UniffiCallbackInterfaceLinkCallbackMethod12? = null,
+    @JvmField internal var `onSetRinger`: UniffiCallbackInterfaceLinkCallbackMethod13? = null,
+    @JvmField internal var `onCallCommand`: UniffiCallbackInterfaceLinkCallbackMethod14? = null,
+    @JvmField internal var `onPhotoListRequest`: UniffiCallbackInterfaceLinkCallbackMethod15? = null,
+    @JvmField internal var `onPhotoRequest`: UniffiCallbackInterfaceLinkCallbackMethod16? = null,
 ) : Structure() {
     class UniffiByValue(
         `uniffiFree`: UniffiCallbackInterfaceFree? = null,
@@ -795,7 +831,16 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
         `onDismissLocal`: UniffiCallbackInterfaceLinkCallbackMethod5? = null,
         `onActionRequested`: UniffiCallbackInterfaceLinkCallbackMethod6? = null,
         `onReplyRequested`: UniffiCallbackInterfaceLinkCallbackMethod7? = null,
-    ): UniffiVTableCallbackInterfaceLinkCallback(`uniffiFree`,`uniffiClone`,`onPairingRequested`,`onPairingFinished`,`onPeersChanged`,`onNotificationPosted`,`onNotificationRemoved`,`onDismissLocal`,`onActionRequested`,`onReplyRequested`,), Structure.ByValue
+        `onPeerBattery`: UniffiCallbackInterfaceLinkCallbackMethod8? = null,
+        `onPeerPlayers`: UniffiCallbackInterfaceLinkCallbackMethod9? = null,
+        `onPeerAudioOutputs`: UniffiCallbackInterfaceLinkCallbackMethod10? = null,
+        `onMediaCommand`: UniffiCallbackInterfaceLinkCallbackMethod11? = null,
+        `onSetAudioOutput`: UniffiCallbackInterfaceLinkCallbackMethod12? = null,
+        `onSetRinger`: UniffiCallbackInterfaceLinkCallbackMethod13? = null,
+        `onCallCommand`: UniffiCallbackInterfaceLinkCallbackMethod14? = null,
+        `onPhotoListRequest`: UniffiCallbackInterfaceLinkCallbackMethod15? = null,
+        `onPhotoRequest`: UniffiCallbackInterfaceLinkCallbackMethod16? = null,
+    ): UniffiVTableCallbackInterfaceLinkCallback(`uniffiFree`,`uniffiClone`,`onPairingRequested`,`onPairingFinished`,`onPeersChanged`,`onNotificationPosted`,`onNotificationRemoved`,`onDismissLocal`,`onActionRequested`,`onReplyRequested`,`onPeerBattery`,`onPeerPlayers`,`onPeerAudioOutputs`,`onMediaCommand`,`onSetAudioOutput`,`onSetRinger`,`onCallCommand`,`onPhotoListRequest`,`onPhotoRequest`,), Structure.ByValue
 
    internal fun uniffiSetValue(other: UniffiVTableCallbackInterfaceLinkCallback) {
         `uniffiFree` = other.`uniffiFree`
@@ -808,6 +853,15 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
         `onDismissLocal` = other.`onDismissLocal`
         `onActionRequested` = other.`onActionRequested`
         `onReplyRequested` = other.`onReplyRequested`
+        `onPeerBattery` = other.`onPeerBattery`
+        `onPeerPlayers` = other.`onPeerPlayers`
+        `onPeerAudioOutputs` = other.`onPeerAudioOutputs`
+        `onMediaCommand` = other.`onMediaCommand`
+        `onSetAudioOutput` = other.`onSetAudioOutput`
+        `onSetRinger` = other.`onSetRinger`
+        `onCallCommand` = other.`onCallCommand`
+        `onPhotoListRequest` = other.`onPhotoListRequest`
+        `onPhotoRequest` = other.`onPhotoRequest`
     }
 
 }
@@ -872,11 +926,29 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_post_local_notification(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_audio_outputs(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_battery(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_call_state(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_players(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_ringer(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_remove_local_notification(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_reply_remote(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_respond_pairing(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_media_command(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_photo_data(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_photo_list(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_set_audio_output(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_set_app_blocked(
     ): Int
@@ -921,6 +993,24 @@ internal object IntegrityCheckingUniffiLib {
     external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_action_requested(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_reply_requested(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_peer_battery(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_peer_players(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_peer_audio_outputs(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_media_command(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_set_audio_output(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_set_ringer(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_call_command(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_list_request(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_request(
     ): Int
     external fun ffi_kushare_mobile_uniffi_contract_version(
     ): Int
@@ -982,12 +1072,30 @@ internal object UniffiLib {
     ): RustBuffer.ByValue
     external fun uniffi_kushare_mobile_fn_method_linkservice_post_local_notification(`ptr`: Long,`notification`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_publish_audio_outputs(`ptr`: Long,`selectable`: Byte,`outputs`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_publish_battery(`ptr`: Long,`battery`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_publish_call_state(`ptr`: Long,`phase`: RustBuffer.ByValue,`number`: RustBuffer.ByValue,`name`: RustBuffer.ByValue,`muted`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_publish_players(`ptr`: Long,`players`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_publish_ringer(`ptr`: Long,`mode`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_remove_local_notification(`ptr`: Long,`key`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_reply_remote(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`key`: RustBuffer.ByValue,`actionId`: RustBuffer.ByValue,`text`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_respond_pairing(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`accept`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Byte
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_media_command(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`playerId`: RustBuffer.ByValue,`action`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_photo_data(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`photoId`: RustBuffer.ByValue,`name`: RustBuffer.ByValue,`offset`: Long,`data`: RustBuffer.ByValue,`last`: Byte,`error`: RustBuffer.ByValue,
+    ): Long
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_photo_list(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`total`: Int,`photos`: RustBuffer.ByValue,
+    ): Long
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_set_audio_output(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outputId`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_set_app_blocked(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outgoing`: Byte,`appId`: RustBuffer.ByValue,`blocked`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_set_direction(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outgoing`: Byte,`enabled`: Byte,uniffi_out_err: UniffiRustCallStatus, 
@@ -1194,6 +1302,21 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_post_local_notification() and 0xFFFF) != 49916) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_publish_audio_outputs() and 0xFFFF) != 45127) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_publish_battery() and 0xFFFF) != 54035) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_publish_call_state() and 0xFFFF) != 20633) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_publish_players() and 0xFFFF) != 31979) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_publish_ringer() and 0xFFFF) != 26391) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_remove_local_notification() and 0xFFFF) != 30434) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1201,6 +1324,18 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_respond_pairing() and 0xFFFF) != 37658) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_media_command() and 0xFFFF) != 41604) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_photo_data() and 0xFFFF) != 43971) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_photo_list() and 0xFFFF) != 1724) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_set_audio_output() and 0xFFFF) != 1181) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_set_app_blocked() and 0xFFFF) != 35477) {
@@ -1267,6 +1402,33 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_reply_requested() and 0xFFFF) != 19540) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_peer_battery() and 0xFFFF) != 2433) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_peer_players() and 0xFFFF) != 50198) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_peer_audio_outputs() and 0xFFFF) != 45208) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_media_command() and 0xFFFF) != 35177) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_set_audio_output() and 0xFFFF) != 52235) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_set_ringer() and 0xFFFF) != 5530) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_call_command() and 0xFFFF) != 31415) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_list_request() and 0xFFFF) != 50632) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_request() and 0xFFFF) != 17283) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
 }
@@ -1833,11 +1995,46 @@ public interface LinkServiceInterface {
     
     fun `postLocalNotification`(`notification`: MobileNotification)
     
+    fun `publishAudioOutputs`(`selectable`: kotlin.Boolean, `outputs`: List<MobileAudioOutput>)
+    
+    fun `publishBattery`(`battery`: MobileBattery)
+    
+    /**
+     * `phase`: idle|ringing|active|dialing.
+     */
+    fun `publishCallState`(`phase`: kotlin.String, `number`: kotlin.String, `name`: kotlin.String, `muted`: kotlin.Boolean)
+    
+    fun `publishPlayers`(`players`: List<MobilePlayer>)
+    
+    /**
+     * `mode`: normal|vibrate|silent.
+     */
+    fun `publishRinger`(`mode`: kotlin.String)
+    
     fun `removeLocalNotification`(`key`: kotlin.String)
     
     fun `replyRemote`(`deviceId`: kotlin.String, `key`: kotlin.String, `actionId`: kotlin.String, `text`: kotlin.String)
     
     fun `respondPairing`(`deviceId`: kotlin.String, `accept`: kotlin.Boolean): kotlin.Boolean
+    
+    /**
+     * `player_id` vacío = todos. `action`: play-pause|play|pause|next|previous|stop.
+     */
+    fun `sendMediaCommand`(`deviceId`: kotlin.String, `playerId`: kotlin.String, `action`: kotlin.String)
+    
+    /**
+     * Un trozo de la foto pedida en [`LinkCallback::on_photo_request`].
+     * Espera a que haya sitio en la cola del enlace (no se pierde ningún
+     * trozo). `error` no vacío = no se pudo leer (y cierra la respuesta).
+     */
+    suspend fun `sendPhotoData`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `photoId`: kotlin.String, `name`: kotlin.String, `offset`: kotlin.ULong, `data`: kotlin.ByteArray, `last`: kotlin.Boolean, `error`: kotlin.String)
+    
+    /**
+     * Respuesta a [`LinkCallback::on_photo_list_request`].
+     */
+    suspend fun `sendPhotoList`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `total`: kotlin.UInt, `photos`: List<MobilePhoto>)
+    
+    fun `sendSetAudioOutput`(`deviceId`: kotlin.String, `outputId`: kotlin.String)
     
     fun `setAppBlocked`(`deviceId`: kotlin.String, `outgoing`: kotlin.Boolean, `appId`: kotlin.String, `blocked`: kotlin.Boolean)
     
@@ -2211,6 +2408,81 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
     
     
 
+    override fun `publishAudioOutputs`(`selectable`: kotlin.Boolean, `outputs`: List<MobileAudioOutput>)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_publish_audio_outputs(
+        it,
+        
+        FfiConverterBoolean.lower(`selectable`),
+        FfiConverterSequenceTypeMobileAudioOutput.lower(`outputs`),_status)
+}
+    }
+    
+    
+
+    override fun `publishBattery`(`battery`: MobileBattery)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_publish_battery(
+        it,
+        
+        FfiConverterTypeMobileBattery.lower(`battery`),_status)
+}
+    }
+    
+    
+
+    
+    /**
+     * `phase`: idle|ringing|active|dialing.
+     */override fun `publishCallState`(`phase`: kotlin.String, `number`: kotlin.String, `name`: kotlin.String, `muted`: kotlin.Boolean)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_publish_call_state(
+        it,
+        
+        FfiConverterString.lower(`phase`),
+        FfiConverterString.lower(`number`),
+        FfiConverterString.lower(`name`),
+        FfiConverterBoolean.lower(`muted`),_status)
+}
+    }
+    
+    
+
+    override fun `publishPlayers`(`players`: List<MobilePlayer>)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_publish_players(
+        it,
+        
+        FfiConverterSequenceTypeMobilePlayer.lower(`players`),_status)
+}
+    }
+    
+    
+
+    
+    /**
+     * `mode`: normal|vibrate|silent.
+     */override fun `publishRinger`(`mode`: kotlin.String)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_publish_ringer(
+        it,
+        
+        FfiConverterString.lower(`mode`),_status)
+}
+    }
+    
+    
+
     override fun `removeLocalNotification`(`key`: kotlin.String)
         = 
     callWithHandle {
@@ -2253,6 +2525,102 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
     }
     )
     }
+    
+
+    
+    /**
+     * `player_id` vacío = todos. `action`: play-pause|play|pause|next|previous|stop.
+     */override fun `sendMediaCommand`(`deviceId`: kotlin.String, `playerId`: kotlin.String, `action`: kotlin.String)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_media_command(
+        it,
+        
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterString.lower(`playerId`),
+        FfiConverterString.lower(`action`),_status)
+}
+    }
+    
+    
+
+    
+    /**
+     * Un trozo de la foto pedida en [`LinkCallback::on_photo_request`].
+     * Espera a que haya sitio en la cola del enlace (no se pierde ningún
+     * trozo). `error` no vacío = no se pudo leer (y cierra la respuesta).
+     */
+    @Throws(MobileException::class)
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+    override suspend fun `sendPhotoData`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `photoId`: kotlin.String, `name`: kotlin.String, `offset`: kotlin.ULong, `data`: kotlin.ByteArray, `last`: kotlin.Boolean, `error`: kotlin.String) {
+        return uniffiRustCallAsync(
+        callWithHandle { uniffiHandle ->
+            UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_photo_data(
+                uniffiHandle,
+                
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterULong.lower(`requestId`),
+        FfiConverterString.lower(`photoId`),
+        FfiConverterString.lower(`name`),
+        FfiConverterULong.lower(`offset`),
+        FfiConverterByteArray.lower(`data`),
+        FfiConverterBoolean.lower(`last`),
+        FfiConverterString.lower(`error`),
+            )
+        },
+        { future, callback, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_poll_void(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_complete_void(future, continuation) },
+        { future -> UniffiLib.ffi_kushare_mobile_rust_future_free_void(future) },
+        // lift function
+        { Unit },
+        
+        // Error FFI converter
+        MobileException.ErrorHandler,
+    )
+    }
+
+    
+    /**
+     * Respuesta a [`LinkCallback::on_photo_list_request`].
+     */
+    @Throws(MobileException::class)
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+    override suspend fun `sendPhotoList`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `total`: kotlin.UInt, `photos`: List<MobilePhoto>) {
+        return uniffiRustCallAsync(
+        callWithHandle { uniffiHandle ->
+            UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_photo_list(
+                uniffiHandle,
+                
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterULong.lower(`requestId`),
+        FfiConverterUInt.lower(`total`),
+        FfiConverterSequenceTypeMobilePhoto.lower(`photos`),
+            )
+        },
+        { future, callback, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_poll_void(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_complete_void(future, continuation) },
+        { future -> UniffiLib.ffi_kushare_mobile_rust_future_free_void(future) },
+        // lift function
+        { Unit },
+        
+        // Error FFI converter
+        MobileException.ErrorHandler,
+    )
+    }
+
+    override fun `sendSetAudioOutput`(`deviceId`: kotlin.String, `outputId`: kotlin.String)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_set_audio_output(
+        it,
+        
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterString.lower(`outputId`),_status)
+}
+    }
+    
     
 
     
@@ -2774,6 +3142,92 @@ public object FfiConverterTypeMobileApp: FfiConverterRustBuffer<MobileApp> {
 
 
 
+data class MobileAudioOutput (
+    var `id`: kotlin.String
+    , 
+    var `name`: kotlin.String
+    , 
+    var `active`: kotlin.Boolean
+    
+){
+    
+
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMobileAudioOutput: FfiConverterRustBuffer<MobileAudioOutput> {
+    override fun read(buf: ByteBuffer): MobileAudioOutput {
+        return MobileAudioOutput(
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterBoolean.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MobileAudioOutput) = (
+            FfiConverterString.allocationSize(value.`id`) +
+            FfiConverterString.allocationSize(value.`name`) +
+            FfiConverterBoolean.allocationSize(value.`active`)
+    )
+
+    override fun write(value: MobileAudioOutput, buf: ByteBuffer) {
+            FfiConverterString.write(value.`id`, buf)
+            FfiConverterString.write(value.`name`, buf)
+            FfiConverterBoolean.write(value.`active`, buf)
+    }
+}
+
+
+
+data class MobileBattery (
+    var `present`: kotlin.Boolean
+    , 
+    var `percent`: kotlin.UInt
+    , 
+    var `charging`: kotlin.Boolean
+    
+){
+    
+
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMobileBattery: FfiConverterRustBuffer<MobileBattery> {
+    override fun read(buf: ByteBuffer): MobileBattery {
+        return MobileBattery(
+            FfiConverterBoolean.read(buf),
+            FfiConverterUInt.read(buf),
+            FfiConverterBoolean.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MobileBattery) = (
+            FfiConverterBoolean.allocationSize(value.`present`) +
+            FfiConverterUInt.allocationSize(value.`percent`) +
+            FfiConverterBoolean.allocationSize(value.`charging`)
+    )
+
+    override fun write(value: MobileBattery, buf: ByteBuffer) {
+            FfiConverterBoolean.write(value.`present`, buf)
+            FfiConverterUInt.write(value.`percent`, buf)
+            FfiConverterBoolean.write(value.`charging`, buf)
+    }
+}
+
+
+
 /**
  * Notificación de ESTE teléfono, para reenviar.
  */
@@ -2929,6 +3383,153 @@ public object FfiConverterTypeMobilePeer: FfiConverterRustBuffer<MobilePeer> {
             FfiConverterSequenceString.write(value.`outgoingBlocked`, buf)
             FfiConverterSequenceString.write(value.`incomingBlocked`, buf)
             FfiConverterSequenceTypeMobileApp.write(value.`peerApps`, buf)
+    }
+}
+
+
+
+data class MobilePhoto (
+    var `id`: kotlin.String
+    , 
+    var `name`: kotlin.String
+    , 
+    var `dateMs`: kotlin.Long
+    , 
+    var `width`: kotlin.UInt
+    , 
+    var `height`: kotlin.UInt
+    , 
+    var `size`: kotlin.ULong
+    , 
+    /**
+     * Miniatura JPEG.
+     */
+    var `thumbnail`: kotlin.ByteArray
+    
+){
+    
+
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMobilePhoto: FfiConverterRustBuffer<MobilePhoto> {
+    override fun read(buf: ByteBuffer): MobilePhoto {
+        return MobilePhoto(
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterLong.read(buf),
+            FfiConverterUInt.read(buf),
+            FfiConverterUInt.read(buf),
+            FfiConverterULong.read(buf),
+            FfiConverterByteArray.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MobilePhoto) = (
+            FfiConverterString.allocationSize(value.`id`) +
+            FfiConverterString.allocationSize(value.`name`) +
+            FfiConverterLong.allocationSize(value.`dateMs`) +
+            FfiConverterUInt.allocationSize(value.`width`) +
+            FfiConverterUInt.allocationSize(value.`height`) +
+            FfiConverterULong.allocationSize(value.`size`) +
+            FfiConverterByteArray.allocationSize(value.`thumbnail`)
+    )
+
+    override fun write(value: MobilePhoto, buf: ByteBuffer) {
+            FfiConverterString.write(value.`id`, buf)
+            FfiConverterString.write(value.`name`, buf)
+            FfiConverterLong.write(value.`dateMs`, buf)
+            FfiConverterUInt.write(value.`width`, buf)
+            FfiConverterUInt.write(value.`height`, buf)
+            FfiConverterULong.write(value.`size`, buf)
+            FfiConverterByteArray.write(value.`thumbnail`, buf)
+    }
+}
+
+
+
+data class MobilePlayer (
+    var `id`: kotlin.String
+    , 
+    var `name`: kotlin.String
+    , 
+    var `title`: kotlin.String
+    , 
+    var `artist`: kotlin.String
+    , 
+    var `album`: kotlin.String
+    , 
+    /**
+     * "playing" | "paused" | "stopped".
+     */
+    var `state`: kotlin.String
+    , 
+    var `canPlay`: kotlin.Boolean
+    , 
+    var `canPause`: kotlin.Boolean
+    , 
+    var `canNext`: kotlin.Boolean
+    , 
+    var `canPrevious`: kotlin.Boolean
+    
+){
+    
+
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMobilePlayer: FfiConverterRustBuffer<MobilePlayer> {
+    override fun read(buf: ByteBuffer): MobilePlayer {
+        return MobilePlayer(
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterBoolean.read(buf),
+            FfiConverterBoolean.read(buf),
+            FfiConverterBoolean.read(buf),
+            FfiConverterBoolean.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MobilePlayer) = (
+            FfiConverterString.allocationSize(value.`id`) +
+            FfiConverterString.allocationSize(value.`name`) +
+            FfiConverterString.allocationSize(value.`title`) +
+            FfiConverterString.allocationSize(value.`artist`) +
+            FfiConverterString.allocationSize(value.`album`) +
+            FfiConverterString.allocationSize(value.`state`) +
+            FfiConverterBoolean.allocationSize(value.`canPlay`) +
+            FfiConverterBoolean.allocationSize(value.`canPause`) +
+            FfiConverterBoolean.allocationSize(value.`canNext`) +
+            FfiConverterBoolean.allocationSize(value.`canPrevious`)
+    )
+
+    override fun write(value: MobilePlayer, buf: ByteBuffer) {
+            FfiConverterString.write(value.`id`, buf)
+            FfiConverterString.write(value.`name`, buf)
+            FfiConverterString.write(value.`title`, buf)
+            FfiConverterString.write(value.`artist`, buf)
+            FfiConverterString.write(value.`album`, buf)
+            FfiConverterString.write(value.`state`, buf)
+            FfiConverterBoolean.write(value.`canPlay`, buf)
+            FfiConverterBoolean.write(value.`canPause`, buf)
+            FfiConverterBoolean.write(value.`canNext`, buf)
+            FfiConverterBoolean.write(value.`canPrevious`, buf)
     }
 }
 
@@ -3219,6 +3820,40 @@ public interface LinkCallback {
     
     fun `onReplyRequested`(`deviceId`: kotlin.String, `key`: kotlin.String, `actionId`: kotlin.String, `text`: kotlin.String)
     
+    fun `onPeerBattery`(`deviceId`: kotlin.String, `battery`: MobileBattery)
+    
+    fun `onPeerPlayers`(`deviceId`: kotlin.String, `players`: List<MobilePlayer>)
+    
+    fun `onPeerAudioOutputs`(`deviceId`: kotlin.String, `selectable`: kotlin.Boolean, `outputs`: List<MobileAudioOutput>)
+    
+    /**
+     * El peer pide controlar un reproductor del teléfono (`player_id`
+     * vacío = todos). `action`: play-pause|play|pause|next|previous|stop.
+     */
+    fun `onMediaCommand`(`deviceId`: kotlin.String, `playerId`: kotlin.String, `action`: kotlin.String)
+    
+    fun `onSetAudioOutput`(`deviceId`: kotlin.String, `outputId`: kotlin.String)
+    
+    /**
+     * `mode`: normal|vibrate|silent.
+     */
+    fun `onSetRinger`(`deviceId`: kotlin.String, `mode`: kotlin.String)
+    
+    /**
+     * `action`: answer|reject|hangup|mute|unmute.
+     */
+    fun `onCallCommand`(`deviceId`: kotlin.String, `action`: kotlin.String)
+    
+    /**
+     * Responder con [`LinkService::send_photo_list`].
+     */
+    fun `onPhotoListRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `offset`: kotlin.UInt, `limit`: kotlin.UInt)
+    
+    /**
+     * Responder con [`LinkService::send_photo_data`] (uno o varios trozos).
+     */
+    fun `onPhotoRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `photoId`: kotlin.String)
+    
     companion object
 }
 
@@ -3333,6 +3968,128 @@ internal object uniffiCallbackInterfaceLinkCallback {
             uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
         }
     }
+    internal object `onPeerBattery`: UniffiCallbackInterfaceLinkCallbackMethod8 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`battery`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onPeerBattery`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterTypeMobileBattery.lift(`battery`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onPeerPlayers`: UniffiCallbackInterfaceLinkCallbackMethod9 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`players`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onPeerPlayers`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterSequenceTypeMobilePlayer.lift(`players`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onPeerAudioOutputs`: UniffiCallbackInterfaceLinkCallbackMethod10 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`selectable`: Byte,`outputs`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onPeerAudioOutputs`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterBoolean.lift(`selectable`),
+                    FfiConverterSequenceTypeMobileAudioOutput.lift(`outputs`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onMediaCommand`: UniffiCallbackInterfaceLinkCallbackMethod11 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`playerId`: RustBuffer.ByValue,`action`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onMediaCommand`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterString.lift(`playerId`),
+                    FfiConverterString.lift(`action`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onSetAudioOutput`: UniffiCallbackInterfaceLinkCallbackMethod12 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`outputId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onSetAudioOutput`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterString.lift(`outputId`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onSetRinger`: UniffiCallbackInterfaceLinkCallbackMethod13 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`mode`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onSetRinger`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterString.lift(`mode`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onCallCommand`: UniffiCallbackInterfaceLinkCallbackMethod14 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`action`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onCallCommand`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterString.lift(`action`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onPhotoListRequest`: UniffiCallbackInterfaceLinkCallbackMethod15 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`offset`: Int,`limit`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onPhotoListRequest`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                    FfiConverterUInt.lift(`offset`),
+                    FfiConverterUInt.lift(`limit`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onPhotoRequest`: UniffiCallbackInterfaceLinkCallbackMethod16 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`photoId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onPhotoRequest`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                    FfiConverterString.lift(`photoId`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
 
     internal object uniffiFree: UniffiCallbackInterfaceFree {
         override fun callback(handle: Long) {
@@ -3357,6 +4114,15 @@ internal object uniffiCallbackInterfaceLinkCallback {
         `onDismissLocal`,
         `onActionRequested`,
         `onReplyRequested`,
+        `onPeerBattery`,
+        `onPeerPlayers`,
+        `onPeerAudioOutputs`,
+        `onMediaCommand`,
+        `onSetAudioOutput`,
+        `onSetRinger`,
+        `onCallCommand`,
+        `onPhotoListRequest`,
+        `onPhotoRequest`,
     )
 
     // Registers the foreign callback with the Rust side.
@@ -3683,6 +4449,34 @@ public object FfiConverterSequenceTypeMobileApp: FfiConverterRustBuffer<List<Mob
 /**
  * @suppress
  */
+public object FfiConverterSequenceTypeMobileAudioOutput: FfiConverterRustBuffer<List<MobileAudioOutput>> {
+    override fun read(buf: ByteBuffer): List<MobileAudioOutput> {
+        val len = buf.getInt()
+        return List<MobileAudioOutput>(len) {
+            FfiConverterTypeMobileAudioOutput.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<MobileAudioOutput>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeMobileAudioOutput.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<MobileAudioOutput>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeMobileAudioOutput.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
 public object FfiConverterSequenceTypeMobilePeer: FfiConverterRustBuffer<List<MobilePeer>> {
     override fun read(buf: ByteBuffer): List<MobilePeer> {
         val len = buf.getInt()
@@ -3701,6 +4495,62 @@ public object FfiConverterSequenceTypeMobilePeer: FfiConverterRustBuffer<List<Mo
         buf.putInt(value.size)
         value.iterator().forEach {
             FfiConverterTypeMobilePeer.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeMobilePhoto: FfiConverterRustBuffer<List<MobilePhoto>> {
+    override fun read(buf: ByteBuffer): List<MobilePhoto> {
+        val len = buf.getInt()
+        return List<MobilePhoto>(len) {
+            FfiConverterTypeMobilePhoto.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<MobilePhoto>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeMobilePhoto.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<MobilePhoto>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeMobilePhoto.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeMobilePlayer: FfiConverterRustBuffer<List<MobilePlayer>> {
+    override fun read(buf: ByteBuffer): List<MobilePlayer> {
+        val len = buf.getInt()
+        return List<MobilePlayer>(len) {
+            FfiConverterTypeMobilePlayer.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<MobilePlayer>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeMobilePlayer.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<MobilePlayer>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeMobilePlayer.write(it, buf)
         }
     }
 }

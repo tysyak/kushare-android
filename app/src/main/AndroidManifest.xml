@@ -43,6 +43,19 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Funciones extra (al estilo KDE Connect), cada una opcional:
+         estado de las llamadas y contestar/colgar desde el PC, cambiar el
+         modo de timbre (silencio exige acceso a "No molestar"), silenciar
+         el micrófono en llamada, y ver/descargar las fotos desde el PC. -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
     <!-- Nombre e icono de las apps cuyas notificaciones se reenvían (respaldo
          si la notificación no trae su ApplicationInfo en los extras). -->
     <queries>

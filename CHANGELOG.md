@@ -6,6 +6,27 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.3.0] - 2026-11-06
+
+### Añadido
+- Comparte con el PC la **batería**, el **modo de timbre**, los
+  **reproductores** (sesiones multimedia de cualquier app), las **salidas de
+  audio** y el **estado de las llamadas**.
+- Obedece al PC: controlar reproductores (y *Pausar todo*), cambiar el
+  timbre, contestar/rechazar/colgar y silenciar el micrófono.
+- **Galería para el PC**: miniaturas por páginas y la foto original a
+  petición (requiere el permiso de fotos).
+- En *Dispositivos*, por cada PC: su batería, sus reproductores con controles
+  y su salida de audio (elegible).
+- *Ajustes → Funciones del teléfono*: permisos opcionales (llamadas, fotos,
+  No molestar) y el selector de salida de audio del sistema.
+
+### Cambiado
+- **Esquema de colores** violeta (#9d06d8) con acento rosa, igual que en el
+  escritorio; el color dinámico (Material You) pasa a estar desactivado por
+  defecto.
+- Icono de la app en el color nuevo.
+
 ## [0.2.0] - 2026-11-05
 
 ### Añadido
@@ -39,6 +60,7 @@ Todos los cambios notables de kushare-android. Formato basado en
 - App inicial: envío y recepción de archivos con kushare de escritorio por
   Wi-Fi (mDNS) y Bluetooth RFCOMM.
 
-[Sin publicar]: https://github.com/tysyak/kushare-android/compare/v0.2.0...HEAD
+[Sin publicar]: https://github.com/tysyak/kushare-android/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/tysyak/kushare-android/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/tysyak/kushare-android/releases/tag/v0.2.0
 [0.1.0]: https://github.com/tysyak/kushare-android/commit/8d1f720

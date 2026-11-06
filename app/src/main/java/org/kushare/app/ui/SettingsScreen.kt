@@ -1,6 +1,10 @@
 package org.kushare.app.ui
 
+import android.Manifest
 import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import org.kushare.app.PhoneFeatures
 import android.os.Build
 import android.provider.Settings
 import androidx.compose.animation.AnimatedVisibility
@@ -195,6 +199,9 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             }
 
+            item { SectionTitle("Funciones del teléfono") }
+            item { PhoneFeaturesCard() }
+
             item { SectionTitle("Acerca de") }
             item {
                 ExpressiveCard(shape = KushareShapes.ListCard) {
@@ -254,5 +261,83 @@ private fun InfoRow(label: String, value: String) {
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
         Text(value, style = MaterialTheme.typography.bodyMediumEmphasized)
+    }
+}
+
+/** Permisos opcionales de las funciones extra y el selector de salida de audio. */
+@Composable
+private fun PhoneFeaturesCard() {
+    val context = LocalContext.current
+    var calls by remember { mutableStateOf(PhoneFeatures.hasCallPermissions(context)) }
+    var photos by remember { mutableStateOf(PhoneFeatures.hasPhotoPermission(context)) }
+    var dnd by remember { mutableStateOf(PhoneFeatures.canChangeRinger(context)) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    calls = PhoneFeatures.hasCallPermissions(context)
+                    photos = PhoneFeatures.hasPhotoPermission(context)
+                    dnd = PhoneFeatures.canChangeRinger(context)
+                }
+            }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    val callLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            calls = PhoneFeatures.hasCallPermissions(context)
+            PhoneFeatures.onPermissionsChanged()
+        }
+    val photoLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+            photos = PhoneFeatures.hasPhotoPermission(context)
+        }
+    ExpressiveCard(shape = KushareShapes.ListCard) {
+        Text(
+            "La batería, el timbre y la música se comparten siempre con el PC. Esto es opcional:",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        PermissionRow(
+            title = "Llamadas",
+            subtitle = "Ver quién llama en el PC, y contestar o colgar desde allí.",
+            granted = calls,
+            onGrant = {
+                callLauncher.launch(arrayOf(Manifest.permission.READ_PHONE_STATE, Manifest.permission.ANSWER_PHONE_CALLS))
+            },
+        )
+        PermissionRow(
+            title = "Fotos",
+            subtitle = "Ver la galería y descargar fotos desde el PC.",
+            granted = photos,
+            onGrant = { photoLauncher.launch(PhoneFeatures.photoPermission) },
+        )
+        PermissionRow(
+            title = "No molestar",
+            subtitle = "Que el PC pueda poner el teléfono en silencio.",
+            granted = dnd,
+            onGrant = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) },
+        )
+        Spacer(Modifier.size(8.dp))
+        FilledTonalButton(onClick = { PhoneFeatures.openOutputSwitcher(context) }, shapes = ButtonDefaults.shapes()) {
+            Text("Elegir salida de audio")
+        }
+    }
+}
+
+@Composable
+private fun PermissionRow(title: String, subtitle: String, granted: Boolean, onGrant: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = 12.dp)) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyLargeEmphasized)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Spacer(Modifier.width(12.dp))
+        if (granted) {
+            Text("Concedido", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+        } else {
+            FilledTonalButton(onClick = onGrant, shapes = ButtonDefaults.shapes()) { Text("Permitir") }
+        }
     }
 }

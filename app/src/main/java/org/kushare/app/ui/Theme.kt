@@ -40,69 +40,86 @@ fun currentAppearance(config: ThemeConfig): Appearance {
     }
 }
 
-// Paleta propia (sin color dinámico): azul de kushare como primario y un
-// magenta de acento como terciario, para que los contenedores destacados
-// (estado de conexión, acciones principales) tengan alto contraste.
+// Esquema de colores de kushare (README del orquestador, "Esquema de
+// colores"): primario violeta #9d06d8 y acento rosa en el terciario. Los
+// roles que la tabla no fija son tonos M3 de la misma paleta. Debe
+// coincidir con `src/bin/kushare-gui/style.rs` del escritorio.
 private val BrandLight =
     lightColorScheme(
-        primary = Color(0xFF2E5BD8),
-        onPrimary = Color.White,
-        primaryContainer = Color(0xFFDCE1FF),
-        onPrimaryContainer = Color(0xFF001550),
-        secondary = Color(0xFF575E71),
-        secondaryContainer = Color(0xFFDBE2F9),
-        onSecondaryContainer = Color(0xFF141B2C),
-        tertiary = Color(0xFF8B4A8E),
-        onTertiary = Color.White,
-        tertiaryContainer = Color(0xFFFFD6FB),
-        onTertiaryContainer = Color(0xFF380B3D),
-        background = Color(0xFFFAF8FF),
-        surface = Color(0xFFFAF8FF),
-        surfaceContainerLowest = Color.White,
-        surfaceContainerLow = Color(0xFFF3F3FC),
-        surfaceContainer = Color(0xFFEDEDF7),
-        surfaceContainerHigh = Color(0xFFE7E7F1),
-        surfaceContainerHighest = Color(0xFFE1E2EC),
+        primary = Color(0xFF9D06D8),
+        onPrimary = Color(0xFFFFFFFF),
+        primaryContainer = Color(0xFFF5D9FF),
+        onPrimaryContainer = Color(0xFF320046),
+        secondary = Color(0xFF714D7A),
+        onSecondary = Color(0xFFFFFFFF),
+        secondaryContainer = Color(0xFFF9D8FF),
+        onSecondaryContainer = Color(0xFF2A0A33),
+        tertiary = Color(0xFF854A63),
+        onTertiary = Color(0xFFFFFFFF),
+        tertiaryContainer = Color(0xFFFFD9E5),
+        onTertiaryContainer = Color(0xFF360620),
+        background = Color(0xFFFFF7FE),
+        onBackground = Color(0xFF1E1A1F),
+        surface = Color(0xFFFFF7FE),
+        onSurface = Color(0xFF1E1A1F),
+        surfaceVariant = Color(0xFFEBDCEB),
+        onSurfaceVariant = Color(0xFF4C444F),
+        outline = Color(0xFF7E7480),
+        error = Color(0xFFBA1A1A),
+        surfaceContainerLowest = Color(0xFFFFFFFF),
+        surfaceContainerLow = Color(0xFFFBF0FB),
+        surfaceContainer = Color(0xFFF5EAF5),
+        surfaceContainerHigh = Color(0xFFF0E3F0),
+        surfaceContainerHighest = Color(0xFFEBDCEB),
     )
 
 private val BrandDark =
     darkColorScheme(
-        primary = Color(0xFFB6C4FF),
-        onPrimary = Color(0xFF002780),
-        primaryContainer = Color(0xFF1240B0),
-        onPrimaryContainer = Color(0xFFDCE1FF),
-        secondary = Color(0xFFBFC6DC),
-        secondaryContainer = Color(0xFF3F4759),
-        onSecondaryContainer = Color(0xFFDBE2F9),
-        tertiary = Color(0xFFFFA9FE),
-        onTertiary = Color(0xFF55195B),
-        tertiaryContainer = Color(0xFF703374),
-        onTertiaryContainer = Color(0xFFFFD6FB),
-        background = Color(0xFF121318),
-        surface = Color(0xFF121318),
-        surfaceContainerLowest = Color(0xFF0D0E13),
-        surfaceContainerLow = Color(0xFF1A1B21),
-        surfaceContainer = Color(0xFF1E1F25),
-        surfaceContainerHigh = Color(0xFF292A2F),
-        surfaceContainerHighest = Color(0xFF34343A),
+        primary = Color(0xFFE4B5FF),
+        onPrimary = Color(0xFF540078),
+        primaryContainer = Color(0xFF7800AA),
+        onPrimaryContainer = Color(0xFFF5D9FF),
+        secondary = Color(0xFFDFBCE6),
+        onSecondary = Color(0xFF402849),
+        secondaryContainer = Color(0xFF583E61),
+        onSecondaryContainer = Color(0xFFF9D8FF),
+        tertiary = Color(0xFFF9B1CD),
+        onTertiary = Color(0xFF501D35),
+        tertiaryContainer = Color(0xFF6A334B),
+        onTertiaryContainer = Color(0xFFFFD9E5),
+        background = Color(0xFF151217),
+        onBackground = Color(0xFFE8E0E8),
+        surface = Color(0xFF151217),
+        onSurface = Color(0xFFE8E0E8),
+        surfaceVariant = Color(0xFF4A454D),
+        onSurfaceVariant = Color(0xFFCDC3CE),
+        outline = Color(0xFF968E98),
+        error = Color(0xFFFFB4AB),
+        surfaceContainerLowest = Color(0xFF100D11),
+        surfaceContainerLow = Color(0xFF1E1A1F),
+        surfaceContainer = Color(0xFF231F24),
+        surfaceContainerHigh = Color(0xFF2D292F),
+        surfaceContainerHighest = Color(0xFF38333A),
     )
 
 /**
- * Oscuro OLED: fondo y superficie negro puro (píxeles apagados) y los
- * contenedores en una escalera de casi-negros, para que las tarjetas sigan
- * leyéndose sin encender la pantalla entera.
+ * Oscuro OLED (True Black): fondo y superficie negro puro (píxeles
+ * apagados), "surface variant" #121013 y los contenedores en una escalera
+ * de casi-negros alrededor de él, para que las tarjetas sigan leyéndose sin encender la
+ * pantalla entera.
  */
 private fun ColorScheme.toOled(): ColorScheme =
     copy(
         background = Color.Black,
         surface = Color.Black,
         surfaceDim = Color.Black,
-        surfaceBright = Color(0xFF232327),
+        surfaceBright = Color(0xFF221F23),
+        surfaceVariant = Color(0xFF121013),
         surfaceContainerLowest = Color.Black,
-        surfaceContainerLow = Color(0xFF0A0A0C),
-        surfaceContainer = Color(0xFF101013),
-        surfaceContainerHigh = Color(0xFF17171B),
-        surfaceContainerHighest = Color(0xFF1F1F24),
+        surfaceContainerLow = Color(0xFF0A090B),
+        surfaceContainer = Color(0xFF0F0D10),
+        surfaceContainerHigh = Color(0xFF151316),
+        surfaceContainerHighest = Color(0xFF1C191D),
     )
 
 /**

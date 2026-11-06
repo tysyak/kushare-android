@@ -10,6 +10,8 @@ App Android de [kushare](https://github.com/tysyak/kushare): transferencia de ar
   - notificaciones del teléfono en el PC y del PC en el teléfono, cada dirección activable por separado desde cualquiera de los dos lados;
   - filtro por app, descartar sincronizado, iconos, y **acciones y respuesta** desde el PC (p. ej. contestar un mensaje de Telegram);
   - reconexión automática, sin volver a pedir el PIN.
+- **Teléfono desde el PC** (al estilo KDE Connect): batería, modo de timbre, reproductores (controlar YouTube, TIDAL, Spotify… y *Pausar todo*), salidas de audio, llamadas (contestar, rechazar, colgar, silenciar; con el PC como manos libres por Bluetooth) y galería de fotos (miniaturas y descarga del original).
+- **PC desde el teléfono**: su batería, sus reproductores (MPRIS) y su salida de audio, en *Dispositivos*.
 - **Botón en los ajustes rápidos** (la cortina de Wi-Fi, Bluetooth…):
   - encendido mantiene el enlace; apagado detiene kushare del todo;
   - debajo del nombre muestra por dónde está conectado ("PC · Bluetooth");
@@ -28,6 +30,11 @@ Ver el [FAQ de kushare](https://github.com/tysyak/kushare/blob/main/FAQ.md): fir
 | Dispositivos cercanos (Bluetooth) | Enlace y transferencias por RFCOMM. |
 | Servicio en primer plano (*connectedDevice*) | Mantener el enlace con la pantalla apagada. |
 | Estado de la red / Wi-Fi | Descubrimiento mDNS y pausa automática sin red. |
+| Teléfono y llamadas (opcional) | Avisar en el PC de las llamadas y contestar/colgar desde allí. |
+| Fotos (opcional) | Que el PC vea la galería y descargue fotos. |
+| No molestar (opcional) | Que el PC pueda poner el teléfono en silencio. |
+
+Los opcionales se conceden en *Ajustes → Funciones del teléfono*. Los reproductores se leen gracias al acceso a notificaciones (no hace falta otro permiso).
 
 `android:allowBackup` está desactivado a propósito: la clave de identidad (`files/link/identity.key`) no debe acabar en una copia de seguridad, porque restaurarla en otro teléfono lo haría pasar por este.
 

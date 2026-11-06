@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import uniffi.kushare_mobile.LinkCallback
 import uniffi.kushare_mobile.LinkService
+import uniffi.kushare_mobile.MobileAudioOutput
+import uniffi.kushare_mobile.MobileBattery
+import uniffi.kushare_mobile.MobilePlayer
 import uniffi.kushare_mobile.MobilePeer
 import uniffi.kushare_mobile.MobileRemoteNotification
 
@@ -72,6 +75,7 @@ object KushareLink {
                 Callback,
             )
         service = svc
+        PhoneFeatures.start(appContext)
         refreshPeers()
         Log.i(TAG, "enlace listo, device_id=${svc.deviceId()}")
         return svc
@@ -83,7 +87,10 @@ object KushareLink {
             ?: "Android"
 
     fun refreshPeers() {
-        service?.let { peers.value = it.peers() }
+        service?.let { svc ->
+            peers.value = svc.peers()
+            peers.value.filter { !it.connected }.forEach { PhoneFeatures.onPeerDisconnected(it.deviceId) }
+        }
         if (::appContext.isInitialized) KushareSwitch.refreshTile(appContext)
     }
 
@@ -96,6 +103,7 @@ object KushareLink {
     fun shutdown() {
         val svc = service ?: return
         service = null
+        PhoneFeatures.stop()
         runCatching { svc.shutdown() }
         runCatching { svc.close() }
         peers.value = peers.value.map { it.copy(connected = false, transport = null) }
@@ -237,6 +245,32 @@ object KushareLink {
         override fun onReplyRequested(deviceId: String, key: String, actionId: String, text: String) {
             KushareNotificationListener.instance?.reply(key, actionId, text)
         }
+
+        override fun onPeerBattery(deviceId: String, battery: MobileBattery) =
+            PhoneFeatures.onPeerBattery(deviceId, battery)
+
+        override fun onPeerPlayers(deviceId: String, players: List<MobilePlayer>) =
+            PhoneFeatures.onPeerPlayers(deviceId, players)
+
+        override fun onPeerAudioOutputs(deviceId: String, selectable: Boolean, outputs: List<MobileAudioOutput>) =
+            PhoneFeatures.onPeerOutputs(deviceId, selectable, outputs)
+
+        override fun onMediaCommand(deviceId: String, playerId: String, action: String) =
+            PhoneFeatures.mediaCommand(playerId, action)
+
+        override fun onSetAudioOutput(deviceId: String, outputId: String) {
+            // Android no permite a una app elegir la salida de las demás.
+        }
+
+        override fun onSetRinger(deviceId: String, mode: String) = PhoneFeatures.setRinger(mode)
+
+        override fun onCallCommand(deviceId: String, action: String) = PhoneFeatures.callCommand(action)
+
+        override fun onPhotoListRequest(deviceId: String, requestId: ULong, offset: UInt, limit: UInt) =
+            PhoneFeatures.onPhotoListRequest(deviceId, requestId, offset, limit)
+
+        override fun onPhotoRequest(deviceId: String, requestId: ULong, photoId: String) =
+            PhoneFeatures.onPhotoRequest(deviceId, requestId, photoId)
     }
 
     fun onSighting(sighting: LinkSighting) {

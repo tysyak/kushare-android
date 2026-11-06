@@ -22,7 +22,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.BatteryChargingFull
+import androidx.compose.material.icons.rounded.BatteryStd
 import androidx.compose.material.icons.rounded.Bluetooth
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.SkipNext
+import androidx.compose.material.icons.rounded.SkipPrevious
 import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.LinkOff
 import androidx.compose.material.icons.rounded.Search
@@ -31,7 +37,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
@@ -72,6 +80,8 @@ import org.kushare.app.BondedPeer
 import org.kushare.app.KushareLink
 import org.kushare.app.KushareService
 import org.kushare.app.KushareSwitch
+import org.kushare.app.PeerExtras
+import org.kushare.app.PhoneFeatures
 import uniffi.kushare_mobile.MobileApp
 import uniffi.kushare_mobile.MobilePeer
 
@@ -95,6 +105,7 @@ fun DevicesScreen(onBack: () -> Unit) {
     val scanning by KushareLink.scanning.collectAsState()
     val enabled by KushareSwitch.enabled.collectAsState()
     val paused by KushareSwitch.paused.collectAsState()
+    val extras by PhoneFeatures.peerExtras.collectAsState()
     var accessGranted by remember { mutableStateOf(notificationAccessGranted(context)) }
     var filterTarget by remember { mutableStateOf<AppFilterTarget?>(null) }
     var pairingInProgress by remember { mutableStateOf<String?>(null) }
@@ -221,6 +232,7 @@ fun DevicesScreen(onBack: () -> Unit) {
             items(peers, key = { it.deviceId }) { peer ->
                 PeerCard(
                     peer = peer,
+                    extras = extras[peer.deviceId],
                     onDirection = { outgoing, on ->
                         runCatching { KushareLink.service?.setDirection(peer.deviceId, outgoing, on) }
                         KushareLink.refreshPeers()
@@ -385,9 +397,76 @@ private fun CandidateRow(
     }
 }
 
+/** Multimedia y salida de audio del PC, controlables desde el teléfono. */
+@Composable
+private fun PeerControls(deviceId: String, extras: PeerExtras) {
+    val link = KushareLink.service ?: return
+    if (extras.players.isNotEmpty()) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = 12.dp)) {
+            Text("Multimedia", style = MaterialTheme.typography.titleSmallEmphasized, modifier = Modifier.weight(1f))
+            TextButton(
+                enabled = extras.players.any { it.state == "playing" },
+                onClick = { link.sendMediaCommand(deviceId, "", "pause") },
+            ) { Text("Pausar todo") }
+        }
+        extras.players.forEach { p ->
+            Surface(
+                shape = KushareShapes.ListCard,
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 14.dp, end = 4.dp, top = 6.dp, bottom = 6.dp)) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(p.name, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            listOf(p.title, p.artist).filter { it.isNotBlank() }.joinToString(" — ").ifBlank { "—" },
+                            style = MaterialTheme.typography.bodyMediumEmphasized,
+                            maxLines = 1,
+                        )
+                    }
+                    IconButton(enabled = p.canPrevious, onClick = { link.sendMediaCommand(deviceId, p.id, "previous") }) {
+                        Icon(Icons.Rounded.SkipPrevious, contentDescription = "Anterior")
+                    }
+                    FilledIconButton(onClick = { link.sendMediaCommand(deviceId, p.id, "play-pause") }) {
+                        Icon(
+                            if (p.state == "playing") Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                            contentDescription = if (p.state == "playing") "Pausar" else "Reproducir",
+                        )
+                    }
+                    IconButton(enabled = p.canNext, onClick = { link.sendMediaCommand(deviceId, p.id, "next") }) {
+                        Icon(Icons.Rounded.SkipNext, contentDescription = "Siguiente")
+                    }
+                }
+            }
+        }
+    }
+    if (extras.outputs.isNotEmpty()) {
+        Text(
+            "Salida de audio",
+            style = MaterialTheme.typography.titleSmallEmphasized,
+            modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+        )
+        extras.outputs.forEach { o ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                RadioButton(
+                    selected = o.active,
+                    enabled = extras.outputsSelectable,
+                    onClick = { link.sendSetAudioOutput(deviceId, o.id) },
+                )
+                Text(o.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
+            }
+        }
+    }
+}
+
 @Composable
 private fun PeerCard(
     peer: MobilePeer,
+    extras: PeerExtras?,
     onDirection: (outgoing: Boolean, enabled: Boolean) -> Unit,
     onApps: (outgoing: Boolean) -> Unit,
     onUnpair: () -> Unit,
@@ -420,8 +499,23 @@ private fun PeerCard(
                     if (peer.connected) "Conectado por $via" else "Desconectado",
                     style = MaterialTheme.typography.bodyMedium,
                 )
+                extras?.battery?.takeIf { it.present }?.let { b ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            if (b.charging) Icons.Rounded.BatteryChargingFull else Icons.Rounded.BatteryStd,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            "${b.percent} %" + if (b.charging) " · cargando" else "",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
             }
         }
+        if (peer.connected && extras != null) PeerControls(peer.deviceId, extras)
         Spacer(Modifier.size(8.dp))
         SwitchRow("Enviar mis notificaciones", peer.outgoingEnabled, { onDirection(true, it) })
         SwitchRow("Recibir sus notificaciones", peer.incomingEnabled, { onDirection(false, it) })

@@ -13,6 +13,7 @@ use tokio::sync::mpsc;
 
 mod bt_bridge;
 mod link;
+pub mod features;
 pub use bt_bridge::ByteStreamIo;
 pub use link::{LinkCallback, LinkService};
 use bt_bridge::CallbackStream;

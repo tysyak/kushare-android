@@ -14,8 +14,12 @@ enum class ThemeMode(val label: String) {
 
 data class ThemeConfig(
     val mode: ThemeMode = ThemeMode.SYSTEM,
-    /** Material You: colores sacados del fondo de pantalla (Android 12+). */
-    val dynamicColor: Boolean = true,
+    /**
+     * Material You: colores sacados del fondo de pantalla (Android 12+).
+     * Desactivado por defecto: el esquema propio de kushare (violeta) es el
+     * mismo que el de la app de escritorio.
+     */
+    val dynamicColor: Boolean = false,
     /** Con [ThemeMode.SYSTEM] en oscuro, usar negro puro (pantallas OLED). */
     val oledWhenSystemDark: Boolean = true,
 )
@@ -31,7 +35,7 @@ object ThemeSettings {
         state.value =
             ThemeConfig(
                 mode = runCatching { ThemeMode.valueOf(p.getString("mode", null) ?: "") }.getOrDefault(ThemeMode.SYSTEM),
-                dynamicColor = p.getBoolean("dynamic_color", true),
+                dynamicColor = p.getBoolean("dynamic_color_v2", false),
                 oledWhenSystemDark = p.getBoolean("oled_system_dark", true),
             )
     }
@@ -41,7 +45,7 @@ object ThemeSettings {
         state.value = next
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putString("mode", next.mode.name)
-            .putBoolean("dynamic_color", next.dynamicColor)
+            .putBoolean("dynamic_color_v2", next.dynamicColor)
             .putBoolean("oled_system_dark", next.oledWhenSystemDark)
             .apply()
     }
