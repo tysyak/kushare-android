@@ -475,6 +475,14 @@ impl LinkService {
         features::publish(&self.manager, &self.cache, F::CallState(call));
     }
 
+    /// La galería cambió (foto o captura nueva): avisar a los peers para que
+    /// la GUI que la esté mostrando pida las más recientes.
+    pub fn notify_photos_changed(&self) {
+        self.manager.broadcast_feature(pb::Feature {
+            kind: Some(F::PhotosChanged(pb::PhotosChanged {})),
+        });
+    }
+
     /// Respuesta a [`LinkCallback::on_photo_list_request`].
     pub async fn send_photo_list(
         &self,

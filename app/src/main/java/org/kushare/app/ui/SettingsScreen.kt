@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import org.kushare.app.R
 import org.kushare.app.PhoneFeatures
 import android.os.Build
 import android.provider.Settings
@@ -53,6 +54,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -76,7 +78,8 @@ private fun ThemeMode.icon(): ImageVector =
         ThemeMode.OLED -> Icons.Rounded.Contrast
     }
 
-private fun ThemeMode.shortLabel(): String = if (this == ThemeMode.OLED) "OLED" else label
+@Composable
+private fun ThemeMode.shortLabel(): String = stringResource(if (this == ThemeMode.OLED) R.string.theme_oled_short else labelRes)
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
@@ -103,10 +106,10 @@ fun SettingsScreen(onBack: () -> Unit) {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeFlexibleTopAppBar(
-                title = { Text("Ajustes", style = MaterialTheme.typography.displaySmallEmphasized) },
-                subtitle = { Text("Apariencia y conexión") },
+                title = { Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.displaySmallEmphasized) },
+                subtitle = { Text(stringResource(R.string.settings_subtitle)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Volver") }
+                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.common_back)) }
                 },
                 scrollBehavior = scrollBehavior,
             )
@@ -117,12 +120,12 @@ fun SettingsScreen(onBack: () -> Unit) {
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = padding.calculateTopPadding(), bottom = padding.calculateBottomPadding() + 24.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            item { SectionTitle("Apariencia") }
+            item { SectionTitle(stringResource(R.string.settings_appearance)) }
             item {
                 ExpressiveCard(shape = KushareShapes.Wide) {
-                    Text("Tema", style = MaterialTheme.typography.titleLargeEmphasized)
+                    Text(stringResource(R.string.settings_theme), style = MaterialTheme.typography.titleLargeEmphasized)
                     Text(
-                        "OLED usa negro puro: en pantallas OLED los píxeles negros se apagan y ahorran batería.",
+                        stringResource(R.string.settings_theme_detail),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -134,20 +137,20 @@ fun SettingsScreen(onBack: () -> Unit) {
                         exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()) + fadeOut(),
                     ) {
                         SwitchRow(
-                            title = "Negro puro cuando el sistema esté en oscuro",
-                            subtitle = "Si el teléfono usa el tema oscuro, kushare usará el OLED.",
+                            title = stringResource(R.string.settings_oled_system),
+                            subtitle = stringResource(R.string.settings_oled_system_detail),
                             checked = config.oledWhenSystemDark,
                             onCheckedChange = { on -> ThemeSettings.update(context) { it.copy(oledWhenSystemDark = on) } },
                             modifier = Modifier.padding(top = 12.dp),
                         )
                     }
                     SwitchRow(
-                        title = "Color dinámico",
+                        title = stringResource(R.string.settings_dynamic),
                         subtitle =
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                "Colores sacados de tu fondo de pantalla (Material You)."
+                                stringResource(R.string.settings_dynamic_detail)
                             } else {
-                                "Requiere Android 12 o superior."
+                                stringResource(R.string.settings_dynamic_unsupported)
                             },
                         checked = config.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
                         enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
@@ -156,12 +159,12 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             }
 
-            item { SectionTitle("Conexión") }
+            item { SectionTitle(stringResource(R.string.settings_connection)) }
             item {
                 ExpressiveCard(shape = KushareShapes.ListCard) {
                     SwitchRow(
-                        title = "kushare activado",
-                        subtitle = "También desde el botón de los ajustes rápidos.",
+                        title = stringResource(R.string.common_enabled),
+                        subtitle = stringResource(R.string.settings_enabled_detail),
                         checked = enabled,
                         onCheckedChange = { KushareSwitch.setEnabled(context, it) },
                     )
@@ -183,10 +186,10 @@ fun SettingsScreen(onBack: () -> Unit) {
                         )
                         Spacer(Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Acceso a notificaciones", style = MaterialTheme.typography.bodyLargeEmphasized)
+                            Text(stringResource(R.string.settings_access), style = MaterialTheme.typography.bodyLargeEmphasized)
                             Text(
-                                if (listenerGranted) "Concedido: las notificaciones del teléfono se pueden enviar."
-                                else "Sin él no se envían las notificaciones del teléfono.",
+                                if (listenerGranted) stringResource(R.string.settings_access_granted)
+                                else stringResource(R.string.settings_access_missing),
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
@@ -195,19 +198,19 @@ fun SettingsScreen(onBack: () -> Unit) {
                     FilledTonalButton(
                         onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) },
                         shapes = ButtonDefaults.shapes(),
-                    ) { Text(if (listenerGranted) "Revisar" else "Conceder acceso") }
+                    ) { Text(if (listenerGranted) stringResource(R.string.settings_review) else stringResource(R.string.settings_grant)) }
                 }
             }
 
-            item { SectionTitle("Funciones del teléfono") }
+            item { SectionTitle(stringResource(R.string.settings_phone_features)) }
             item { PhoneFeaturesCard() }
 
-            item { SectionTitle("Acerca de") }
+            item { SectionTitle(stringResource(R.string.settings_about)) }
             item {
                 ExpressiveCard(shape = KushareShapes.ListCard) {
-                    InfoRow("Nombre", KushareLink.deviceName(context))
-                    InfoRow("Identificador", KushareLink.service?.deviceId() ?: "—")
-                    InfoRow("Versión", context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "—")
+                    InfoRow(stringResource(R.string.settings_name), KushareLink.deviceName(context))
+                    InfoRow(stringResource(R.string.settings_id), KushareLink.service?.deviceId() ?: "—")
+                    InfoRow(stringResource(R.string.settings_version), context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "—")
                 }
             }
         }
@@ -292,36 +295,37 @@ private fun PhoneFeaturesCard() {
     val photoLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
             photos = PhoneFeatures.hasPhotoPermission(context)
+            PhoneFeatures.onPermissionsChanged()
         }
     ExpressiveCard(shape = KushareShapes.ListCard) {
         Text(
-            "La batería, el timbre y la música se comparten siempre con el PC. Esto es opcional:",
+            stringResource(R.string.features_intro),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         PermissionRow(
-            title = "Llamadas",
-            subtitle = "Ver quién llama en el PC, y contestar o colgar desde allí.",
+            title = stringResource(R.string.features_calls),
+            subtitle = stringResource(R.string.features_calls_detail),
             granted = calls,
             onGrant = {
                 callLauncher.launch(arrayOf(Manifest.permission.READ_PHONE_STATE, Manifest.permission.ANSWER_PHONE_CALLS))
             },
         )
         PermissionRow(
-            title = "Fotos",
-            subtitle = "Ver la galería y descargar fotos desde el PC.",
+            title = stringResource(R.string.features_photos),
+            subtitle = stringResource(R.string.features_photos_detail),
             granted = photos,
             onGrant = { photoLauncher.launch(PhoneFeatures.photoPermission) },
         )
         PermissionRow(
-            title = "No molestar",
-            subtitle = "Que el PC pueda poner el teléfono en silencio.",
+            title = stringResource(R.string.features_dnd),
+            subtitle = stringResource(R.string.features_dnd_detail),
             granted = dnd,
             onGrant = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) },
         )
         Spacer(Modifier.size(8.dp))
         FilledTonalButton(onClick = { PhoneFeatures.openOutputSwitcher(context) }, shapes = ButtonDefaults.shapes()) {
-            Text("Elegir salida de audio")
+            Text(stringResource(R.string.features_output))
         }
     }
 }
@@ -335,9 +339,9 @@ private fun PermissionRow(title: String, subtitle: String, granted: Boolean, onG
         }
         Spacer(Modifier.width(12.dp))
         if (granted) {
-            Text("Concedido", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.features_granted), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
         } else {
-            FilledTonalButton(onClick = onGrant, shapes = ButtonDefaults.shapes()) { Text("Permitir") }
+            FilledTonalButton(onClick = onGrant, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.features_allow)) }
         }
     }
 }

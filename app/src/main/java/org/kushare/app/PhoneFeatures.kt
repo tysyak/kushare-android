@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.database.ContentObserver
 import android.graphics.Bitmap
 import android.media.AudioAttributes
 import android.media.AudioDeviceCallback
@@ -80,6 +81,7 @@ object PhoneFeatures {
     private var audioCallback: AudioDeviceCallback? = null
     private var sessionsListener: MediaSessionManager.OnActiveSessionsChangedListener? = null
     private var telephonyCallback: TelephonyCallback? = null
+    private var photosObserver: ContentObserver? = null
     private val controllers = mutableMapOf<String, Pair<MediaController, MediaController.Callback>>()
     private var lastCallPhase = "idle"
 
@@ -100,6 +102,7 @@ object PhoneFeatures {
         startAudioOutputs(app)
         startMediaSessions(app)
         startCalls(app)
+        startPhotosObserver(app)
     }
 
     @Synchronized
@@ -109,6 +112,9 @@ object PhoneFeatures {
         receivers.clear()
         audioCallback?.let { app.getSystemService(AudioManager::class.java).unregisterAudioDeviceCallback(it) }
         audioCallback = null
+        photosObserver?.let { app.contentResolver.unregisterContentObserver(it) }
+        photosObserver = null
+        main.removeCallbacks(photosChanged)
         sessionsListener?.let {
             runCatching { app.getSystemService(MediaSessionManager::class.java).removeOnActiveSessionsChangedListener(it) }
         }
@@ -125,10 +131,35 @@ object PhoneFeatures {
         peerExtras.value = emptyMap()
     }
 
-    /** El usuario concedió permisos nuevos (llamadas): empezar lo que faltaba. */
+    /** El usuario concedió permisos nuevos (llamadas, fotos): empezar lo que faltaba. */
     fun onPermissionsChanged() {
         val app = context ?: return
-        main.post { if (telephonyCallback == null) startCalls(app) }
+        main.post {
+            if (telephonyCallback == null) startCalls(app)
+            if (photosObserver == null) startPhotosObserver(app)
+        }
+    }
+
+    // --- Galería: avisar al PC de fotos nuevas -----------------------------
+
+    private val photosChanged = Runnable { svc()?.notifyPhotosChanged() }
+
+    /**
+     * Vigila MediaStore: una foto o captura nueva dispara varios cambios
+     * seguidos (inserción, fin de IS_PENDING…), así que se agrupan y se
+     * avisa al PC una sola vez, ~1,5 s después del último.
+     */
+    private fun startPhotosObserver(app: Context) {
+        if (!hasPhotoPermission(app)) return
+        val observer =
+            object : ContentObserver(main) {
+                override fun onChange(selfChange: Boolean) {
+                    main.removeCallbacks(photosChanged)
+                    main.postDelayed(photosChanged, 1500)
+                }
+            }
+        app.contentResolver.registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, true, observer)
+        photosObserver = observer
     }
 
     /** El listener de notificaciones se conectó: ya se pueden leer las sesiones. */
@@ -196,7 +227,7 @@ object PhoneFeatures {
             .onFailure {
                 // Sin acceso a "No molestar", Android no deja pasar a/desde silencio.
                 Log.w(TAG, "no se pudo cambiar el timbre", it)
-                KushareLink.messages.value = "El PC pidió cambiar el timbre: concede a kushare el acceso a «No molestar»"
+                KushareLink.messages.value = app.getString(R.string.msg_ringer_needs_dnd)
             }
         svc()?.publishRinger(ringerName(audio.ringerMode))
     }
@@ -204,14 +235,15 @@ object PhoneFeatures {
     // --- Salidas de audio --------------------------------------------------
 
     private fun outputName(d: AudioDeviceInfo): String? {
+        val app = context ?: return null
         val label = d.productName?.toString()?.takeIf { it.isNotBlank() && it != Build.MODEL }
         return when (d.type) {
-            AudioDeviceInfo.TYPE_BUILTIN_SPEAKER -> "Altavoz del teléfono"
-            AudioDeviceInfo.TYPE_WIRED_HEADSET, AudioDeviceInfo.TYPE_WIRED_HEADPHONES -> "Auriculares con cable"
-            AudioDeviceInfo.TYPE_USB_HEADSET, AudioDeviceInfo.TYPE_USB_DEVICE -> label ?: "Audio USB"
+            AudioDeviceInfo.TYPE_BUILTIN_SPEAKER -> app.getString(R.string.output_speaker)
+            AudioDeviceInfo.TYPE_WIRED_HEADSET, AudioDeviceInfo.TYPE_WIRED_HEADPHONES -> app.getString(R.string.output_wired)
+            AudioDeviceInfo.TYPE_USB_HEADSET, AudioDeviceInfo.TYPE_USB_DEVICE -> label ?: app.getString(R.string.output_usb)
             AudioDeviceInfo.TYPE_BLUETOOTH_A2DP, AudioDeviceInfo.TYPE_BLE_HEADSET, AudioDeviceInfo.TYPE_BLE_SPEAKER ->
                 label ?: "Bluetooth"
-            AudioDeviceInfo.TYPE_HEARING_AID -> label ?: "Audífono"
+            AudioDeviceInfo.TYPE_HEARING_AID -> label ?: app.getString(R.string.output_hearing_aid)
             AudioDeviceInfo.TYPE_HDMI -> "HDMI"
             else -> null
         }
@@ -269,7 +301,7 @@ object PhoneFeatures {
                     .putExtra("com.android.settings.panel.extra.PACKAGE_NAME", ctx.packageName)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             )
-        }.onFailure { KushareLink.messages.value = "Este Android no tiene selector de salida de audio" }
+        }.onFailure { KushareLink.messages.value = ctx.getString(R.string.msg_no_output_switcher) }
     }
 
     // --- Multimedia (sesiones de otras apps) -------------------------------
@@ -435,7 +467,7 @@ object PhoneFeatures {
                 }
             }
             if (!allowed && action in setOf("answer", "reject", "hangup")) {
-                KushareLink.messages.value = "Concede a kushare el permiso de llamadas para contestar desde el PC"
+                KushareLink.messages.value = app.getString(R.string.msg_calls_permission)
             }
         }.onFailure { Log.w(TAG, "orden de llamada fallida: $action", it) }
     }
@@ -457,7 +489,7 @@ object PhoneFeatures {
                         .onFailure { Log.w(TAG, "no se pudo leer la galería", it) }
                         .getOrDefault(0 to emptyList())
                 } else {
-                    KushareLink.messages.value = "El PC quiere ver tus fotos: concede a kushare el permiso de fotos"
+                    KushareLink.messages.value = app.getString(R.string.msg_photos_permission)
                     0 to emptyList()
                 }
             runCatching { svc()?.sendPhotoList(deviceId, requestId, total.toUInt(), photos) }

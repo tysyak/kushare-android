@@ -39,8 +39,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import org.kushare.app.R
 import org.kushare.app.BondedPeer
 import org.kushare.app.DiscoveredPeer
 
@@ -59,7 +61,7 @@ private fun TransferScaffold(
                 title = { Text(title, style = MaterialTheme.typography.displaySmallEmphasized) },
                 subtitle = { Text(subtitle) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Volver") }
+                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.common_back)) }
                 },
                 scrollBehavior = scrollBehavior,
             )
@@ -83,7 +85,7 @@ fun ReceiveScreen(
     log: List<String>,
     onBack: () -> Unit,
 ) {
-    TransferScaffold("Recibir", if (visible) "Visible en la red" else "Oculto", onBack) {
+    TransferScaffold(stringResource(R.string.receive_title), if (visible) stringResource(R.string.receive_visible_net) else stringResource(R.string.receive_hidden), onBack) {
         item {
             ExpressiveCard(
                 shape = KushareShapes.Hero,
@@ -101,28 +103,28 @@ fun ReceiveScreen(
                     )
                     Spacer(Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(if (visible) "Visible" else "Oculto", style = MaterialTheme.typography.headlineMediumEmphasized)
+                        Text(if (visible) stringResource(R.string.receive_visible) else stringResource(R.string.receive_hidden), style = MaterialTheme.typography.headlineMediumEmphasized)
                         Text(
-                            "Por Wi-Fi mientras esta pantalla está abierta. Por Bluetooth se recibe siempre que kushare está encendido.",
+                            stringResource(R.string.receive_detail),
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
                 }
-                SwitchRow("Visible para todos", visible, onVisibleChange, modifier = Modifier.padding(top = 8.dp))
+                SwitchRow(stringResource(R.string.receive_visible_all), visible, onVisibleChange, modifier = Modifier.padding(top = 8.dp))
                 OutlinedTextField(
                     value = deviceName,
                     onValueChange = onDeviceNameChange,
-                    label = { Text("Nombre del dispositivo") },
+                    label = { Text(stringResource(R.string.receive_device_name)) },
                     shape = MaterialTheme.shapes.large,
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
             }
         }
-        item { SectionTitle("Actividad") }
+        item { SectionTitle(stringResource(R.string.receive_activity)) }
         if (log.isEmpty()) {
             item {
                 Text(
-                    "Los archivos recibidos se guardan en Descargas.",
+                    stringResource(R.string.receive_saved_in),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 4.dp),
@@ -151,7 +153,7 @@ fun SendScreen(
     onBack: () -> Unit,
 ) {
     var manualAddress by remember { mutableStateOf("") }
-    TransferScaffold("Enviar", fileName ?: "Ningún archivo", onBack) {
+    TransferScaffold(stringResource(R.string.send_title), fileName ?: stringResource(R.string.send_no_file), onBack) {
         item {
             ExpressiveCard(
                 shape = KushareShapes.ActionLeading,
@@ -175,7 +177,7 @@ fun SendScreen(
                                 isSending -> {
                                     val (bytes, total) = prog ?: (0L to 0L)
                                     Column {
-                                        Text("Enviando… ${bytes / 1024} / ${total / 1024} KB", style = MaterialTheme.typography.bodyMedium)
+                                        Text(stringResource(R.string.send_progress, bytes / 1024, total / 1024), style = MaterialTheme.typography.bodyMedium)
                                         LinearWavyProgressIndicator(
                                             progress = { if (total > 0) bytes.toFloat() / total else 0f },
                                             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -183,7 +185,7 @@ fun SendScreen(
                                     }
                                 }
                                 result != null -> Text(result, style = MaterialTheme.typography.bodyMediumEmphasized)
-                                else -> Text("Elige a quién enviarlo", style = MaterialTheme.typography.bodyMedium)
+                                else -> Text(stringResource(R.string.send_choose), style = MaterialTheme.typography.bodyMedium)
                             }
                         }
                     }
@@ -191,11 +193,11 @@ fun SendScreen(
             }
         }
         if (!sending) {
-            item { SectionTitle("Cerca, por Wi-Fi") }
+            item { SectionTitle(stringResource(R.string.send_nearby_wifi)) }
             if (devices.isEmpty()) {
                 item {
                     Text(
-                        "Buscando… (no funciona si la red aísla a los dispositivos)",
+                        stringResource(R.string.send_searching),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 4.dp),
@@ -205,17 +207,17 @@ fun SendScreen(
             items(devices) { peer ->
                 TargetRow(peer.name, "${peer.host}:${peer.port}", Icons.Rounded.Wifi) { onSend(peer) }
             }
-            item { SectionTitle("Por Bluetooth") }
+            item { SectionTitle(stringResource(R.string.common_by_bluetooth)) }
             items(bondedPeers) { peer ->
                 TargetRow(peer.name, peer.address, Icons.Rounded.Bluetooth) { onSendBt(peer) }
             }
-            item { SectionTitle("Dirección manual") }
+            item { SectionTitle(stringResource(R.string.send_manual)) }
             item {
                 ExpressiveCard(shape = KushareShapes.ListCard, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
                     OutlinedTextField(
                         value = manualAddress,
                         onValueChange = { manualAddress = it },
-                        label = { Text("IP:puerto") },
+                        label = { Text(stringResource(R.string.send_ip_port)) },
                         shape = MaterialTheme.shapes.large,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -228,7 +230,7 @@ fun SendScreen(
                             if (host.isNotBlank() && port != null) onManualSend(host, port)
                         },
                         shapes = ButtonDefaults.shapes(),
-                    ) { Text("Enviar a esta dirección") }
+                    ) { Text(stringResource(R.string.send_to_address)) }
                 }
             }
         }

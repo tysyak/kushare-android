@@ -135,6 +135,14 @@ adb logcat -s KushareService KushareLink KushareNotif LinkNsd
 adb shell run-as org.kushare.app cat files/link/peers.toml
 ```
 
+## Traducir
+
+Todos los textos están en [`app/src/main/res/values/strings.xml`](app/src/main/res/values/strings.xml)
+(español). Para otro idioma, copia ese archivo a `res/values-<idioma>/strings.xml`
+(p. ej. `values-en`) y traduce los valores sin cambiar los `name`; `%1$s` y
+`%1$d` son datos que se rellenan y `%%` es un signo de porcentaje. Android elige
+el idioma del sistema y, si falta un texto, usa el español.
+
 ## Licencia
 
 GPL-3.0-or-later, como kushare.

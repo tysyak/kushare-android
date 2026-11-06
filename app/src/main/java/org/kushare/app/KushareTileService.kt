@@ -55,9 +55,9 @@ class KushareTileService : TileService() {
         tile.state = if (enabled) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
         val subtitle =
             when {
-                !enabled -> "Apagado"
-                !KushareSwitch.radiosAvailable(this) -> "En pausa · sin Bluetooth ni Wi-Fi"
-                else -> connectedSummary() ?: "Esperando…"
+                !enabled -> getString(R.string.home_off)
+                !KushareSwitch.radiosAvailable(this) -> getString(R.string.tile_paused)
+                else -> connectedSummary() ?: getString(R.string.devices_waiting)
             }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) tile.subtitle = subtitle
         tile.contentDescription = "kushare: $subtitle"

@@ -41,12 +41,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.RoundedPolygon
+import org.kushare.app.R
 import org.kushare.app.KushareLink
 import org.kushare.app.KushareSwitch
 
@@ -76,20 +78,20 @@ fun HomeScreen(
 
     val status =
         when {
-            !enabled -> LinkStatus("Apagado", "Ni se sincroniza ni se mantiene la conexión.", Icons.Rounded.PowerSettingsNew, MaterialShapes.Circle, false)
-            paused -> LinkStatus("En pausa", "Sin Bluetooth ni Wi-Fi. Vuelve solo al encender alguno.", Icons.Rounded.PauseCircle, MaterialShapes.Square, false)
+            !enabled -> LinkStatus(stringResource(R.string.home_off), stringResource(R.string.home_off_detail), Icons.Rounded.PowerSettingsNew, MaterialShapes.Circle, false)
+            paused -> LinkStatus(stringResource(R.string.home_paused), stringResource(R.string.home_paused_detail), Icons.Rounded.PauseCircle, MaterialShapes.Square, false)
             connected.isNotEmpty() -> {
                 val viaBt = connected.any { it.transport?.startsWith("bluetooth") == true }
                 LinkStatus(
-                    "Conectado",
+                    stringResource(R.string.home_connected),
                     connected.joinToString(" · ") { it.deviceName },
                     if (viaBt) Icons.Rounded.Bluetooth else Icons.Rounded.Wifi,
                     MaterialShapes.Cookie9Sided,
                     true,
                 )
             }
-            peers.isEmpty() -> LinkStatus("Sin emparejar", "Empareja tu PC en Dispositivos.", Icons.Rounded.Devices, MaterialShapes.Pentagon, false)
-            else -> LinkStatus("Esperando", "Se conectará solo cuando el PC esté cerca.", Icons.Rounded.HourglassTop, MaterialShapes.SoftBurst, true)
+            peers.isEmpty() -> LinkStatus(stringResource(R.string.home_unpaired), stringResource(R.string.home_unpaired_detail), Icons.Rounded.Devices, MaterialShapes.Pentagon, false)
+            else -> LinkStatus(stringResource(R.string.home_waiting), stringResource(R.string.home_waiting_detail), Icons.Rounded.HourglassTop, MaterialShapes.SoftBurst, true)
         }
 
     val iconEnter = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
@@ -103,7 +105,7 @@ fun HomeScreen(
                 title = { Text("kushare", style = MaterialTheme.typography.displaySmallEmphasized) },
                 subtitle = { Text(deviceName) },
                 actions = {
-                    IconButton(onClick = onSettings) { Icon(Icons.Rounded.Settings, contentDescription = "Ajustes") }
+                    IconButton(onClick = onSettings) { Icon(Icons.Rounded.Settings, contentDescription = stringResource(R.string.settings_title)) }
                 },
                 scrollBehavior = scrollBehavior,
             )
@@ -148,8 +150,8 @@ fun HomeScreen(
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     ActionTile(
-                        title = "Enviar",
-                        subtitle = "Un archivo a un dispositivo cercano",
+                        title = stringResource(R.string.send_title),
+                        subtitle = stringResource(R.string.home_send_detail),
                         icon = Icons.Rounded.Send,
                         polygon = MaterialShapes.Clover4Leaf,
                         container = MaterialTheme.colorScheme.tertiaryContainer,
@@ -161,8 +163,8 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f),
                     )
                     ActionTile(
-                        title = "Recibir",
-                        subtitle = "Hacerte visible por Wi-Fi",
+                        title = stringResource(R.string.receive_title),
+                        subtitle = stringResource(R.string.home_receive_detail),
                         icon = Icons.Rounded.Download,
                         polygon = MaterialShapes.Flower,
                         container = MaterialTheme.colorScheme.secondaryContainer,
@@ -187,12 +189,12 @@ fun HomeScreen(
                         )
                         Spacer(Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Dispositivos y notificaciones", style = MaterialTheme.typography.titleLargeEmphasized)
+                            Text(stringResource(R.string.home_devices_title), style = MaterialTheme.typography.titleLargeEmphasized)
                             Text(
                                 when (peers.size) {
-                                    0 -> "Empareja tu PC para sincronizar notificaciones"
-                                    1 -> "1 dispositivo emparejado"
-                                    else -> "${peers.size} dispositivos emparejados"
+                                    0 -> stringResource(R.string.home_devices_none)
+                                    1 -> stringResource(R.string.home_devices_one)
+                                    else -> stringResource(R.string.home_devices_many, peers.size)
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,

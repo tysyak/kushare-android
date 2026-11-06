@@ -918,6 +918,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_note_sighting(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_notify_photos_changed(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_pair_bt(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_pair_tcp(
@@ -1063,6 +1065,8 @@ internal object UniffiLib {
     external fun uniffi_kushare_mobile_fn_method_linkservice_local_apps(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): RustBuffer.ByValue
     external fun uniffi_kushare_mobile_fn_method_linkservice_note_sighting(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`host`: RustBuffer.ByValue,`port`: Short,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_notify_photos_changed(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_pair_bt(`ptr`: Long,`io`: Long,`address`: RustBuffer.ByValue,
     ): Long
@@ -1288,6 +1292,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_note_sighting() and 0xFFFF) != 55198) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_notify_photos_changed() and 0xFFFF) != 12487) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_pair_bt() and 0xFFFF) != 42244) {
@@ -1979,6 +1986,12 @@ public interface LinkServiceInterface {
     fun `noteSighting`(`deviceId`: kotlin.String, `host`: kotlin.String, `port`: kotlin.UShort)
     
     /**
+     * La galería cambió (foto o captura nueva): avisar a los peers para que
+     * la GUI que la esté mostrando pida las más recientes.
+     */
+    fun `notifyPhotosChanged`()
+    
+    /**
      * Empareja (con PIN) por un `BluetoothSocket` que Kotlin ya conectó al
      * servicio RFCOMM del enlace. Para redes que aíslan a los clientes
      * entre sí, donde el Wi-Fi no sirve.
@@ -2322,6 +2335,22 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
         FfiConverterString.lower(`deviceId`),
         FfiConverterString.lower(`host`),
         FfiConverterUShort.lower(`port`),_status)
+}
+    }
+    
+    
+
+    
+    /**
+     * La galería cambió (foto o captura nueva): avisar a los peers para que
+     * la GUI que la esté mostrando pida las más recientes.
+     */override fun `notifyPhotosChanged`()
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_notify_photos_changed(
+        it,
+        _status)
 }
     }
     

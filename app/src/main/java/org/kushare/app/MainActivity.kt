@@ -247,16 +247,16 @@ private fun KushareApp(activity: ComponentActivity, openDevices: MutableState<Bo
             }
         }
 
-    fun runSend(label: String, block: suspend () -> Unit) {
+    fun runSend(okMessage: String, block: suspend () -> Unit) {
         sending = true
         progress = 0L to 0L
         resultMessage = null
         scope.launch {
             try {
                 block()
-                resultMessage = "Enviado $label."
+                resultMessage = okMessage
             } catch (e: Exception) {
-                resultMessage = "Error: ${e.message}"
+                resultMessage = activity.getString(R.string.send_error, e.message)
             } finally {
                 sending = false
             }
@@ -325,14 +325,14 @@ private fun KushareApp(activity: ComponentActivity, openDevices: MutableState<Bo
                     resultMessage = resultMessage,
                     onSend = { peer ->
                         current.filePath?.let { path ->
-                            runSend("a ${peer.name}") {
+                            runSend(activity.getString(R.string.send_done_to, peer.name)) {
                                 sendFile("${peer.host}:${peer.port}", endpointId, deviceName, path, progressCallback)
                             }
                         }
                     },
                     onSendBt = { peer ->
                         current.filePath?.let { path ->
-                            runSend("por Bluetooth a ${peer.name}") {
+                            runSend(activity.getString(R.string.send_done_bt, peer.name)) {
                                 val io = withContext(Dispatchers.IO) { bluetoothHelper.connect(peer.address) }
                                 sendFileBt(io, endpointId, deviceName, path, progressCallback)
                             }
@@ -340,7 +340,7 @@ private fun KushareApp(activity: ComponentActivity, openDevices: MutableState<Bo
                     },
                     onManualSend = { host, port ->
                         current.filePath?.let { path ->
-                            runSend("a $host:$port") { sendFile("$host:$port", endpointId, deviceName, path, progressCallback) }
+                            runSend(activity.getString(R.string.send_done_to, "$host:$port")) { sendFile("$host:$port", endpointId, deviceName, path, progressCallback) }
                         }
                     },
                     onBack = ::goHome,

@@ -130,13 +130,13 @@ object KushareLink {
     private fun createChannels() {
         val nm = notificationManager()
         nm.createNotificationChannel(
-            NotificationChannel(CHANNEL_PC, "Notificaciones del PC", NotificationManager.IMPORTANCE_HIGH),
+            NotificationChannel(CHANNEL_PC, appContext.getString(R.string.channel_pc), NotificationManager.IMPORTANCE_HIGH),
         )
         nm.createNotificationChannel(
-            NotificationChannel(CHANNEL_PAIRING, "Emparejado", NotificationManager.IMPORTANCE_HIGH),
+            NotificationChannel(CHANNEL_PAIRING, appContext.getString(R.string.channel_pairing), NotificationManager.IMPORTANCE_HIGH),
         )
         nm.createNotificationChannel(
-            NotificationChannel(CHANNEL_SERVICE, "Conexión en segundo plano", NotificationManager.IMPORTANCE_MIN),
+            NotificationChannel(CHANNEL_SERVICE, appContext.getString(R.string.channel_service), NotificationManager.IMPORTANCE_MIN),
         )
     }
 
@@ -175,12 +175,12 @@ object KushareLink {
         val notification =
             Notification.Builder(appContext, CHANNEL_PAIRING)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("Emparejar con ${prompt.deviceName}")
-                .setContentText("PIN ${prompt.pin} — acepta solo si el otro dispositivo muestra el mismo.")
+                .setContentTitle(appContext.getString(R.string.devices_pair_with, prompt.deviceName))
+                .setContentText(appContext.getString(R.string.pair_notification_text, prompt.pin))
                 .setContentIntent(open)
                 .setOngoing(true)
-                .addAction(Notification.Action.Builder(null, "Aceptar", accept).build())
-                .addAction(Notification.Action.Builder(null, "Rechazar", reject).build())
+                .addAction(Notification.Action.Builder(null, appContext.getString(R.string.common_accept), accept).build())
+                .addAction(Notification.Action.Builder(null, appContext.getString(R.string.common_reject), reject).build())
                 .build()
         runCatching { notificationManager().notify(pairingTag(prompt.deviceId), PAIRING_ID, notification) }
     }
@@ -223,7 +223,7 @@ object KushareLink {
         override fun onPairingFinished(deviceId: String, deviceName: String, accepted: Boolean) {
             pendingPairing.update { if (it?.deviceId == deviceId) null else it }
             notificationManager().cancel(pairingTag(deviceId), PAIRING_ID)
-            messages.value = if (accepted) "Emparejado con $deviceName" else "No se emparejó con $deviceName"
+            messages.value = appContext.getString(if (accepted) R.string.msg_paired else R.string.msg_not_paired, deviceName)
         }
 
         override fun onPeersChanged() = refreshPeers()

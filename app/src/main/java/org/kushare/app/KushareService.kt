@@ -247,12 +247,12 @@ class KushareService : Service() {
         val notification =
             Notification.Builder(this, KushareLink.CHANNEL_SERVICE)
                 .setSmallIcon(R.drawable.ic_tile)
-                .setContentTitle(if (paused) "kushare en pausa" else "kushare conectado en segundo plano")
+                .setContentTitle(getString(if (paused) R.string.service_paused else R.string.service_running))
                 .setContentText(
                     if (paused) {
-                        "Sin Bluetooth ni Wi-Fi; se reanudará al volver alguno"
+                        getString(R.string.service_paused_detail)
                     } else {
-                        "Sincronizando notificaciones con tus dispositivos"
+                        getString(R.string.service_running_detail)
                     },
                 )
                 .setContentIntent(open)

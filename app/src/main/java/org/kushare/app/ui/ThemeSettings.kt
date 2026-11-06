@@ -1,15 +1,17 @@
 package org.kushare.app.ui
 
+import androidx.annotation.StringRes
+import org.kushare.app.R
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /** Cómo se elige entre claro y oscuro. */
-enum class ThemeMode(val label: String) {
-    SYSTEM("Sistema"),
-    LIGHT("Claro"),
-    DARK("Oscuro"),
-    OLED("Oscuro OLED"),
+enum class ThemeMode(@StringRes val labelRes: Int) {
+    SYSTEM(R.string.theme_system),
+    LIGHT(R.string.theme_light),
+    DARK(R.string.theme_dark),
+    OLED(R.string.theme_oled),
 }
 
 data class ThemeConfig(

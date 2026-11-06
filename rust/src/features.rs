@@ -250,6 +250,6 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
         }
         F::PhotoRequest(req) => callback.on_photo_request(device_id, req.request_id, req.id),
         // Solo los manda un teléfono; el PC no tiene timbre, llamadas ni galería.
-        F::RingerMode(_) | F::CallState(_) | F::PhotoList(_) | F::PhotoData(_) => {}
+        F::RingerMode(_) | F::CallState(_) | F::PhotoList(_) | F::PhotoData(_) | F::PhotosChanged(_) => {}
     }
 }

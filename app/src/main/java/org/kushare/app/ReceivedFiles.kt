@@ -31,11 +31,11 @@ class FileReceiveCallback(private val context: Context) : ReceiveCallback {
 
     override fun onCompleted(deviceName: String, fileName: String, savedTo: String) {
         val uri = publishToDownloads(context, File(savedTo))
-        notify(context, "Archivo recibido de $deviceName", fileName, uri)
+        notify(context, context.getString(R.string.file_received_from, deviceName), fileName, uri)
     }
 
     override fun onFailed(fileName: String, reason: String) {
-        notify(context, "No se pudo recibir \"$fileName\"", reason, null)
+        notify(context, context.getString(R.string.file_receive_failed, fileName), reason, null)
     }
 }
 
@@ -64,7 +64,7 @@ private fun publishToDownloads(context: Context, file: File): Uri? {
 private fun notify(context: Context, title: String, text: String, uri: Uri?) {
     val nm = context.getSystemService(NotificationManager::class.java)
     nm.createNotificationChannel(
-        NotificationChannel(CHANNEL_FILES, "Archivos recibidos", NotificationManager.IMPORTANCE_DEFAULT),
+        NotificationChannel(CHANNEL_FILES, context.getString(R.string.channel_files), NotificationManager.IMPORTANCE_DEFAULT),
     )
     val builder =
         Notification.Builder(context, CHANNEL_FILES)

@@ -65,6 +65,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -75,6 +76,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.kushare.app.R
 import org.kushare.app.BluetoothHelper
 import org.kushare.app.BondedPeer
 import org.kushare.app.KushareLink
@@ -143,7 +145,7 @@ fun DevicesScreen(onBack: () -> Unit) {
             try {
                 action()
             } catch (e: Exception) {
-                KushareLink.messages.value = "No se pudo emparejar: ${e.message}"
+                KushareLink.messages.value = context.getString(R.string.devices_pair_failed, e.message)
             } finally {
                 pairingInProgress = null
                 KushareLink.refreshPeers()
@@ -155,18 +157,18 @@ fun DevicesScreen(onBack: () -> Unit) {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeFlexibleTopAppBar(
-                title = { Text("Dispositivos", style = MaterialTheme.typography.displaySmallEmphasized) },
+                title = { Text(stringResource(R.string.devices_title), style = MaterialTheme.typography.displaySmallEmphasized) },
                 subtitle = {
                     Text(
                         when {
-                            !enabled -> "kushare está apagado"
-                            paused -> "En pausa: sin Bluetooth ni Wi-Fi"
-                            else -> "${peers.count { it.connected }} conectado(s) de ${peers.size}"
+                            !enabled -> stringResource(R.string.devices_off)
+                            paused -> stringResource(R.string.devices_paused)
+                            else -> stringResource(R.string.devices_connected_of, peers.count { it.connected }, peers.size)
                         },
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Volver") }
+                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.common_back)) }
                 },
                 scrollBehavior = scrollBehavior,
             )
@@ -192,8 +194,8 @@ fun DevicesScreen(onBack: () -> Unit) {
                 item(key = "off") {
                     ExpressiveCard(shape = KushareShapes.Hero, containerColor = MaterialTheme.colorScheme.surfaceContainerHighest) {
                         SwitchRow(
-                            title = "kushare activado",
-                            subtitle = if (!enabled) "Enciéndelo para emparejar y sincronizar." else "En pausa hasta que vuelva el Bluetooth o el Wi-Fi.",
+                            title = stringResource(R.string.common_enabled),
+                            subtitle = if (!enabled) stringResource(R.string.devices_enable_hint) else stringResource(R.string.devices_paused_hint),
                             checked = enabled,
                             onCheckedChange = { KushareSwitch.setEnabled(context, it) },
                         )
@@ -207,22 +209,22 @@ fun DevicesScreen(onBack: () -> Unit) {
                         containerColor = MaterialTheme.colorScheme.errorContainer,
                         contentColor = MaterialTheme.colorScheme.onErrorContainer,
                     ) {
-                        Text("Falta el acceso a notificaciones", style = MaterialTheme.typography.titleLargeEmphasized)
-                        Text("Sin él, las notificaciones del teléfono no llegan al PC.", style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.devices_access_missing), style = MaterialTheme.typography.titleLargeEmphasized)
+                        Text(stringResource(R.string.devices_access_missing_detail), style = MaterialTheme.typography.bodyMedium)
                         Spacer(Modifier.size(12.dp))
                         Button(
                             onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) },
                             shapes = ButtonDefaults.shapes(),
-                        ) { Text("Permitir acceso") }
+                        ) { Text(stringResource(R.string.devices_grant_access)) }
                     }
                 }
             }
 
-            item(key = "paired-title") { SectionTitle("Emparejados") }
+            item(key = "paired-title") { SectionTitle(stringResource(R.string.devices_paired)) }
             if (peers.isEmpty()) {
                 item(key = "no-peers") {
                     Text(
-                        "Todavía no hay ninguno. Empareja por Wi-Fi o Bluetooth más abajo.",
+                        stringResource(R.string.devices_none_yet),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 4.dp),
@@ -247,7 +249,7 @@ fun DevicesScreen(onBack: () -> Unit) {
 
             item(key = "net-title") {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    SectionTitle("En esta red", modifier = Modifier.weight(1f))
+                    SectionTitle(stringResource(R.string.devices_on_network), modifier = Modifier.weight(1f))
                     FilledTonalButton(
                         enabled = canUseLink && !scanning,
                         onClick = { KushareService.scan(context) },
@@ -259,15 +261,15 @@ fun DevicesScreen(onBack: () -> Unit) {
                             Icon(Icons.Rounded.Search, contentDescription = null, modifier = Modifier.size(18.dp))
                         }
                         Spacer(Modifier.width(8.dp))
-                        Text(if (scanning) "Buscando" else "Buscar")
+                        Text(if (scanning) stringResource(R.string.devices_searching) else stringResource(R.string.devices_search))
                     }
                 }
             }
             if (visible.isEmpty()) {
                 item(key = "no-visible") {
                     Text(
-                        if (scanning) "Buscando dispositivos kushare…"
-                        else "Pulsa Buscar. Si la red aísla a los dispositivos, empareja por Bluetooth.",
+                        if (scanning) stringResource(R.string.devices_searching_detail)
+                        else stringResource(R.string.devices_search_hint),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 4.dp),
@@ -290,11 +292,11 @@ fun DevicesScreen(onBack: () -> Unit) {
                 )
             }
 
-            item(key = "bt-title") { SectionTitle("Por Bluetooth") }
+            item(key = "bt-title") { SectionTitle(stringResource(R.string.common_by_bluetooth)) }
             if (bondedCandidates.isEmpty()) {
                 item(key = "no-bt") {
                     Text(
-                        "No hay dispositivos Bluetooth vinculados sin emparejar.",
+                        stringResource(R.string.devices_no_bonded),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 4.dp),
@@ -334,10 +336,10 @@ fun DevicesScreen(onBack: () -> Unit) {
                     active = true,
                 )
             },
-            title = { Text("Emparejar con ${prompt.deviceName}", style = MaterialTheme.typography.headlineSmallEmphasized) },
+            title = { Text(stringResource(R.string.devices_pair_with, prompt.deviceName), style = MaterialTheme.typography.headlineSmallEmphasized) },
             text = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                    Text("Comprueba que el otro dispositivo muestra el mismo código")
+                    Text(stringResource(R.string.devices_pin_hint))
                     Surface(
                         shape = MaterialShapes.Pill.toShape(),
                         color = MaterialTheme.colorScheme.primaryContainer,
@@ -354,11 +356,11 @@ fun DevicesScreen(onBack: () -> Unit) {
             },
             confirmButton = {
                 Button(onClick = { KushareLink.respondPairing(prompt.deviceId, true) }, shapes = ButtonDefaults.shapes()) {
-                    Text("Coincide")
+                    Text(stringResource(R.string.devices_pin_matches))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { KushareLink.respondPairing(prompt.deviceId, false) }) { Text("Rechazar") }
+                TextButton(onClick = { KushareLink.respondPairing(prompt.deviceId, false) }) { Text(stringResource(R.string.common_reject)) }
             },
         )
     }
@@ -391,7 +393,7 @@ private fun CandidateRow(
                 Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Button(onClick = onPair, enabled = enabled, shapes = ButtonDefaults.shapes()) {
-                Text(if (busy) "Esperando…" else "Emparejar")
+                Text(if (busy) stringResource(R.string.devices_waiting) else stringResource(R.string.devices_pair))
             }
         }
     }
@@ -403,11 +405,11 @@ private fun PeerControls(deviceId: String, extras: PeerExtras) {
     val link = KushareLink.service ?: return
     if (extras.players.isNotEmpty()) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = 12.dp)) {
-            Text("Multimedia", style = MaterialTheme.typography.titleSmallEmphasized, modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.devices_media), style = MaterialTheme.typography.titleSmallEmphasized, modifier = Modifier.weight(1f))
             TextButton(
                 enabled = extras.players.any { it.state == "playing" },
                 onClick = { link.sendMediaCommand(deviceId, "", "pause") },
-            ) { Text("Pausar todo") }
+            ) { Text(stringResource(R.string.devices_pause_all)) }
         }
         extras.players.forEach { p ->
             Surface(
@@ -426,7 +428,7 @@ private fun PeerControls(deviceId: String, extras: PeerExtras) {
                         )
                     }
                     IconButton(enabled = p.canPrevious, onClick = { link.sendMediaCommand(deviceId, p.id, "previous") }) {
-                        Icon(Icons.Rounded.SkipPrevious, contentDescription = "Anterior")
+                        Icon(Icons.Rounded.SkipPrevious, contentDescription = stringResource(R.string.media_previous))
                     }
                     FilledIconButton(onClick = { link.sendMediaCommand(deviceId, p.id, "play-pause") }) {
                         Icon(
@@ -435,7 +437,7 @@ private fun PeerControls(deviceId: String, extras: PeerExtras) {
                         )
                     }
                     IconButton(enabled = p.canNext, onClick = { link.sendMediaCommand(deviceId, p.id, "next") }) {
-                        Icon(Icons.Rounded.SkipNext, contentDescription = "Siguiente")
+                        Icon(Icons.Rounded.SkipNext, contentDescription = stringResource(R.string.media_next))
                     }
                 }
             }
@@ -443,7 +445,7 @@ private fun PeerControls(deviceId: String, extras: PeerExtras) {
     }
     if (extras.outputs.isNotEmpty()) {
         Text(
-            "Salida de audio",
+            stringResource(R.string.devices_output),
             style = MaterialTheme.typography.titleSmallEmphasized,
             modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
         )
@@ -496,7 +498,7 @@ private fun PeerCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(peer.deviceName, style = MaterialTheme.typography.headlineSmallEmphasized)
                 Text(
-                    if (peer.connected) "Conectado por $via" else "Desconectado",
+                    if (peer.connected) stringResource(R.string.devices_connected_via, via ?: "") else stringResource(R.string.devices_disconnected),
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 extras?.battery?.takeIf { it.present }?.let { b ->
@@ -508,7 +510,7 @@ private fun PeerCard(
                         )
                         Spacer(Modifier.width(4.dp))
                         Text(
-                            "${b.percent} %" + if (b.charging) " · cargando" else "",
+                            if (b.charging) stringResource(R.string.battery_charging, b.percent.toInt()) else stringResource(R.string.battery_level, b.percent.toInt()),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
@@ -517,13 +519,13 @@ private fun PeerCard(
         }
         if (peer.connected && extras != null) PeerControls(peer.deviceId, extras)
         Spacer(Modifier.size(8.dp))
-        SwitchRow("Enviar mis notificaciones", peer.outgoingEnabled, { onDirection(true, it) })
-        SwitchRow("Recibir sus notificaciones", peer.incomingEnabled, { onDirection(false, it) })
+        SwitchRow(stringResource(R.string.devices_send_notifications), peer.outgoingEnabled, { onDirection(true, it) })
+        SwitchRow(stringResource(R.string.devices_receive_notifications), peer.incomingEnabled, { onDirection(false, it) })
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
-            OutlinedButton(onClick = { onApps(true) }, shapes = ButtonDefaults.shapes()) { Text("Apps que envío") }
-            OutlinedButton(onClick = { onApps(false) }, shapes = ButtonDefaults.shapes()) { Text("Apps que recibo") }
+            OutlinedButton(onClick = { onApps(true) }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.devices_apps_out)) }
+            OutlinedButton(onClick = { onApps(false) }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.devices_apps_in)) }
         }
-        TextButton(onClick = onUnpair) { Text("Desemparejar") }
+        TextButton(onClick = onUnpair) { Text(stringResource(R.string.devices_unpair)) }
     }
 }
 
@@ -540,13 +542,13 @@ private fun AppFilterDialog(target: AppFilterTarget, onDismiss: () -> Unit) {
         shape = KushareShapes.Dialog,
         title = {
             Text(
-                if (target.outgoing) "Apps que envío a ${peer.deviceName}" else "Apps que recibo de ${peer.deviceName}",
+                if (target.outgoing) stringResource(R.string.devices_apps_out_to, peer.deviceName) else stringResource(R.string.devices_apps_in_from, peer.deviceName),
                 style = MaterialTheme.typography.headlineSmallEmphasized,
             )
         },
         text = {
             if (apps.isEmpty()) {
-                Text("Las apps aparecen aquí cuando notifican algo por primera vez.")
+                Text(stringResource(R.string.devices_apps_hint))
             } else {
                 Box(modifier = Modifier.heightIn(max = 420.dp)) {
                     LazyColumn {
@@ -568,6 +570,6 @@ private fun AppFilterDialog(target: AppFilterTarget, onDismiss: () -> Unit) {
                 }
             }
         },
-        confirmButton = { Button(onClick = onDismiss, shapes = ButtonDefaults.shapes()) { Text("Listo") } },
+        confirmButton = { Button(onClick = onDismiss, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.common_done)) } },
     )
 }
