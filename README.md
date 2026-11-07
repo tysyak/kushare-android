@@ -13,6 +13,7 @@ App Android de [kushare](https://github.com/tysyak/kushare): transferencia de ar
 - **Teléfono desde el PC** (al estilo KDE Connect): batería, modo de timbre, reproductores (controlar YouTube, TIDAL, Spotify… y *Pausar todo*), salidas de audio, llamadas (contestar, rechazar, colgar, silenciar; con el PC como manos libres por Bluetooth) y galería de fotos (miniaturas y descarga del original).
 - **"Enlace Móvil" para Linux** (0.4.0): el PC lee y manda **SMS**, ve el **registro de llamadas**, busca **contactos** y **llama** desde el teléfono, ve sus **notificaciones activas** (con acciones y respuesta), su **fondo de pantalla**, y puede **borrar fotos** (van a la papelera, confirmándolo aquí).
 - **Portapapeles compartido**: lo que copia el PC llega al instante; lo del teléfono se manda al abrir kushare, con *Enviar portapapeles* (en su notificación o en *Ajustes*), con el botón de ajustes rápidos *Portapapeles al PC* o con *Compartir → Copiar en el PC*. Android no deja leer el portapapeles en segundo plano.
+- **Menú lateral** (☰) al estilo de Enlace Móvil: PC vinculados con su estado, *Agregar PC*, *Portapapeles* (lo último copiado con el PC), *Permisos de la aplicación*, *Ajustes* y *Actualizaciones*.
 - **PC desde el teléfono**: su batería, sus reproductores (MPRIS) y su salida de audio, en *Dispositivos*.
 - **Actualizaciones** desde *Ajustes*: busca el último release en GitHub, lo descarga y lo instala con el instalador del sistema (que exige la misma firma).
 - **Botón en los ajustes rápidos** (la cortina de Wi-Fi, Bluetooth…):

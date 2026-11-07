@@ -85,7 +85,7 @@ object UpdateChecker {
                     },
                     onFailure = {
                         Log.w(TAG, "no se pudo buscar actualizaciones", it)
-                        State.Failed(it.message ?: "error")
+                        State.Failed(ctx.friendlyError(it))
                     },
                 )
             state.value = next
@@ -122,7 +122,7 @@ object UpdateChecker {
                 }
             }
         state.value =
-            result.fold(onSuccess = { State.Available(release) }, onFailure = { State.Failed(it.message ?: "error") })
+            result.fold(onSuccess = { State.Available(release) }, onFailure = { State.Failed(ctx.friendlyError(it)) })
     }
 }
 
@@ -138,7 +138,7 @@ class UpdateStatusReceiver : BroadcastReceiver() {
             PackageInstaller.STATUS_SUCCESS -> Log.i(TAG, "actualizada")
             else -> {
                 val msg = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE) ?: "error"
-                UpdateChecker.state.value = UpdateChecker.State.Failed(msg)
+                UpdateChecker.state.value = UpdateChecker.State.Failed(context.friendlyError(msg))
             }
         }
     }

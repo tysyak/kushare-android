@@ -77,6 +77,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kushare.app.R
+import org.kushare.app.friendlyError
 import org.kushare.app.BluetoothHelper
 import org.kushare.app.BondedPeer
 import org.kushare.app.KushareLink
@@ -145,7 +146,7 @@ fun DevicesScreen(onBack: () -> Unit) {
             try {
                 action()
             } catch (e: Exception) {
-                KushareLink.messages.value = context.getString(R.string.devices_pair_failed, e.message)
+                KushareLink.messages.value = context.getString(R.string.devices_pair_failed, context.friendlyError(e))
             } finally {
                 pairingInProgress = null
                 KushareLink.refreshPeers()

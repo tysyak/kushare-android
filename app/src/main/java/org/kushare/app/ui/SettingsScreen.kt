@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.BrightnessAuto
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.LightMode
@@ -89,7 +90,7 @@ private fun ThemeMode.icon(): ImageVector =
 private fun ThemeMode.shortLabel(): String = stringResource(if (this == ThemeMode.OLED) R.string.theme_oled_short else labelRes)
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onPermissions: () -> Unit) {
     val context = LocalContext.current
     val config by ThemeSettings.config.collectAsState()
     val enabled by KushareSwitch.enabled.collectAsState()
@@ -177,43 +178,23 @@ fun SettingsScreen(onBack: () -> Unit) {
                     )
                 }
             }
+            item { SectionTitle(stringResource(R.string.drawer_permissions)) }
             item {
-                ExpressiveCard(
-                    shape = KushareShapes.ListCard,
-                    containerColor = if (listenerGranted) MaterialTheme.colorScheme.surfaceContainerHigh else MaterialTheme.colorScheme.errorContainer,
-                    contentColor = if (listenerGranted) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onErrorContainer,
-                ) {
+                ExpressiveCard(shape = KushareShapes.ListCard, onClick = onPermissions) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        ShapeIcon(
-                            icon = Icons.Rounded.Notifications,
-                            polygon = MaterialShapes.Cookie4Sided,
-                            container = if (listenerGranted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                            content = if (listenerGranted) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onError,
-                            size = 48.dp,
-                        )
-                        Spacer(Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(stringResource(R.string.settings_access), style = MaterialTheme.typography.bodyLargeEmphasized)
+                            Text(stringResource(R.string.drawer_permissions), style = MaterialTheme.typography.bodyLargeEmphasized)
                             Text(
-                                if (listenerGranted) stringResource(R.string.settings_access_granted)
+                                if (listenerGranted) stringResource(R.string.permissions_subtitle)
                                 else stringResource(R.string.settings_access_missing),
                                 style = MaterialTheme.typography.bodySmall,
+                                color = if (listenerGranted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
                             )
                         }
+                        Icon(Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = null)
                     }
-                    Spacer(Modifier.size(12.dp))
-                    FilledTonalButton(
-                        onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) },
-                        shapes = ButtonDefaults.shapes(),
-                    ) { Text(if (listenerGranted) stringResource(R.string.settings_review) else stringResource(R.string.settings_grant)) }
                 }
             }
-
-            item { SectionTitle(stringResource(R.string.settings_phone_features)) }
-            item { PhoneFeaturesCard() }
-
-            item { SectionTitle(stringResource(R.string.settings_clipboard)) }
-            item { ClipboardCard() }
 
             item { SectionTitle(stringResource(R.string.settings_updates)) }
             item { UpdateCard() }
@@ -282,7 +263,7 @@ private fun InfoRow(label: String, value: String) {
 
 /** Permisos opcionales de las funciones extra y el selector de salida de audio. */
 @Composable
-private fun PhoneFeaturesCard() {
+internal fun PhoneFeaturesCard() {
     val context = LocalContext.current
     var calls by remember { mutableStateOf(PhoneFeatures.hasCallPermissions(context)) }
     var photos by remember { mutableStateOf(PhoneFeatures.hasPhotoPermission(context)) }
@@ -405,7 +386,7 @@ private fun PermissionRow(title: String, subtitle: String, granted: Boolean, onG
 
 /** Portapapeles compartido con el PC. */
 @Composable
-private fun ClipboardCard() {
+internal fun ClipboardCard() {
     val context = LocalContext.current
     var on by remember { mutableStateOf(PhoneData.clipboardSync(context)) }
     ExpressiveCard(shape = KushareShapes.ListCard) {
@@ -476,5 +457,54 @@ private fun UpdateCard() {
                 shapes = ButtonDefaults.shapes(),
             ) { Text(stringResource(R.string.update_check)) }
         }
+    }
+}
+
+/** Acceso a notificaciones (el permiso principal de kushare). */
+@Composable
+internal fun NotificationAccessCard() {
+    val context = LocalContext.current
+    var listenerGranted by remember {
+        mutableStateOf(NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName))
+    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    listenerGranted = NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
+                }
+            }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    ExpressiveCard(
+                    shape = KushareShapes.ListCard,
+                    containerColor = if (listenerGranted) MaterialTheme.colorScheme.surfaceContainerHigh else MaterialTheme.colorScheme.errorContainer,
+                    contentColor = if (listenerGranted) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onErrorContainer,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        ShapeIcon(
+                            icon = Icons.Rounded.Notifications,
+                            polygon = MaterialShapes.Cookie4Sided,
+                            container = if (listenerGranted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                            content = if (listenerGranted) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onError,
+                            size = 48.dp,
+                        )
+                        Spacer(Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(stringResource(R.string.settings_access), style = MaterialTheme.typography.bodyLargeEmphasized)
+                            Text(
+                                if (listenerGranted) stringResource(R.string.settings_access_granted)
+                                else stringResource(R.string.settings_access_missing),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                    }
+                    Spacer(Modifier.size(12.dp))
+                    FilledTonalButton(
+                        onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) },
+                        shapes = ButtonDefaults.shapes(),
+                    ) { Text(if (listenerGranted) stringResource(R.string.settings_review) else stringResource(R.string.settings_grant)) }
     }
 }

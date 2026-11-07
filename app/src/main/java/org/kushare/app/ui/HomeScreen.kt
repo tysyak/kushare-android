@@ -25,7 +25,7 @@ import androidx.compose.material.icons.rounded.HourglassTop
 import androidx.compose.material.icons.rounded.PauseCircle
 import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.Send
-import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Wifi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,7 +67,7 @@ fun HomeScreen(
     onSend: () -> Unit,
     onReceive: () -> Unit,
     onDevices: () -> Unit,
-    onSettings: () -> Unit,
+    onMenu: () -> Unit,
 ) {
     val context = LocalContext.current
     val enabled by KushareSwitch.enabled.collectAsState()
@@ -104,8 +104,8 @@ fun HomeScreen(
             LargeFlexibleTopAppBar(
                 title = { Text("kushare", style = MaterialTheme.typography.displaySmallEmphasized) },
                 subtitle = { Text(deviceName) },
-                actions = {
-                    IconButton(onClick = onSettings) { Icon(Icons.Rounded.Settings, contentDescription = stringResource(R.string.settings_title)) }
+                navigationIcon = {
+                    IconButton(onClick = onMenu) { Icon(Icons.Rounded.Menu, contentDescription = stringResource(R.string.drawer_open)) }
                 },
                 scrollBehavior = scrollBehavior,
             )

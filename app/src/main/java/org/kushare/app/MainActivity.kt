@@ -25,6 +25,13 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
+import org.kushare.app.ui.ClipboardScreen
+import org.kushare.app.ui.DrawerContent
+import org.kushare.app.ui.DrawerTarget
+import org.kushare.app.ui.PermissionsScreen
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -67,6 +74,10 @@ private sealed class Screen(val depth: Int) {
     data object Devices : Screen(1)
 
     data object Settings : Screen(1)
+
+    data object Permissions : Screen(2)
+
+    data object Clipboard : Screen(1)
 }
 
 class MainActivity : ComponentActivity() {
@@ -185,7 +196,7 @@ private fun KushareApp(activity: ComponentActivity, openDevices: MutableState<Bo
                 }
 
                 override fun onFailed(fileName: String, reason: String) {
-                    activityLog.add(0, "✗ error con \"$fileName\": $reason")
+                    activityLog.add(0, "✗ \"$fileName\": ${activity.friendlyError(reason)}")
                 }
             }
         val handle = startReceiver(0u, downloadDir.absolutePath, callback)
@@ -262,7 +273,7 @@ private fun KushareApp(activity: ComponentActivity, openDevices: MutableState<Bo
                 block()
                 resultMessage = okMessage
             } catch (e: Exception) {
-                resultMessage = activity.getString(R.string.send_error, e.message)
+                resultMessage = activity.getString(R.string.send_error, activity.friendlyError(e))
             } finally {
                 sending = false
             }
@@ -278,12 +289,42 @@ private fun KushareApp(activity: ComponentActivity, openDevices: MutableState<Bo
         screen = Screen.Home
     }
 
-    BackHandler(enabled = screen != Screen.Home && !sending) { goHome() }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    BackHandler(enabled = drawerState.isOpen) { scope.launch { drawerState.close() } }
+    BackHandler(enabled = screen != Screen.Home && !sending && drawerState.isClosed) { goHome() }
 
     // Transición entre pantallas con los muelles del esquema expresivo:
     // entrar desliza desde la derecha; volver, desde la izquierda.
     val spatial = MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()
     val effects = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        gesturesEnabled = screen == Screen.Home || drawerState.isOpen,
+        drawerContent = {
+            DrawerContent { target ->
+                scope.launch { drawerState.close() }
+                when (target) {
+                    DrawerTarget.Devices -> {
+                        ensurePermissions()
+                        screen = Screen.Devices
+                    }
+                    DrawerTarget.Clipboard -> screen = Screen.Clipboard
+                    DrawerTarget.Permissions -> screen = Screen.Permissions
+                    DrawerTarget.Settings -> screen = Screen.Settings
+                    DrawerTarget.Updates -> {
+                        screen = Screen.Settings
+                        scope.launch { UpdateChecker.check(activity) }
+                    }
+                    DrawerTarget.Feedback ->
+                        runCatching {
+                            activity.startActivity(
+                                Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/tysyak/kushare-android/issues")),
+                            )
+                        }
+                }
+            }
+        },
+    ) {
     AnimatedContent(
         targetState = screen,
         transitionSpec = {
@@ -308,10 +349,12 @@ private fun KushareApp(activity: ComponentActivity, openDevices: MutableState<Bo
                         ensurePermissions()
                         screen = Screen.Devices
                     },
-                    onSettings = { screen = Screen.Settings },
+                    onMenu = { scope.launch { drawerState.open() } },
                 )
             is Screen.Devices -> DevicesScreen(onBack = ::goHome)
-            is Screen.Settings -> SettingsScreen(onBack = ::goHome)
+            is Screen.Settings -> SettingsScreen(onBack = ::goHome, onPermissions = { screen = Screen.Permissions })
+            is Screen.Permissions -> PermissionsScreen(onBack = ::goHome)
+            is Screen.Clipboard -> ClipboardScreen(onBack = ::goHome)
             is Screen.Receive ->
                 ReceiveScreen(
                     deviceName = deviceName,
@@ -352,5 +395,6 @@ private fun KushareApp(activity: ComponentActivity, openDevices: MutableState<Bo
                     onBack = ::goHome,
                 )
         }
+    }
     }
 }

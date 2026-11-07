@@ -6,6 +6,24 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.4.1] - 2026-11-07
+
+### Añadido
+- **Menú lateral** al estilo de Enlace Móvil: este teléfono, los PC
+  vinculados con su estado (*Conectado · Bluetooth*), *Agregar PC*, y
+  *Portapapeles*, *Permisos de la aplicación*, *Ajustes*, *Buscar
+  actualizaciones* y *Envíanos comentarios*.
+- Pantalla **Portapapeles**: lo último copiado desde y hacia el PC (solo en
+  memoria; tocar una entrada la copia aquí) y un aviso breve «Copiado desde
+  el PC» al recibir (desactivable).
+- Pantalla **Permisos de la aplicación** (acceso a notificaciones y
+  funciones opcionales).
+
+### Cambiado
+- Los errores se muestran con mensajes comprensibles («El PC no respondió…»,
+  «No hay conexión con el PC», «Falta un permiso…») en vez del texto técnico,
+  que queda solo en el log.
+
 ## [0.4.0] - 2026-11-07
 
 ### Añadido

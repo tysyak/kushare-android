@@ -35,6 +35,8 @@ import java.io.ByteArrayOutputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uniffi.kushare_mobile.LinkService
 import uniffi.kushare_mobile.MobileCallLogEntry
@@ -525,6 +527,48 @@ object PhoneData {
 
     private const val PREFS = "kushare"
     private const val KEY_CLIPBOARD = "clipboard_sync"
+    private const val KEY_CLIPBOARD_NOTIFY = "clipboard_notify"
+    private const val CLIPBOARD_CHANNEL = "clipboard"
+    private const val CLIPBOARD_NOTIFICATION = 7301
+
+    /** Lo copiado con el PC en esta sesión (solo en memoria, máx. 20). */
+    data class ClipEntry(val text: String, val fromPc: Boolean, val timeMs: Long)
+
+    val clipboardLog = MutableStateFlow<List<ClipEntry>>(emptyList())
+
+    private fun logClip(text: String, fromPc: Boolean) =
+        clipboardLog.update { (listOf(ClipEntry(text, fromPc, System.currentTimeMillis())) + it.filter { e -> e.text != text }).take(20) }
+
+    fun clipboardNotify(ctx: Context) = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_CLIPBOARD_NOTIFY, true)
+
+    fun setClipboardNotify(ctx: Context, on: Boolean) =
+        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_CLIPBOARD_NOTIFY, on).apply()
+
+    /** Copia `text` en el teléfono (desde la lista) sin mandarlo de vuelta al PC. */
+    fun copyLocally(ctx: Context, text: String) {
+        lastClip = text
+        runCatching {
+            ctx.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("kushare", text))
+        }
+    }
+
+    /** Aviso discreto "Copiado desde el PC" (desaparece solo). */
+    private fun notifyClipboard(app: Context, text: String) {
+        if (!clipboardNotify(app)) return
+        val nm = app.getSystemService(NotificationManager::class.java)
+        nm.createNotificationChannel(
+            NotificationChannel(CLIPBOARD_CHANNEL, app.getString(R.string.channel_clipboard), NotificationManager.IMPORTANCE_LOW),
+        )
+        val n =
+            NotificationCompat.Builder(app, CLIPBOARD_CHANNEL)
+                .setSmallIcon(R.drawable.ic_tile)
+                .setContentTitle(app.getString(R.string.clipboard_copied_from_pc))
+                .setContentText(text.replace('\n', ' ').take(120))
+                .setTimeoutAfter(4000)
+                .setOnlyAlertOnce(true)
+                .build()
+        runCatching { nm.notify(CLIPBOARD_NOTIFICATION, n) }
+    }
 
     /** Último texto visto o puesto (para no reenviar ecos). */
     @Volatile
@@ -539,11 +583,14 @@ object PhoneData {
     fun onClipboard(text: String) {
         val app = context ?: return
         if (!clipboardSync(app)) return
+        Log.i(TAG, "portapapeles del PC recibido (${text.length} caracteres)")
         lastClip = text
+        logClip(text, fromPc = true)
         main.post {
             runCatching {
                 app.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("kushare", text))
-            }.onFailure { Log.w(TAG, "no se pudo poner el portapapeles", it) }
+            }.onSuccess { notifyClipboard(app, text) }
+                .onFailure { Log.w(TAG, "no se pudo poner el portapapeles", it) }
         }
     }
 
@@ -570,9 +617,10 @@ object PhoneData {
     fun sendText(text: String, force: Boolean = true): Boolean {
         if (text.isBlank() || text.length > 256 * 1024) return false
         if (!force && text == lastClip) return false
-        lastClip = text
         val svc = svc() ?: return false
+        lastClip = text
         svc.publishClipboard(text)
+        logClip(text, fromPc = false)
         return true
     }
 }
