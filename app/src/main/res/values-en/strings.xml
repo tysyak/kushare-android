@@ -195,4 +195,6 @@
     <string name="clipboard_copied_here">Copied on the phone</string>
     <string name="clipboard_copied_from_pc">Copied from the PC</string>
     <string name="channel_clipboard">PC clipboard</string>
+    <string name="settings_hybrid">Hybrid connection (recommended)</string>
+    <string name="settings_hybrid_detail">Notifications, calls and control over Bluetooth (low power); photos, texts and lists over Wi-Fi when the PC is on the same network. Off: everything over Bluetooth.</string>
 </resources>

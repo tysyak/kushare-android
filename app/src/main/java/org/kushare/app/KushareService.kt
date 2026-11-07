@@ -16,12 +16,14 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.net.ConnectivityManager
+import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import java.net.Inet4Address
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -63,6 +65,14 @@ private const val BT_RETRY_MAX_MS = 15 * 60_000L
 class KushareService : Service() {
     companion object {
         const val ACTION_SCAN = "org.kushare.app.SCAN"
+
+        @Volatile
+        private var instance: KushareService? = null
+
+        /** Cambió el modo de conexión: volver a anunciar (o retirar) la Wi-Fi al PC. */
+        fun onLinkModeChanged() {
+            instance?.let { it.serviceScope.launch { it.publishLan() } }
+        }
 
         fun start(context: Context) {
             if (!KushareSwitch.isEnabled(context)) return
@@ -120,24 +130,65 @@ class KushareService : Service() {
             }
         }
 
+    /** Red Wi-Fi actual (para decirle al PC dónde abrir el enlace de datos). */
+    @Volatile
+    private var wifiNetwork: Network? = null
+
     private val networkCallback =
         object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
+                wifiNetwork = network
                 serviceScope.launch {
                     onRadiosChanged()
+                    publishLan()
                     KushareLink.service?.wakeReconnect()
                 }
             }
 
+            override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+                wifiNetwork = network
+                serviceScope.launch { publishLan() }
+            }
+
             override fun onLost(network: Network) {
-                serviceScope.launch { onRadiosChanged() }
+                if (wifiNetwork == network) wifiNetwork = null
+                serviceScope.launch {
+                    onRadiosChanged()
+                    publishLan()
+                }
             }
         }
+
+    /**
+     * Modo híbrido: dice al PC (por el enlace de control, normalmente
+     * Bluetooth) las IPv4 de la Wi-Fi y el puerto del enlace, para que abra
+     * ahí un enlace de datos solo cuando haga falta. En "Solo Bluetooth" o
+     * sin Wi-Fi, una lista vacía: todo sigue por Bluetooth.
+     */
+    private fun publishLan() {
+        val link = KushareLink.service ?: return
+        val network = wifiNetwork
+        val addrs =
+            if (network == null || !KushareSwitch.isHybrid(this)) {
+                emptyList()
+            } else {
+                runCatching {
+                    getSystemService(ConnectivityManager::class.java)
+                        .getLinkProperties(network)
+                        ?.linkAddresses
+                        ?.map { it.address }
+                        ?.filterIsInstance<Inet4Address>()
+                        ?.mapNotNull { it.hostAddress }
+                }.getOrNull().orEmpty()
+            }
+        runCatching { link.publishLanAddress(addrs, LINK_PORT.toUShort()) }
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
         nsd = LinkNsd(this)
         startForeground(paused = false)
         if (!KushareSwitch.isEnabled(this)) {
@@ -166,6 +217,7 @@ class KushareService : Service() {
     }
 
     override fun onDestroy() {
+        if (instance === this) instance = null
         runCatching { unregisterReceiver(bluetoothEvents) }
         runCatching { getSystemService(ConnectivityManager::class.java).unregisterNetworkCallback(networkCallback) }
         stopLink()
@@ -198,6 +250,7 @@ class KushareService : Service() {
             try {
                 val port = link.startTcpListener(LINK_PORT.toUShort()).toInt()
                 nsd.advertise(link.deviceId(), KushareLink.deviceName(this@KushareService), port)
+                publishLan()
             } catch (e: Exception) {
                 Log.w(TAG, "no se pudo iniciar el enlace por Wi-Fi", e)
             }

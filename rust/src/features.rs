@@ -100,6 +100,7 @@ pub struct LocalCache {
     outputs: Option<pb::AudioOutputs>,
     ringer: Option<pb::RingerMode>,
     call: Option<pb::CallState>,
+    lan: Option<pb::LanAddress>,
 }
 
 impl LocalCache {
@@ -110,6 +111,7 @@ impl LocalCache {
             self.outputs.clone().map(F::AudioOutputs),
             self.ringer.map(F::RingerMode),
             self.call.clone().map(F::CallState),
+            self.lan.clone().map(F::LanAddress),
         ]
         .into_iter()
         .flatten()
@@ -136,6 +138,7 @@ pub fn publish(manager: &LinkManager, cache: &SharedCache, kind: F) {
             F::AudioOutputs(v) => replace(&mut c.outputs, v),
             F::RingerMode(v) => replace(&mut c.ringer, v),
             F::CallState(v) => replace(&mut c.call, v),
+            F::LanAddress(v) => replace(&mut c.lan, v),
             _ => true,
         };
         if !changed {
@@ -323,7 +326,8 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
         | F::Contacts(_)
         | F::ActiveNotifications(_)
         | F::Wallpaper(_)
-        | F::CommandResult(_) => {}
+        | F::CommandResult(_)
+        | F::LanAddress(_) => {}
     }
 }
 

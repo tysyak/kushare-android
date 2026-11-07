@@ -176,6 +176,16 @@ fun SettingsScreen(onBack: () -> Unit, onPermissions: () -> Unit) {
                         checked = enabled,
                         onCheckedChange = { KushareSwitch.setEnabled(context, it) },
                     )
+                    var hybrid by remember { mutableStateOf(KushareSwitch.isHybrid(context)) }
+                    SwitchRow(
+                        title = stringResource(R.string.settings_hybrid),
+                        subtitle = stringResource(R.string.settings_hybrid_detail),
+                        checked = hybrid,
+                        onCheckedChange = {
+                            hybrid = it
+                            KushareSwitch.setHybrid(context, it)
+                        },
+                    )
                 }
             }
             item { SectionTitle(stringResource(R.string.drawer_permissions)) }

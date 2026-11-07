@@ -6,6 +6,17 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.5.0] - 2026-11-07
+
+### Añadido
+- **Conexión híbrida** (por defecto): el control sigue por Bluetooth y lo
+  pesado (fotos, SMS, listas) va por Wi-Fi cuando el PC está en la misma
+  red, en un enlace que se abre solo cuando hace falta y se cierra a los
+  30 s sin uso. El teléfono comunica su IP de Wi-Fi al PC por Bluetooth.
+  *Ajustes → Conexión → Conexión híbrida*; apagado = todo por Bluetooth.
+- El menú lateral muestra «Conectado · Bluetooth + Wi-Fi» mientras se usa
+  el enlace de datos.
+
 ## [0.4.1] - 2026-11-07
 
 ### Añadido

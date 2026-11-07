@@ -90,6 +90,7 @@ fun DrawerContent(onSelect: (DrawerTarget) -> Unit) {
                 val connected = peer.connected
                 val via =
                     when {
+                        peer.transport?.startsWith("bluetooth") == true && peer.bulkTransport != null -> "Bluetooth + Wi-Fi"
                         peer.transport?.startsWith("bluetooth") == true -> "Bluetooth"
                         peer.transport != null -> "Wi-Fi"
                         else -> null

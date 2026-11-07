@@ -201,4 +201,6 @@
     <string name="clipboard_copied_here">Copiado en el teléfono</string>
     <string name="clipboard_copied_from_pc">Copiado desde el PC</string>
     <string name="channel_clipboard">Portapapeles del PC</string>
+    <string name="settings_hybrid">Conexión híbrida (recomendada)</string>
+    <string name="settings_hybrid_detail">Notificaciones, llamadas y control por Bluetooth (bajo consumo); fotos, SMS y listas por Wi-Fi cuando el PC está en la misma red. Apagado: todo por Bluetooth.</string>
 </resources>

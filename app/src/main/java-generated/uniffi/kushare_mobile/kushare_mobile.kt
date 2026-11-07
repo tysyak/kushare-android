@@ -998,6 +998,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_clipboard(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_lan_address(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_players(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_ringer(
@@ -1183,6 +1185,8 @@ internal object UniffiLib {
     external fun uniffi_kushare_mobile_fn_method_linkservice_publish_call_state(`ptr`: Long,`phase`: RustBuffer.ByValue,`number`: RustBuffer.ByValue,`name`: RustBuffer.ByValue,`muted`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_publish_clipboard(`ptr`: Long,`text`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_publish_lan_address(`ptr`: Long,`addrs`: RustBuffer.ByValue,`port`: Short,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_publish_players(`ptr`: Long,`players`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
@@ -1438,6 +1442,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_publish_clipboard() and 0xFFFF) != 54936) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_publish_lan_address() and 0xFFFF) != 17064) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_publish_players() and 0xFFFF) != 31979) {
@@ -2200,6 +2207,13 @@ public interface LinkServiceInterface {
      */
     fun `publishClipboard`(`text`: kotlin.String)
     
+    /**
+     * Modo híbrido: IPs de la Wi-Fi y puerto TCP del enlace, para que el PC
+     * abra ahí un enlace de datos cuando necesite algo pesado. Lista vacía
+     * = no usar Wi-Fi (modo "Solo Bluetooth" o sin Wi-Fi).
+     */
+    fun `publishLanAddress`(`addrs`: List<kotlin.String>, `port`: kotlin.UShort)
+    
     fun `publishPlayers`(`players`: List<MobilePlayer>)
     
     /**
@@ -2715,6 +2729,25 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
         it,
         
         FfiConverterString.lower(`text`),_status)
+}
+    }
+    
+    
+
+    
+    /**
+     * Modo híbrido: IPs de la Wi-Fi y puerto TCP del enlace, para que el PC
+     * abra ahí un enlace de datos cuando necesite algo pesado. Lista vacía
+     * = no usar Wi-Fi (modo "Solo Bluetooth" o sin Wi-Fi).
+     */override fun `publishLanAddress`(`addrs`: List<kotlin.String>, `port`: kotlin.UShort)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_publish_lan_address(
+        it,
+        
+        FfiConverterSequenceString.lower(`addrs`),
+        FfiConverterUShort.lower(`port`),_status)
 }
     }
     
@@ -3861,6 +3894,11 @@ data class MobilePeer (
     , 
     var `transport`: kotlin.String?
     , 
+    /**
+     * Enlace de datos por Wi-Fi abierto ahora (modo híbrido), si hay.
+     */
+    var `bulkTransport`: kotlin.String?
+    , 
     var `btAddress`: kotlin.String?
     , 
     /**
@@ -3900,6 +3938,7 @@ public object FfiConverterTypeMobilePeer: FfiConverterRustBuffer<MobilePeer> {
             FfiConverterBoolean.read(buf),
             FfiConverterOptionalString.read(buf),
             FfiConverterOptionalString.read(buf),
+            FfiConverterOptionalString.read(buf),
             FfiConverterBoolean.read(buf),
             FfiConverterBoolean.read(buf),
             FfiConverterSequenceString.read(buf),
@@ -3914,6 +3953,7 @@ public object FfiConverterTypeMobilePeer: FfiConverterRustBuffer<MobilePeer> {
             FfiConverterString.allocationSize(value.`deviceKind`) +
             FfiConverterBoolean.allocationSize(value.`connected`) +
             FfiConverterOptionalString.allocationSize(value.`transport`) +
+            FfiConverterOptionalString.allocationSize(value.`bulkTransport`) +
             FfiConverterOptionalString.allocationSize(value.`btAddress`) +
             FfiConverterBoolean.allocationSize(value.`outgoingEnabled`) +
             FfiConverterBoolean.allocationSize(value.`incomingEnabled`) +
@@ -3928,6 +3968,7 @@ public object FfiConverterTypeMobilePeer: FfiConverterRustBuffer<MobilePeer> {
             FfiConverterString.write(value.`deviceKind`, buf)
             FfiConverterBoolean.write(value.`connected`, buf)
             FfiConverterOptionalString.write(value.`transport`, buf)
+            FfiConverterOptionalString.write(value.`bulkTransport`, buf)
             FfiConverterOptionalString.write(value.`btAddress`, buf)
             FfiConverterBoolean.write(value.`outgoingEnabled`, buf)
             FfiConverterBoolean.write(value.`incomingEnabled`, buf)

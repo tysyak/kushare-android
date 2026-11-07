@@ -75,6 +75,8 @@ pub struct MobilePeer {
     pub device_kind: String,
     pub connected: bool,
     pub transport: Option<String>,
+    /// Enlace de datos por Wi-Fi abierto ahora (modo híbrido), si hay.
+    pub bulk_transport: Option<String>,
     pub bt_address: Option<String>,
     /// ¿Se reenvían las notificaciones del teléfono a este peer?
     pub outgoing_enabled: bool,
@@ -426,6 +428,7 @@ impl LinkService {
                 device_kind: p.device_kind,
                 connected: p.connected,
                 transport: p.transport,
+                bulk_transport: p.bulk_transport,
                 outgoing_enabled: p.outgoing_enabled,
                 incoming_enabled: p.incoming_enabled,
                 outgoing_blocked: p.outgoing_blocked,
@@ -489,6 +492,17 @@ impl LinkService {
             muted,
         };
         features::publish(&self.manager, &self.cache, F::CallState(call));
+    }
+
+    /// Modo híbrido: IPs de la Wi-Fi y puerto TCP del enlace, para que el PC
+    /// abra ahí un enlace de datos cuando necesite algo pesado. Lista vacía
+    /// = no usar Wi-Fi (modo "Solo Bluetooth" o sin Wi-Fi).
+    pub fn publish_lan_address(&self, addrs: Vec<String>, port: u16) {
+        let lan = pb::LanAddress {
+            addrs,
+            port: u32::from(port),
+        };
+        features::publish(&self.manager, &self.cache, F::LanAddress(lan));
     }
 
     /// La galería cambió (foto o captura nueva): avisar a los peers para que

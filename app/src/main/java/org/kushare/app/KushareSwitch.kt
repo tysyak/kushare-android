@@ -27,6 +27,20 @@ object KushareSwitch {
     /** Encendido pero en pausa por falta de Bluetooth y Wi-Fi. */
     val paused = MutableStateFlow(false)
 
+    private const val KEY_HYBRID = "link_hybrid"
+
+    /**
+     * Modo de conexión: híbrido (por defecto; control por Bluetooth y lo
+     * pesado por Wi-Fi si el PC está en la misma red) o solo Bluetooth.
+     */
+    fun isHybrid(context: Context): Boolean =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_HYBRID, true)
+
+    fun setHybrid(context: Context, on: Boolean) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_HYBRID, on).apply()
+        KushareService.onLinkModeChanged()
+    }
+
     fun isEnabled(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_ENABLED, true).also {
             enabled.value = it
