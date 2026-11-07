@@ -6,6 +6,33 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.4.0] - 2026-11-07
+
+### Añadido
+- Para el PC (cada función con su permiso opcional en *Ajustes →
+  Funciones del teléfono*):
+  - **SMS**: conversaciones, mensajes y mandar SMS; avisa al PC de los nuevos.
+  - **Registro de llamadas y contactos**, y **llamar** desde el PC.
+  - **Notificaciones activas**: la lista completa, con acciones y respuesta.
+  - **Fondo de pantalla** (con «acceso a todos los archivos»; sin él, sus colores).
+  - **Borrar fotos** desde el PC (Android pide confirmarlo con un aviso).
+- **Portapapeles compartido**: lo que copia el PC llega al instante; lo del
+  teléfono se manda al abrir kushare, con el botón *Enviar portapapeles* de
+  su notificación, con el botón de ajustes rápidos *Portapapeles al PC* o
+  con *Compartir → Copiar en el PC*. No se manda lo marcado como sensible.
+- **Fotos por Bluetooth**: no se reenvían las miniaturas que el PC ya tiene;
+  las descargas de fondo van en trozos pequeños y a baja prioridad.
+- **Actualizaciones**: *Ajustes → Actualizaciones* busca en GitHub, descarga
+  el APK y lo instala con el instalador del sistema (misma firma).
+- **Inglés** (`values-en`) y selección de idioma por app (Android 13+).
+
+## [0.3.1] - 2026-11-07
+
+### Añadido
+- Avisa al PC de las fotos nuevas al instante (`PhotosChanged`).
+- Textos en `res/values/strings.xml`, listos para traducir.
+- Archivo `LICENSE` (GPL-3.0-or-later).
+
 ## [0.3.0] - 2026-11-06
 
 ### Añadido

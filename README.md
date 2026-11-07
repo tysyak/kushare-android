@@ -11,7 +11,10 @@ App Android de [kushare](https://github.com/tysyak/kushare): transferencia de ar
   - filtro por app, descartar sincronizado, iconos, y **acciones y respuesta** desde el PC (p. ej. contestar un mensaje de Telegram);
   - reconexión automática, sin volver a pedir el PIN.
 - **Teléfono desde el PC** (al estilo KDE Connect): batería, modo de timbre, reproductores (controlar YouTube, TIDAL, Spotify… y *Pausar todo*), salidas de audio, llamadas (contestar, rechazar, colgar, silenciar; con el PC como manos libres por Bluetooth) y galería de fotos (miniaturas y descarga del original).
+- **"Enlace Móvil" para Linux** (0.4.0): el PC lee y manda **SMS**, ve el **registro de llamadas**, busca **contactos** y **llama** desde el teléfono, ve sus **notificaciones activas** (con acciones y respuesta), su **fondo de pantalla**, y puede **borrar fotos** (van a la papelera, confirmándolo aquí).
+- **Portapapeles compartido**: lo que copia el PC llega al instante; lo del teléfono se manda al abrir kushare, con *Enviar portapapeles* (en su notificación o en *Ajustes*), con el botón de ajustes rápidos *Portapapeles al PC* o con *Compartir → Copiar en el PC*. Android no deja leer el portapapeles en segundo plano.
 - **PC desde el teléfono**: su batería, sus reproductores (MPRIS) y su salida de audio, en *Dispositivos*.
+- **Actualizaciones** desde *Ajustes*: busca el último release en GitHub, lo descarga y lo instala con el instalador del sistema (que exige la misma firma).
 - **Botón en los ajustes rápidos** (la cortina de Wi-Fi, Bluetooth…):
   - encendido mantiene el enlace; apagado detiene kushare del todo;
   - debajo del nombre muestra por dónde está conectado ("PC · Bluetooth");
@@ -33,6 +36,10 @@ Ver el [FAQ de kushare](https://github.com/tysyak/kushare/blob/main/FAQ.md): fir
 | Teléfono y llamadas (opcional) | Avisar en el PC de las llamadas y contestar/colgar desde allí. |
 | Fotos (opcional) | Que el PC vea la galería y descargue fotos. |
 | No molestar (opcional) | Que el PC pueda poner el teléfono en silencio. |
+| SMS (opcional) | Leer y mandar SMS desde el PC. |
+| Registro de llamadas, contactos y llamar (opcional) | Llamadas recientes, buscar contactos y llamar desde el PC. |
+| Acceso a todos los archivos (opcional) | Solo para que el PC muestre el fondo de pantalla (Android no lo deja leer de otra forma); sin él, el PC usa sus colores. |
+| Instalar apps (al actualizar) | Instalar la versión nueva de kushare desde la propia app. |
 
 Los opcionales se conceden en *Ajustes → Funciones del teléfono*. Los reproductores se leen gracias al acceso a notificaciones (no hace falta otro permiso).
 
@@ -139,9 +146,12 @@ adb shell run-as org.kushare.app cat files/link/peers.toml
 
 Todos los textos están en [`app/src/main/res/values/strings.xml`](app/src/main/res/values/strings.xml)
 (español). Para otro idioma, copia ese archivo a `res/values-<idioma>/strings.xml`
-(p. ej. `values-en`) y traduce los valores sin cambiar los `name`; `%1$s` y
-`%1$d` son datos que se rellenan y `%%` es un signo de porcentaje. Android elige
-el idioma del sistema y, si falta un texto, usa el español.
+y traduce los valores sin cambiar los `name`; `%1$s` y `%1$d` son datos que se
+rellenan y `%%` es un signo de porcentaje. Incluidos: español y **inglés**
+(`values-en`). Android usa el idioma del sistema; en Android 13+ se puede elegir
+otro solo para kushare (*Ajustes del sistema → Apps → kushare → Idioma*; añade
+el nuevo idioma a `res/xml/locales_config.xml`). Si falta un texto, sale en
+español.
 
 ## Licencia
 

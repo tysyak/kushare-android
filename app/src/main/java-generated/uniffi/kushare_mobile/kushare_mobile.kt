@@ -724,9 +724,39 @@ internal interface UniffiCallbackInterfaceLinkCallbackMethod14 : com.sun.jna.Cal
     fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`action`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
 }
 internal interface UniffiCallbackInterfaceLinkCallbackMethod15 : com.sun.jna.Callback {
-    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`offset`: Int,`limit`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`offset`: Int,`limit`: Int,`haveThumbnails`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
 }
 internal interface UniffiCallbackInterfaceLinkCallbackMethod16 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`photoId`: RustBuffer.ByValue,`chunkSize`: Int,`background`: Byte,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod17 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`text`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod18 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`offset`: Int,`limit`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod19 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`threadId`: RustBuffer.ByValue,`limit`: Int,`beforeMs`: Long,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod20 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`address`: RustBuffer.ByValue,`body`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod21 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`limit`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod22 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod23 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`number`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod24 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`haveIcons`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod25 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`maxSize`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod26 : com.sun.jna.Callback {
     fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`photoId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
 }
 @Structure.FieldOrder("uniffiFree", "uniffiClone", "onIncomingRequest", "onCompleted", "onFailed")
@@ -798,7 +828,7 @@ internal open class UniffiVTableCallbackInterfaceByteStreamIo(
     }
 
 }
-@Structure.FieldOrder("uniffiFree", "uniffiClone", "onPairingRequested", "onPairingFinished", "onPeersChanged", "onNotificationPosted", "onNotificationRemoved", "onDismissLocal", "onActionRequested", "onReplyRequested", "onPeerBattery", "onPeerPlayers", "onPeerAudioOutputs", "onMediaCommand", "onSetAudioOutput", "onSetRinger", "onCallCommand", "onPhotoListRequest", "onPhotoRequest")
+@Structure.FieldOrder("uniffiFree", "uniffiClone", "onPairingRequested", "onPairingFinished", "onPeersChanged", "onNotificationPosted", "onNotificationRemoved", "onDismissLocal", "onActionRequested", "onReplyRequested", "onPeerBattery", "onPeerPlayers", "onPeerAudioOutputs", "onMediaCommand", "onSetAudioOutput", "onSetRinger", "onCallCommand", "onPhotoListRequest", "onPhotoRequest", "onClipboard", "onSmsThreadsRequest", "onSmsMessagesRequest", "onSendSms", "onCallLogRequest", "onContactsRequest", "onDial", "onActiveNotificationsRequest", "onWallpaperRequest", "onPhotoDelete")
 internal open class UniffiVTableCallbackInterfaceLinkCallback(
     @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
     @JvmField internal var `uniffiClone`: UniffiCallbackInterfaceClone? = null,
@@ -819,6 +849,16 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
     @JvmField internal var `onCallCommand`: UniffiCallbackInterfaceLinkCallbackMethod14? = null,
     @JvmField internal var `onPhotoListRequest`: UniffiCallbackInterfaceLinkCallbackMethod15? = null,
     @JvmField internal var `onPhotoRequest`: UniffiCallbackInterfaceLinkCallbackMethod16? = null,
+    @JvmField internal var `onClipboard`: UniffiCallbackInterfaceLinkCallbackMethod17? = null,
+    @JvmField internal var `onSmsThreadsRequest`: UniffiCallbackInterfaceLinkCallbackMethod18? = null,
+    @JvmField internal var `onSmsMessagesRequest`: UniffiCallbackInterfaceLinkCallbackMethod19? = null,
+    @JvmField internal var `onSendSms`: UniffiCallbackInterfaceLinkCallbackMethod20? = null,
+    @JvmField internal var `onCallLogRequest`: UniffiCallbackInterfaceLinkCallbackMethod21? = null,
+    @JvmField internal var `onContactsRequest`: UniffiCallbackInterfaceLinkCallbackMethod22? = null,
+    @JvmField internal var `onDial`: UniffiCallbackInterfaceLinkCallbackMethod23? = null,
+    @JvmField internal var `onActiveNotificationsRequest`: UniffiCallbackInterfaceLinkCallbackMethod24? = null,
+    @JvmField internal var `onWallpaperRequest`: UniffiCallbackInterfaceLinkCallbackMethod25? = null,
+    @JvmField internal var `onPhotoDelete`: UniffiCallbackInterfaceLinkCallbackMethod26? = null,
 ) : Structure() {
     class UniffiByValue(
         `uniffiFree`: UniffiCallbackInterfaceFree? = null,
@@ -840,7 +880,17 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
         `onCallCommand`: UniffiCallbackInterfaceLinkCallbackMethod14? = null,
         `onPhotoListRequest`: UniffiCallbackInterfaceLinkCallbackMethod15? = null,
         `onPhotoRequest`: UniffiCallbackInterfaceLinkCallbackMethod16? = null,
-    ): UniffiVTableCallbackInterfaceLinkCallback(`uniffiFree`,`uniffiClone`,`onPairingRequested`,`onPairingFinished`,`onPeersChanged`,`onNotificationPosted`,`onNotificationRemoved`,`onDismissLocal`,`onActionRequested`,`onReplyRequested`,`onPeerBattery`,`onPeerPlayers`,`onPeerAudioOutputs`,`onMediaCommand`,`onSetAudioOutput`,`onSetRinger`,`onCallCommand`,`onPhotoListRequest`,`onPhotoRequest`,), Structure.ByValue
+        `onClipboard`: UniffiCallbackInterfaceLinkCallbackMethod17? = null,
+        `onSmsThreadsRequest`: UniffiCallbackInterfaceLinkCallbackMethod18? = null,
+        `onSmsMessagesRequest`: UniffiCallbackInterfaceLinkCallbackMethod19? = null,
+        `onSendSms`: UniffiCallbackInterfaceLinkCallbackMethod20? = null,
+        `onCallLogRequest`: UniffiCallbackInterfaceLinkCallbackMethod21? = null,
+        `onContactsRequest`: UniffiCallbackInterfaceLinkCallbackMethod22? = null,
+        `onDial`: UniffiCallbackInterfaceLinkCallbackMethod23? = null,
+        `onActiveNotificationsRequest`: UniffiCallbackInterfaceLinkCallbackMethod24? = null,
+        `onWallpaperRequest`: UniffiCallbackInterfaceLinkCallbackMethod25? = null,
+        `onPhotoDelete`: UniffiCallbackInterfaceLinkCallbackMethod26? = null,
+    ): UniffiVTableCallbackInterfaceLinkCallback(`uniffiFree`,`uniffiClone`,`onPairingRequested`,`onPairingFinished`,`onPeersChanged`,`onNotificationPosted`,`onNotificationRemoved`,`onDismissLocal`,`onActionRequested`,`onReplyRequested`,`onPeerBattery`,`onPeerPlayers`,`onPeerAudioOutputs`,`onMediaCommand`,`onSetAudioOutput`,`onSetRinger`,`onCallCommand`,`onPhotoListRequest`,`onPhotoRequest`,`onClipboard`,`onSmsThreadsRequest`,`onSmsMessagesRequest`,`onSendSms`,`onCallLogRequest`,`onContactsRequest`,`onDial`,`onActiveNotificationsRequest`,`onWallpaperRequest`,`onPhotoDelete`,), Structure.ByValue
 
    internal fun uniffiSetValue(other: UniffiVTableCallbackInterfaceLinkCallback) {
         `uniffiFree` = other.`uniffiFree`
@@ -862,6 +912,16 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
         `onCallCommand` = other.`onCallCommand`
         `onPhotoListRequest` = other.`onPhotoListRequest`
         `onPhotoRequest` = other.`onPhotoRequest`
+        `onClipboard` = other.`onClipboard`
+        `onSmsThreadsRequest` = other.`onSmsThreadsRequest`
+        `onSmsMessagesRequest` = other.`onSmsMessagesRequest`
+        `onSendSms` = other.`onSendSms`
+        `onCallLogRequest` = other.`onCallLogRequest`
+        `onContactsRequest` = other.`onContactsRequest`
+        `onDial` = other.`onDial`
+        `onActiveNotificationsRequest` = other.`onActiveNotificationsRequest`
+        `onWallpaperRequest` = other.`onWallpaperRequest`
+        `onPhotoDelete` = other.`onPhotoDelete`
     }
 
 }
@@ -920,6 +980,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_notify_photos_changed(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_notify_sms_changed(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_pair_bt(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_pair_tcp(
@@ -934,6 +996,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_call_state(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_clipboard(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_players(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_publish_ringer(
@@ -944,6 +1008,14 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_respond_pairing(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_active_notifications(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_call_log(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_command_result(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_contacts(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_media_command(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_photo_data(
@@ -951,6 +1023,12 @@ internal object IntegrityCheckingUniffiLib {
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_photo_list(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_set_audio_output(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_sms_messages(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_sms_threads(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_wallpaper(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_set_app_blocked(
     ): Int
@@ -1014,6 +1092,26 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_request(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_clipboard(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_sms_threads_request(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_sms_messages_request(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_send_sms(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_call_log_request(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_contacts_request(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_dial(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_active_notifications_request(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_wallpaper_request(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_delete(
+    ): Int
     external fun ffi_kushare_mobile_uniffi_contract_version(
     ): Int
 
@@ -1068,6 +1166,8 @@ internal object UniffiLib {
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_notify_photos_changed(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_notify_sms_changed(`ptr`: Long,`threadId`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_pair_bt(`ptr`: Long,`io`: Long,`address`: RustBuffer.ByValue,
     ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_pair_tcp(`ptr`: Long,`host`: RustBuffer.ByValue,`port`: Short,
@@ -1082,6 +1182,8 @@ internal object UniffiLib {
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_publish_call_state(`ptr`: Long,`phase`: RustBuffer.ByValue,`number`: RustBuffer.ByValue,`name`: RustBuffer.ByValue,`muted`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_publish_clipboard(`ptr`: Long,`text`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_publish_players(`ptr`: Long,`players`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_publish_ringer(`ptr`: Long,`mode`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
@@ -1092,14 +1194,28 @@ internal object UniffiLib {
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_respond_pairing(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`accept`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Byte
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_active_notifications(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`notifications`: RustBuffer.ByValue,`haveIcons`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
+    ): Long
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_call_log(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`entries`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
+    ): Long
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_command_result(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`ok`: Byte,`error`: RustBuffer.ByValue,`status`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_contacts(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`contacts`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
+    ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_media_command(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`playerId`: RustBuffer.ByValue,`action`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
-    external fun uniffi_kushare_mobile_fn_method_linkservice_send_photo_data(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`photoId`: RustBuffer.ByValue,`name`: RustBuffer.ByValue,`offset`: Long,`data`: RustBuffer.ByValue,`last`: Byte,`error`: RustBuffer.ByValue,
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_photo_data(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`photoId`: RustBuffer.ByValue,`name`: RustBuffer.ByValue,`offset`: Long,`data`: RustBuffer.ByValue,`last`: Byte,`error`: RustBuffer.ByValue,`background`: Byte,
     ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_photo_list(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`total`: Int,`photos`: RustBuffer.ByValue,
     ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_set_audio_output(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outputId`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_sms_messages(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`threadId`: RustBuffer.ByValue,`messages`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
+    ): Long
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_sms_threads(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`total`: Int,`threads`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
+    ): Long
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_wallpaper(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`jpeg`: RustBuffer.ByValue,`colors`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
+    ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_set_app_blocked(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outgoing`: Byte,`appId`: RustBuffer.ByValue,`blocked`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_set_direction(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outgoing`: Byte,`enabled`: Byte,uniffi_out_err: UniffiRustCallStatus, 
@@ -1297,6 +1413,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_notify_photos_changed() and 0xFFFF) != 12487) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_notify_sms_changed() and 0xFFFF) != 1018) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_pair_bt() and 0xFFFF) != 42244) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1318,6 +1437,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_publish_call_state() and 0xFFFF) != 20633) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_publish_clipboard() and 0xFFFF) != 54936) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_publish_players() and 0xFFFF) != 31979) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1333,16 +1455,37 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_respond_pairing() and 0xFFFF) != 37658) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_active_notifications() and 0xFFFF) != 2723) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_call_log() and 0xFFFF) != 38388) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_command_result() and 0xFFFF) != 9251) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_contacts() and 0xFFFF) != 36997) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_media_command() and 0xFFFF) != 41604) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_photo_data() and 0xFFFF) != 43971) {
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_photo_data() and 0xFFFF) != 46173) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_photo_list() and 0xFFFF) != 1724) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_set_audio_output() and 0xFFFF) != 1181) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_sms_messages() and 0xFFFF) != 27152) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_sms_threads() and 0xFFFF) != 50187) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_wallpaper() and 0xFFFF) != 40714) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_set_app_blocked() and 0xFFFF) != 35477) {
@@ -1432,10 +1575,40 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_call_command() and 0xFFFF) != 31415) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_list_request() and 0xFFFF) != 50632) {
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_list_request() and 0xFFFF) != 17983) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_request() and 0xFFFF) != 17283) {
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_request() and 0xFFFF) != 47956) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_clipboard() and 0xFFFF) != 26277) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_sms_threads_request() and 0xFFFF) != 14274) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_sms_messages_request() and 0xFFFF) != 60148) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_send_sms() and 0xFFFF) != 16639) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_call_log_request() and 0xFFFF) != 1896) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_contacts_request() and 0xFFFF) != 11435) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_dial() and 0xFFFF) != 46723) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_active_notifications_request() and 0xFFFF) != 40926) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_wallpaper_request() and 0xFFFF) != 30481) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_delete() and 0xFFFF) != 6617) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
 }
@@ -1992,6 +2165,11 @@ public interface LinkServiceInterface {
     fun `notifyPhotosChanged`()
     
     /**
+     * Llegó o se mandó un SMS.
+     */
+    fun `notifySmsChanged`(`threadId`: kotlin.String)
+    
+    /**
      * Empareja (con PIN) por un `BluetoothSocket` que Kotlin ya conectó al
      * servicio RFCOMM del enlace. Para redes que aíslan a los clientes
      * entre sí, donde el Wi-Fi no sirve.
@@ -2017,6 +2195,11 @@ public interface LinkServiceInterface {
      */
     fun `publishCallState`(`phase`: kotlin.String, `number`: kotlin.String, `name`: kotlin.String, `muted`: kotlin.Boolean)
     
+    /**
+     * Texto copiado en el teléfono: mandarlo a los peers.
+     */
+    fun `publishClipboard`(`text`: kotlin.String)
+    
     fun `publishPlayers`(`players`: List<MobilePlayer>)
     
     /**
@@ -2031,6 +2214,22 @@ public interface LinkServiceInterface {
     fun `respondPairing`(`deviceId`: kotlin.String, `accept`: kotlin.Boolean): kotlin.Boolean
     
     /**
+     * Las notificaciones activas del teléfono (sin el PNG de los iconos
+     * cuyo hash está en `have_icons`).
+     */
+    suspend fun `sendActiveNotifications`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `notifications`: List<MobileNotification>, `haveIcons`: List<kotlin.String>, `error`: kotlin.String)
+    
+    suspend fun `sendCallLog`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `entries`: List<MobileCallLogEntry>, `error`: kotlin.String)
+    
+    /**
+     * Resultado de `on_send_sms`, `on_dial` u `on_photo_delete`.
+     * `status`: "done" | "confirm".
+     */
+    fun `sendCommandResult`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `ok`: kotlin.Boolean, `error`: kotlin.String, `status`: kotlin.String)
+    
+    suspend fun `sendContacts`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `contacts`: List<MobileContact>, `error`: kotlin.String)
+    
+    /**
      * `player_id` vacío = todos. `action`: play-pause|play|pause|next|previous|stop.
      */
     fun `sendMediaCommand`(`deviceId`: kotlin.String, `playerId`: kotlin.String, `action`: kotlin.String)
@@ -2040,7 +2239,7 @@ public interface LinkServiceInterface {
      * Espera a que haya sitio en la cola del enlace (no se pierde ningún
      * trozo). `error` no vacío = no se pudo leer (y cierra la respuesta).
      */
-    suspend fun `sendPhotoData`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `photoId`: kotlin.String, `name`: kotlin.String, `offset`: kotlin.ULong, `data`: kotlin.ByteArray, `last`: kotlin.Boolean, `error`: kotlin.String)
+    suspend fun `sendPhotoData`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `photoId`: kotlin.String, `name`: kotlin.String, `offset`: kotlin.ULong, `data`: kotlin.ByteArray, `last`: kotlin.Boolean, `error`: kotlin.String, `background`: kotlin.Boolean)
     
     /**
      * Respuesta a [`LinkCallback::on_photo_list_request`].
@@ -2048,6 +2247,12 @@ public interface LinkServiceInterface {
     suspend fun `sendPhotoList`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `total`: kotlin.UInt, `photos`: List<MobilePhoto>)
     
     fun `sendSetAudioOutput`(`deviceId`: kotlin.String, `outputId`: kotlin.String)
+    
+    suspend fun `sendSmsMessages`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `threadId`: kotlin.String, `messages`: List<MobileSms>, `error`: kotlin.String)
+    
+    suspend fun `sendSmsThreads`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `total`: kotlin.UInt, `threads`: List<MobileSmsThread>, `error`: kotlin.String)
+    
+    suspend fun `sendWallpaper`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `jpeg`: kotlin.ByteArray, `colors`: List<kotlin.UInt>, `error`: kotlin.String)
     
     fun `setAppBlocked`(`deviceId`: kotlin.String, `outgoing`: kotlin.Boolean, `appId`: kotlin.String, `blocked`: kotlin.Boolean)
     
@@ -2358,6 +2563,22 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
 
     
     /**
+     * Llegó o se mandó un SMS.
+     */override fun `notifySmsChanged`(`threadId`: kotlin.String)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_notify_sms_changed(
+        it,
+        
+        FfiConverterString.lower(`threadId`),_status)
+}
+    }
+    
+    
+
+    
+    /**
      * Empareja (con PIN) por un `BluetoothSocket` que Kotlin ya conectó al
      * servicio RFCOMM del enlace. Para redes que aíslan a los clientes
      * entre sí, donde el Wi-Fi no sirve.
@@ -2483,6 +2704,22 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
     
     
 
+    
+    /**
+     * Texto copiado en el teléfono: mandarlo a los peers.
+     */override fun `publishClipboard`(`text`: kotlin.String)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_publish_clipboard(
+        it,
+        
+        FfiConverterString.lower(`text`),_status)
+}
+    }
+    
+    
+
     override fun `publishPlayers`(`players`: List<MobilePlayer>)
         = 
     callWithHandle {
@@ -2558,6 +2795,110 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
 
     
     /**
+     * Las notificaciones activas del teléfono (sin el PNG de los iconos
+     * cuyo hash está en `have_icons`).
+     */
+    @Throws(MobileException::class)
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+    override suspend fun `sendActiveNotifications`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `notifications`: List<MobileNotification>, `haveIcons`: List<kotlin.String>, `error`: kotlin.String) {
+        return uniffiRustCallAsync(
+        callWithHandle { uniffiHandle ->
+            UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_active_notifications(
+                uniffiHandle,
+                
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterULong.lower(`requestId`),
+        FfiConverterSequenceTypeMobileNotification.lower(`notifications`),
+        FfiConverterSequenceString.lower(`haveIcons`),
+        FfiConverterString.lower(`error`),
+            )
+        },
+        { future, callback, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_poll_void(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_complete_void(future, continuation) },
+        { future -> UniffiLib.ffi_kushare_mobile_rust_future_free_void(future) },
+        // lift function
+        { Unit },
+        
+        // Error FFI converter
+        MobileException.ErrorHandler,
+    )
+    }
+
+    
+    @Throws(MobileException::class)
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+    override suspend fun `sendCallLog`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `entries`: List<MobileCallLogEntry>, `error`: kotlin.String) {
+        return uniffiRustCallAsync(
+        callWithHandle { uniffiHandle ->
+            UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_call_log(
+                uniffiHandle,
+                
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterULong.lower(`requestId`),
+        FfiConverterSequenceTypeMobileCallLogEntry.lower(`entries`),
+        FfiConverterString.lower(`error`),
+            )
+        },
+        { future, callback, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_poll_void(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_complete_void(future, continuation) },
+        { future -> UniffiLib.ffi_kushare_mobile_rust_future_free_void(future) },
+        // lift function
+        { Unit },
+        
+        // Error FFI converter
+        MobileException.ErrorHandler,
+    )
+    }
+
+    
+    /**
+     * Resultado de `on_send_sms`, `on_dial` u `on_photo_delete`.
+     * `status`: "done" | "confirm".
+     */override fun `sendCommandResult`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `ok`: kotlin.Boolean, `error`: kotlin.String, `status`: kotlin.String)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_command_result(
+        it,
+        
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterULong.lower(`requestId`),
+        FfiConverterBoolean.lower(`ok`),
+        FfiConverterString.lower(`error`),
+        FfiConverterString.lower(`status`),_status)
+}
+    }
+    
+    
+
+    
+    @Throws(MobileException::class)
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+    override suspend fun `sendContacts`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `contacts`: List<MobileContact>, `error`: kotlin.String) {
+        return uniffiRustCallAsync(
+        callWithHandle { uniffiHandle ->
+            UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_contacts(
+                uniffiHandle,
+                
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterULong.lower(`requestId`),
+        FfiConverterSequenceTypeMobileContact.lower(`contacts`),
+        FfiConverterString.lower(`error`),
+            )
+        },
+        { future, callback, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_poll_void(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_complete_void(future, continuation) },
+        { future -> UniffiLib.ffi_kushare_mobile_rust_future_free_void(future) },
+        // lift function
+        { Unit },
+        
+        // Error FFI converter
+        MobileException.ErrorHandler,
+    )
+    }
+
+    
+    /**
      * `player_id` vacío = todos. `action`: play-pause|play|pause|next|previous|stop.
      */override fun `sendMediaCommand`(`deviceId`: kotlin.String, `playerId`: kotlin.String, `action`: kotlin.String)
         = 
@@ -2582,7 +2923,7 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
      */
     @Throws(MobileException::class)
     @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
-    override suspend fun `sendPhotoData`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `photoId`: kotlin.String, `name`: kotlin.String, `offset`: kotlin.ULong, `data`: kotlin.ByteArray, `last`: kotlin.Boolean, `error`: kotlin.String) {
+    override suspend fun `sendPhotoData`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `photoId`: kotlin.String, `name`: kotlin.String, `offset`: kotlin.ULong, `data`: kotlin.ByteArray, `last`: kotlin.Boolean, `error`: kotlin.String, `background`: kotlin.Boolean) {
         return uniffiRustCallAsync(
         callWithHandle { uniffiHandle ->
             UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_photo_data(
@@ -2596,6 +2937,7 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
         FfiConverterByteArray.lower(`data`),
         FfiConverterBoolean.lower(`last`),
         FfiConverterString.lower(`error`),
+        FfiConverterBoolean.lower(`background`),
             )
         },
         { future, callback, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_poll_void(future, callback, continuation) },
@@ -2651,6 +2993,87 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
     }
     
     
+
+    
+    @Throws(MobileException::class)
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+    override suspend fun `sendSmsMessages`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `threadId`: kotlin.String, `messages`: List<MobileSms>, `error`: kotlin.String) {
+        return uniffiRustCallAsync(
+        callWithHandle { uniffiHandle ->
+            UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_sms_messages(
+                uniffiHandle,
+                
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterULong.lower(`requestId`),
+        FfiConverterString.lower(`threadId`),
+        FfiConverterSequenceTypeMobileSms.lower(`messages`),
+        FfiConverterString.lower(`error`),
+            )
+        },
+        { future, callback, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_poll_void(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_complete_void(future, continuation) },
+        { future -> UniffiLib.ffi_kushare_mobile_rust_future_free_void(future) },
+        // lift function
+        { Unit },
+        
+        // Error FFI converter
+        MobileException.ErrorHandler,
+    )
+    }
+
+    
+    @Throws(MobileException::class)
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+    override suspend fun `sendSmsThreads`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `total`: kotlin.UInt, `threads`: List<MobileSmsThread>, `error`: kotlin.String) {
+        return uniffiRustCallAsync(
+        callWithHandle { uniffiHandle ->
+            UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_sms_threads(
+                uniffiHandle,
+                
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterULong.lower(`requestId`),
+        FfiConverterUInt.lower(`total`),
+        FfiConverterSequenceTypeMobileSmsThread.lower(`threads`),
+        FfiConverterString.lower(`error`),
+            )
+        },
+        { future, callback, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_poll_void(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_complete_void(future, continuation) },
+        { future -> UniffiLib.ffi_kushare_mobile_rust_future_free_void(future) },
+        // lift function
+        { Unit },
+        
+        // Error FFI converter
+        MobileException.ErrorHandler,
+    )
+    }
+
+    
+    @Throws(MobileException::class)
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+    override suspend fun `sendWallpaper`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `jpeg`: kotlin.ByteArray, `colors`: List<kotlin.UInt>, `error`: kotlin.String) {
+        return uniffiRustCallAsync(
+        callWithHandle { uniffiHandle ->
+            UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_wallpaper(
+                uniffiHandle,
+                
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterULong.lower(`requestId`),
+        FfiConverterByteArray.lower(`jpeg`),
+        FfiConverterSequenceUInt.lower(`colors`),
+        FfiConverterString.lower(`error`),
+            )
+        },
+        { future, callback, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_poll_void(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_complete_void(future, continuation) },
+        { future -> UniffiLib.ffi_kushare_mobile_rust_future_free_void(future) },
+        // lift function
+        { Unit },
+        
+        // Error FFI converter
+        MobileException.ErrorHandler,
+    )
+    }
 
     
     @Throws(MobileException::class)override fun `setAppBlocked`(`deviceId`: kotlin.String, `outgoing`: kotlin.Boolean, `appId`: kotlin.String, `blocked`: kotlin.Boolean)
@@ -3257,6 +3680,105 @@ public object FfiConverterTypeMobileBattery: FfiConverterRustBuffer<MobileBatter
 
 
 
+data class MobileCallLogEntry (
+    var `number`: kotlin.String
+    , 
+    var `name`: kotlin.String
+    , 
+    var `dateMs`: kotlin.Long
+    , 
+    var `durationS`: kotlin.UInt
+    , 
+    /**
+     * incoming|outgoing|missed|rejected|blocked|voicemail
+     */
+    var `kind`: kotlin.String
+    
+){
+    
+
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMobileCallLogEntry: FfiConverterRustBuffer<MobileCallLogEntry> {
+    override fun read(buf: ByteBuffer): MobileCallLogEntry {
+        return MobileCallLogEntry(
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterLong.read(buf),
+            FfiConverterUInt.read(buf),
+            FfiConverterString.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MobileCallLogEntry) = (
+            FfiConverterString.allocationSize(value.`number`) +
+            FfiConverterString.allocationSize(value.`name`) +
+            FfiConverterLong.allocationSize(value.`dateMs`) +
+            FfiConverterUInt.allocationSize(value.`durationS`) +
+            FfiConverterString.allocationSize(value.`kind`)
+    )
+
+    override fun write(value: MobileCallLogEntry, buf: ByteBuffer) {
+            FfiConverterString.write(value.`number`, buf)
+            FfiConverterString.write(value.`name`, buf)
+            FfiConverterLong.write(value.`dateMs`, buf)
+            FfiConverterUInt.write(value.`durationS`, buf)
+            FfiConverterString.write(value.`kind`, buf)
+    }
+}
+
+
+
+data class MobileContact (
+    var `name`: kotlin.String
+    , 
+    var `numbers`: List<kotlin.String>
+    , 
+    var `starred`: kotlin.Boolean
+    
+){
+    
+
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMobileContact: FfiConverterRustBuffer<MobileContact> {
+    override fun read(buf: ByteBuffer): MobileContact {
+        return MobileContact(
+            FfiConverterString.read(buf),
+            FfiConverterSequenceString.read(buf),
+            FfiConverterBoolean.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MobileContact) = (
+            FfiConverterString.allocationSize(value.`name`) +
+            FfiConverterSequenceString.allocationSize(value.`numbers`) +
+            FfiConverterBoolean.allocationSize(value.`starred`)
+    )
+
+    override fun write(value: MobileContact, buf: ByteBuffer) {
+            FfiConverterString.write(value.`name`, buf)
+            FfiConverterSequenceString.write(value.`numbers`, buf)
+            FfiConverterBoolean.write(value.`starred`, buf)
+    }
+}
+
+
+
 /**
  * Notificación de ESTE teléfono, para reenviar.
  */
@@ -3645,6 +4167,137 @@ public object FfiConverterTypeMobileRemoteNotification: FfiConverterRustBuffer<M
 
 
 
+data class MobileSms (
+    var `id`: kotlin.String
+    , 
+    var `address`: kotlin.String
+    , 
+    var `body`: kotlin.String
+    , 
+    var `dateMs`: kotlin.Long
+    , 
+    var `outgoing`: kotlin.Boolean
+    , 
+    var `read`: kotlin.Boolean
+    , 
+    var `failed`: kotlin.Boolean
+    
+){
+    
+
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMobileSms: FfiConverterRustBuffer<MobileSms> {
+    override fun read(buf: ByteBuffer): MobileSms {
+        return MobileSms(
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterLong.read(buf),
+            FfiConverterBoolean.read(buf),
+            FfiConverterBoolean.read(buf),
+            FfiConverterBoolean.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MobileSms) = (
+            FfiConverterString.allocationSize(value.`id`) +
+            FfiConverterString.allocationSize(value.`address`) +
+            FfiConverterString.allocationSize(value.`body`) +
+            FfiConverterLong.allocationSize(value.`dateMs`) +
+            FfiConverterBoolean.allocationSize(value.`outgoing`) +
+            FfiConverterBoolean.allocationSize(value.`read`) +
+            FfiConverterBoolean.allocationSize(value.`failed`)
+    )
+
+    override fun write(value: MobileSms, buf: ByteBuffer) {
+            FfiConverterString.write(value.`id`, buf)
+            FfiConverterString.write(value.`address`, buf)
+            FfiConverterString.write(value.`body`, buf)
+            FfiConverterLong.write(value.`dateMs`, buf)
+            FfiConverterBoolean.write(value.`outgoing`, buf)
+            FfiConverterBoolean.write(value.`read`, buf)
+            FfiConverterBoolean.write(value.`failed`, buf)
+    }
+}
+
+
+
+data class MobileSmsThread (
+    var `threadId`: kotlin.String
+    , 
+    var `address`: kotlin.String
+    , 
+    var `name`: kotlin.String
+    , 
+    var `snippet`: kotlin.String
+    , 
+    var `dateMs`: kotlin.Long
+    , 
+    var `unread`: kotlin.Boolean
+    , 
+    var `count`: kotlin.UInt
+    , 
+    var `outgoing`: kotlin.Boolean
+    
+){
+    
+
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMobileSmsThread: FfiConverterRustBuffer<MobileSmsThread> {
+    override fun read(buf: ByteBuffer): MobileSmsThread {
+        return MobileSmsThread(
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterLong.read(buf),
+            FfiConverterBoolean.read(buf),
+            FfiConverterUInt.read(buf),
+            FfiConverterBoolean.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MobileSmsThread) = (
+            FfiConverterString.allocationSize(value.`threadId`) +
+            FfiConverterString.allocationSize(value.`address`) +
+            FfiConverterString.allocationSize(value.`name`) +
+            FfiConverterString.allocationSize(value.`snippet`) +
+            FfiConverterLong.allocationSize(value.`dateMs`) +
+            FfiConverterBoolean.allocationSize(value.`unread`) +
+            FfiConverterUInt.allocationSize(value.`count`) +
+            FfiConverterBoolean.allocationSize(value.`outgoing`)
+    )
+
+    override fun write(value: MobileSmsThread, buf: ByteBuffer) {
+            FfiConverterString.write(value.`threadId`, buf)
+            FfiConverterString.write(value.`address`, buf)
+            FfiConverterString.write(value.`name`, buf)
+            FfiConverterString.write(value.`snippet`, buf)
+            FfiConverterLong.write(value.`dateMs`, buf)
+            FfiConverterBoolean.write(value.`unread`, buf)
+            FfiConverterUInt.write(value.`count`, buf)
+            FfiConverterBoolean.write(value.`outgoing`, buf)
+    }
+}
+
+
+
 
 
 sealed class MobileException: kotlin.Exception() {
@@ -3874,14 +4527,67 @@ public interface LinkCallback {
     fun `onCallCommand`(`deviceId`: kotlin.String, `action`: kotlin.String)
     
     /**
-     * Responder con [`LinkService::send_photo_list`].
+     * Responder con [`LinkService::send_photo_list`]. `have_thumbnails`:
+     * ids cuya miniatura ya tiene el PC (mandarlas sin miniatura).
      */
-    fun `onPhotoListRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `offset`: kotlin.UInt, `limit`: kotlin.UInt)
+    fun `onPhotoListRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `offset`: kotlin.UInt, `limit`: kotlin.UInt, `haveThumbnails`: List<kotlin.String>)
     
     /**
-     * Responder con [`LinkService::send_photo_data`] (uno o varios trozos).
+     * Responder con [`LinkService::send_photo_data`] (uno o varios trozos
+     * de como mucho `chunk_size` bytes). `background`: precarga, mandarla
+     * con `background = true` para no frenar el resto del enlace.
      */
-    fun `onPhotoRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `photoId`: kotlin.String)
+    fun `onPhotoRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `photoId`: kotlin.String, `chunkSize`: kotlin.UInt, `background`: kotlin.Boolean)
+    
+    /**
+     * El PC copió texto: ponerlo en el portapapeles del teléfono.
+     */
+    fun `onClipboard`(`deviceId`: kotlin.String, `text`: kotlin.String)
+    
+    /**
+     * Responder con [`LinkService::send_sms_threads`].
+     */
+    fun `onSmsThreadsRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `offset`: kotlin.UInt, `limit`: kotlin.UInt)
+    
+    /**
+     * Responder con [`LinkService::send_sms_messages`].
+     */
+    fun `onSmsMessagesRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `threadId`: kotlin.String, `limit`: kotlin.UInt, `beforeMs`: kotlin.Long)
+    
+    /**
+     * Mandar un SMS; responder con [`LinkService::send_command_result`].
+     */
+    fun `onSendSms`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `address`: kotlin.String, `body`: kotlin.String)
+    
+    /**
+     * Responder con [`LinkService::send_call_log`].
+     */
+    fun `onCallLogRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `limit`: kotlin.UInt)
+    
+    /**
+     * Responder con [`LinkService::send_contacts`].
+     */
+    fun `onContactsRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong)
+    
+    /**
+     * Llamar; responder con [`LinkService::send_command_result`].
+     */
+    fun `onDial`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `number`: kotlin.String)
+    
+    /**
+     * Responder con [`LinkService::send_active_notifications`].
+     */
+    fun `onActiveNotificationsRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `haveIcons`: List<kotlin.String>)
+    
+    /**
+     * Responder con [`LinkService::send_wallpaper`].
+     */
+    fun `onWallpaperRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `maxSize`: kotlin.UInt)
+    
+    /**
+     * Borrar la foto; responder con [`LinkService::send_command_result`].
+     */
+    fun `onPhotoDelete`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `photoId`: kotlin.String)
     
     companion object
 }
@@ -4091,10 +4797,55 @@ internal object uniffiCallbackInterfaceLinkCallback {
         }
     }
     internal object `onPhotoListRequest`: UniffiCallbackInterfaceLinkCallbackMethod15 {
-        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`offset`: Int,`limit`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`offset`: Int,`limit`: Int,`haveThumbnails`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
             val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
             val makeCall = { ->
                 uniffiObj.`onPhotoListRequest`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                    FfiConverterUInt.lift(`offset`),
+                    FfiConverterUInt.lift(`limit`),
+                    FfiConverterSequenceString.lift(`haveThumbnails`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onPhotoRequest`: UniffiCallbackInterfaceLinkCallbackMethod16 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`photoId`: RustBuffer.ByValue,`chunkSize`: Int,`background`: Byte,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onPhotoRequest`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                    FfiConverterString.lift(`photoId`),
+                    FfiConverterUInt.lift(`chunkSize`),
+                    FfiConverterBoolean.lift(`background`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onClipboard`: UniffiCallbackInterfaceLinkCallbackMethod17 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`text`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onClipboard`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterString.lift(`text`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onSmsThreadsRequest`: UniffiCallbackInterfaceLinkCallbackMethod18 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`offset`: Int,`limit`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onSmsThreadsRequest`(
                     FfiConverterString.lift(`deviceId`),
                     FfiConverterULong.lift(`requestId`),
                     FfiConverterUInt.lift(`offset`),
@@ -4105,11 +4856,111 @@ internal object uniffiCallbackInterfaceLinkCallback {
             uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
         }
     }
-    internal object `onPhotoRequest`: UniffiCallbackInterfaceLinkCallbackMethod16 {
+    internal object `onSmsMessagesRequest`: UniffiCallbackInterfaceLinkCallbackMethod19 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`threadId`: RustBuffer.ByValue,`limit`: Int,`beforeMs`: Long,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onSmsMessagesRequest`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                    FfiConverterString.lift(`threadId`),
+                    FfiConverterUInt.lift(`limit`),
+                    FfiConverterLong.lift(`beforeMs`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onSendSms`: UniffiCallbackInterfaceLinkCallbackMethod20 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`address`: RustBuffer.ByValue,`body`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onSendSms`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                    FfiConverterString.lift(`address`),
+                    FfiConverterString.lift(`body`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onCallLogRequest`: UniffiCallbackInterfaceLinkCallbackMethod21 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`limit`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onCallLogRequest`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                    FfiConverterUInt.lift(`limit`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onContactsRequest`: UniffiCallbackInterfaceLinkCallbackMethod22 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onContactsRequest`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onDial`: UniffiCallbackInterfaceLinkCallbackMethod23 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`number`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onDial`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                    FfiConverterString.lift(`number`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onActiveNotificationsRequest`: UniffiCallbackInterfaceLinkCallbackMethod24 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`haveIcons`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onActiveNotificationsRequest`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                    FfiConverterSequenceString.lift(`haveIcons`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onWallpaperRequest`: UniffiCallbackInterfaceLinkCallbackMethod25 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`maxSize`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onWallpaperRequest`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                    FfiConverterUInt.lift(`maxSize`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onPhotoDelete`: UniffiCallbackInterfaceLinkCallbackMethod26 {
         override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`photoId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
             val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
             val makeCall = { ->
-                uniffiObj.`onPhotoRequest`(
+                uniffiObj.`onPhotoDelete`(
                     FfiConverterString.lift(`deviceId`),
                     FfiConverterULong.lift(`requestId`),
                     FfiConverterString.lift(`photoId`),
@@ -4152,6 +5003,16 @@ internal object uniffiCallbackInterfaceLinkCallback {
         `onCallCommand`,
         `onPhotoListRequest`,
         `onPhotoRequest`,
+        `onClipboard`,
+        `onSmsThreadsRequest`,
+        `onSmsMessagesRequest`,
+        `onSendSms`,
+        `onCallLogRequest`,
+        `onContactsRequest`,
+        `onDial`,
+        `onActiveNotificationsRequest`,
+        `onWallpaperRequest`,
+        `onPhotoDelete`,
     )
 
     // Registers the foreign callback with the Rust side.
@@ -4394,6 +5255,34 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
 /**
  * @suppress
  */
+public object FfiConverterSequenceUInt: FfiConverterRustBuffer<List<kotlin.UInt>> {
+    override fun read(buf: ByteBuffer): List<kotlin.UInt> {
+        val len = buf.getInt()
+        return List<kotlin.UInt>(len) {
+            FfiConverterUInt.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<kotlin.UInt>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterUInt.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<kotlin.UInt>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterUInt.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
 public object FfiConverterSequenceString: FfiConverterRustBuffer<List<kotlin.String>> {
     override fun read(buf: ByteBuffer): List<kotlin.String> {
         val len = buf.getInt()
@@ -4506,6 +5395,90 @@ public object FfiConverterSequenceTypeMobileAudioOutput: FfiConverterRustBuffer<
 /**
  * @suppress
  */
+public object FfiConverterSequenceTypeMobileCallLogEntry: FfiConverterRustBuffer<List<MobileCallLogEntry>> {
+    override fun read(buf: ByteBuffer): List<MobileCallLogEntry> {
+        val len = buf.getInt()
+        return List<MobileCallLogEntry>(len) {
+            FfiConverterTypeMobileCallLogEntry.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<MobileCallLogEntry>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeMobileCallLogEntry.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<MobileCallLogEntry>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeMobileCallLogEntry.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeMobileContact: FfiConverterRustBuffer<List<MobileContact>> {
+    override fun read(buf: ByteBuffer): List<MobileContact> {
+        val len = buf.getInt()
+        return List<MobileContact>(len) {
+            FfiConverterTypeMobileContact.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<MobileContact>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeMobileContact.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<MobileContact>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeMobileContact.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeMobileNotification: FfiConverterRustBuffer<List<MobileNotification>> {
+    override fun read(buf: ByteBuffer): List<MobileNotification> {
+        val len = buf.getInt()
+        return List<MobileNotification>(len) {
+            FfiConverterTypeMobileNotification.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<MobileNotification>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeMobileNotification.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<MobileNotification>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeMobileNotification.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
 public object FfiConverterSequenceTypeMobilePeer: FfiConverterRustBuffer<List<MobilePeer>> {
     override fun read(buf: ByteBuffer): List<MobilePeer> {
         val len = buf.getInt()
@@ -4580,6 +5553,62 @@ public object FfiConverterSequenceTypeMobilePlayer: FfiConverterRustBuffer<List<
         buf.putInt(value.size)
         value.iterator().forEach {
             FfiConverterTypeMobilePlayer.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeMobileSms: FfiConverterRustBuffer<List<MobileSms>> {
+    override fun read(buf: ByteBuffer): List<MobileSms> {
+        val len = buf.getInt()
+        return List<MobileSms>(len) {
+            FfiConverterTypeMobileSms.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<MobileSms>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeMobileSms.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<MobileSms>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeMobileSms.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeMobileSmsThread: FfiConverterRustBuffer<List<MobileSmsThread>> {
+    override fun read(buf: ByteBuffer): List<MobileSmsThread> {
+        val len = buf.getInt()
+        return List<MobileSmsThread>(len) {
+            FfiConverterTypeMobileSmsThread.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<MobileSmsThread>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeMobileSmsThread.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<MobileSmsThread>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeMobileSmsThread.write(it, buf)
         }
     }
 }

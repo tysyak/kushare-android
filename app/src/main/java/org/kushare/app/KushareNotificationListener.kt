@@ -188,8 +188,21 @@ class KushareNotificationListener : NotificationListenerService() {
         sendPendingIntent(action.actionIntent, fillIn)
     }
 
+    /** Todas las notificaciones del teléfono ahora mismo, para la lista del PC. */
+    fun activeForPc(): List<MobileNotification> =
+        runCatching { activeNotifications }.getOrNull().orEmpty()
+            .filter { sbn ->
+                val n = sbn.notification
+                sbn.packageName != packageName &&
+                    sbn.packageName !in NOTIFICATION_BRIDGES &&
+                    n.flags and Notification.FLAG_GROUP_SUMMARY == 0 &&
+                    (!n.extras.getCharSequence(Notification.EXTRA_TITLE).isNullOrBlank() ||
+                        !n.extras.getCharSequence(Notification.EXTRA_TEXT).isNullOrBlank())
+            }.map { toMobile(it) }
+
     private fun actionFor(key: String, actionId: String): Notification.Action? {
-        val sbn = active[key] ?: run {
+        // También las que no se reenvían (p. ej. desde la lista del PC).
+        val sbn = active[key] ?: runCatching { activeNotifications }.getOrNull()?.firstOrNull { it.key == key } ?: run {
             Log.w(TAG, "acción sobre una notificación que ya no existe: $key")
             return null
         }

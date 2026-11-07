@@ -103,6 +103,7 @@ object PhoneFeatures {
         startMediaSessions(app)
         startCalls(app)
         startPhotosObserver(app)
+        PhoneData.start(app)
     }
 
     @Synchronized
@@ -125,6 +126,7 @@ object PhoneFeatures {
             telephonyCallback?.let { app.getSystemService(TelephonyManager::class.java).unregisterTelephonyCallback(it) }
         }
         telephonyCallback = null
+        PhoneData.stop()
         scope?.cancel()
         scope = null
         context = null
@@ -134,6 +136,7 @@ object PhoneFeatures {
     /** El usuario concedió permisos nuevos (llamadas, fotos): empezar lo que faltaba. */
     fun onPermissionsChanged() {
         val app = context ?: return
+        PhoneData.onPermissionsChanged()
         main.post {
             if (telephonyCallback == null) startCalls(app)
             if (photosObserver == null) startPhotosObserver(app)
@@ -479,13 +482,13 @@ object PhoneFeatures {
 
     fun hasPhotoPermission(ctx: Context) = ctx.checkSelfPermission(photoPermission) == PackageManager.PERMISSION_GRANTED
 
-    fun onPhotoListRequest(deviceId: String, requestId: ULong, offset: UInt, limit: UInt) {
+    fun onPhotoListRequest(deviceId: String, requestId: ULong, offset: UInt, limit: UInt, haveThumbnails: Set<String>) {
         val app = context ?: return
         val s = scope ?: return
         s.launch(Dispatchers.IO) {
             val (total, photos) =
                 if (hasPhotoPermission(app)) {
-                    runCatching { queryPhotos(app, offset.toInt(), limit.toInt()) }
+                    runCatching { queryPhotos(app, offset.toInt(), limit.toInt(), haveThumbnails) }
                         .onFailure { Log.w(TAG, "no se pudo leer la galería", it) }
                         .getOrDefault(0 to emptyList())
                 } else {
@@ -508,7 +511,7 @@ object PhoneFeatures {
             MediaStore.Images.Media.SIZE,
         )
 
-    private fun queryPhotos(app: Context, offset: Int, limit: Int): Pair<Int, List<MobilePhoto>> {
+    private fun queryPhotos(app: Context, offset: Int, limit: Int, haveThumbnails: Set<String>): Pair<Int, List<MobilePhoto>> {
         val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val resolver = app.contentResolver
         val photos = mutableListOf<MobilePhoto>()
@@ -520,8 +523,9 @@ object PhoneFeatures {
             do {
                 val id = c.getLong(0)
                 val item = ContentUris.withAppendedId(uri, id)
+                // El PC ya tiene la miniatura en caché: no volver a mandarla.
                 val thumb =
-                    runCatching {
+                    if (id.toString() in haveThumbnails) ByteArray(0) else runCatching {
                         val bmp = resolver.loadThumbnail(item, Size(THUMB_SIZE, THUMB_SIZE), null)
                         ByteArrayOutputStream().also { bmp.compress(Bitmap.CompressFormat.JPEG, 70, it) }.toByteArray()
                     }.getOrDefault(ByteArray(0))
@@ -552,14 +556,14 @@ object PhoneFeatures {
         return n
     }
 
-    fun onPhotoRequest(deviceId: String, requestId: ULong, photoId: String) {
+    fun onPhotoRequest(deviceId: String, requestId: ULong, photoId: String, chunkSize: Int, background: Boolean) {
         val app = context ?: return
         val s = scope ?: return
         s.launch(Dispatchers.IO) {
             val svc = svc() ?: return@launch
             val id = photoId.toLongOrNull()
             if (id == null || !hasPhotoPermission(app)) {
-                runCatching { svc.sendPhotoData(deviceId, requestId, photoId, "", 0u, ByteArray(0), true, "sin permiso") }
+                runCatching { svc.sendPhotoData(deviceId, requestId, photoId, "", 0u, ByteArray(0), true, "sin permiso", background) }
                 return@launch
             }
             val uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
@@ -571,7 +575,7 @@ object PhoneFeatures {
             val result =
                 runCatching {
                     app.contentResolver.openInputStream(uri)!!.use { input ->
-                        val buf = ByteArray(PHOTO_CHUNK)
+                        val buf = ByteArray(chunkSize.coerceIn(16 * 1024, PHOTO_CHUNK))
                         var offset = 0L
                         var pending: ByteArray? = null
                         while (true) {
@@ -579,21 +583,21 @@ object PhoneFeatures {
                             val chunk = if (n > 0) buf.copyOf(n) else null
                             // Se manda con un trozo de retraso para marcar `last` en el último.
                             pending?.let {
-                                svc.sendPhotoData(deviceId, requestId, photoId, name, offset.toULong(), it, chunk == null, "")
+                                svc.sendPhotoData(deviceId, requestId, photoId, name, offset.toULong(), it, chunk == null, "", background)
                                 offset += it.size
                             }
                             if (chunk == null) break
                             pending = chunk
                         }
                         if (offset == 0L) {
-                            svc.sendPhotoData(deviceId, requestId, photoId, name, 0u, ByteArray(0), true, "")
+                            svc.sendPhotoData(deviceId, requestId, photoId, name, 0u, ByteArray(0), true, "", background)
                         }
                     }
                 }
             result.onFailure {
                 Log.w(TAG, "no se pudo mandar la foto $photoId", it)
                 runCatching {
-                    svc.sendPhotoData(deviceId, requestId, photoId, name, 0u, ByteArray(0), true, it.message ?: "error")
+                    svc.sendPhotoData(deviceId, requestId, photoId, name, 0u, ByteArray(0), true, it.message ?: "error", background)
                 }
             }
         }

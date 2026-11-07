@@ -257,6 +257,22 @@ class KushareService : Service() {
                 )
                 .setContentIntent(open)
                 .setOngoing(true)
+                .apply {
+                    if (!paused) {
+                        // Android solo deja leer el portapapeles a la app en primer
+                        // plano: el botón abre un instante ClipboardActivity.
+                        val clip =
+                            PendingIntent.getActivity(
+                                this@KushareService,
+                                1,
+                                Intent(this@KushareService, ClipboardActivity::class.java),
+                                PendingIntent.FLAG_IMMUTABLE,
+                            )
+                        addAction(
+                            Notification.Action.Builder(null, getString(R.string.clipboard_send), clip).build(),
+                        )
+                    }
+                }
                 .build()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(FOREGROUND_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)

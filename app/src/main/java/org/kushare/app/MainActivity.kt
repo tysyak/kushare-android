@@ -97,6 +97,12 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         if (intent.getBooleanExtra(EXTRA_OPEN_DEVICES, false)) openDevices.value = true
     }
+
+    /** Con la app en primer plano sí se puede leer el portapapeles: compartirlo. */
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) PhoneData.sendClipboard(this)
+    }
 }
 
 /** Iconos de las barras del sistema claros u oscuros según el tema de la app (no el del sistema). */

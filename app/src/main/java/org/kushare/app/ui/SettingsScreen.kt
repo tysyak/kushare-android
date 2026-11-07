@@ -6,6 +6,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import org.kushare.app.R
 import org.kushare.app.PhoneFeatures
+import org.kushare.app.PhoneData
+import org.kushare.app.UpdateChecker
+import android.net.Uri
+import android.widget.Toast
+import androidx.compose.material3.Switch
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import android.os.Build
 import android.provider.Settings
 import androidx.compose.animation.AnimatedVisibility
@@ -205,6 +212,12 @@ fun SettingsScreen(onBack: () -> Unit) {
             item { SectionTitle(stringResource(R.string.settings_phone_features)) }
             item { PhoneFeaturesCard() }
 
+            item { SectionTitle(stringResource(R.string.settings_clipboard)) }
+            item { ClipboardCard() }
+
+            item { SectionTitle(stringResource(R.string.settings_updates)) }
+            item { UpdateCard() }
+
             item { SectionTitle(stringResource(R.string.settings_about)) }
             item {
                 ExpressiveCard(shape = KushareShapes.ListCard) {
@@ -274,6 +287,9 @@ private fun PhoneFeaturesCard() {
     var calls by remember { mutableStateOf(PhoneFeatures.hasCallPermissions(context)) }
     var photos by remember { mutableStateOf(PhoneFeatures.hasPhotoPermission(context)) }
     var dnd by remember { mutableStateOf(PhoneFeatures.canChangeRinger(context)) }
+    var sms by remember { mutableStateOf(PhoneData.hasSmsPermissions(context)) }
+    var callLog by remember { mutableStateOf(PhoneData.hasCallLogPermissions(context)) }
+    var wallpaper by remember { mutableStateOf(PhoneData.hasWallpaperAccess()) }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer =
@@ -282,6 +298,9 @@ private fun PhoneFeaturesCard() {
                     calls = PhoneFeatures.hasCallPermissions(context)
                     photos = PhoneFeatures.hasPhotoPermission(context)
                     dnd = PhoneFeatures.canChangeRinger(context)
+                    sms = PhoneData.hasSmsPermissions(context)
+                    callLog = PhoneData.hasCallLogPermissions(context)
+                    wallpaper = PhoneData.hasWallpaperAccess()
                 }
             }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -290,6 +309,16 @@ private fun PhoneFeaturesCard() {
     val callLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             calls = PhoneFeatures.hasCallPermissions(context)
+            PhoneFeatures.onPermissionsChanged()
+        }
+    val smsLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            sms = PhoneData.hasSmsPermissions(context)
+            PhoneFeatures.onPermissionsChanged()
+        }
+    val callLogLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            callLog = PhoneData.hasCallLogPermissions(context)
             PhoneFeatures.onPermissionsChanged()
         }
     val photoLauncher =
@@ -318,6 +347,34 @@ private fun PhoneFeaturesCard() {
             onGrant = { photoLauncher.launch(PhoneFeatures.photoPermission) },
         )
         PermissionRow(
+            title = stringResource(R.string.features_sms),
+            subtitle = stringResource(R.string.features_sms_detail),
+            granted = sms,
+            onGrant = { smsLauncher.launch(arrayOf(Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS)) },
+        )
+        PermissionRow(
+            title = stringResource(R.string.features_call_log),
+            subtitle = stringResource(R.string.features_call_log_detail),
+            granted = callLog,
+            onGrant = {
+                callLogLauncher.launch(
+                    arrayOf(Manifest.permission.READ_CALL_LOG, Manifest.permission.READ_CONTACTS, Manifest.permission.CALL_PHONE),
+                )
+            },
+        )
+        if (Build.VERSION.SDK_INT >= 30) {
+            PermissionRow(
+                title = stringResource(R.string.features_wallpaper),
+                subtitle = stringResource(R.string.features_wallpaper_detail),
+                granted = wallpaper,
+                onGrant = {
+                    context.startActivity(
+                        Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:${context.packageName}")),
+                    )
+                },
+            )
+        }
+        PermissionRow(
             title = stringResource(R.string.features_dnd),
             subtitle = stringResource(R.string.features_dnd_detail),
             granted = dnd,
@@ -342,6 +399,82 @@ private fun PermissionRow(title: String, subtitle: String, granted: Boolean, onG
             Text(stringResource(R.string.features_granted), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
         } else {
             FilledTonalButton(onClick = onGrant, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.features_allow)) }
+        }
+    }
+}
+
+/** Portapapeles compartido con el PC. */
+@Composable
+private fun ClipboardCard() {
+    val context = LocalContext.current
+    var on by remember { mutableStateOf(PhoneData.clipboardSync(context)) }
+    ExpressiveCard(shape = KushareShapes.ListCard) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.clipboard_sync), style = MaterialTheme.typography.bodyLargeEmphasized)
+                Text(
+                    stringResource(R.string.clipboard_sync_detail),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            Switch(checked = on, onCheckedChange = {
+                on = it
+                PhoneData.setClipboardSync(context, it)
+            })
+        }
+        Spacer(Modifier.size(8.dp))
+        FilledTonalButton(
+            onClick = {
+                val sent = PhoneData.sendClipboard(context, force = true)
+                Toast.makeText(context, if (sent) R.string.clipboard_sent else R.string.clipboard_empty, Toast.LENGTH_SHORT).show()
+            },
+            shapes = ButtonDefaults.shapes(),
+        ) { Text(stringResource(R.string.clipboard_send)) }
+    }
+}
+
+/** Buscar e instalar versiones nuevas de la app (desde GitHub). */
+@Composable
+private fun UpdateCard() {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val state by UpdateChecker.state.collectAsState()
+    ExpressiveCard(shape = KushareShapes.ListCard) {
+        val (title, detail) =
+            when (val s = state) {
+                UpdateChecker.State.Idle -> stringResource(R.string.update_unknown) to ""
+                UpdateChecker.State.Checking -> stringResource(R.string.update_checking) to ""
+                is UpdateChecker.State.UpToDate -> stringResource(R.string.update_up_to_date) to s.version
+                is UpdateChecker.State.Available ->
+                    stringResource(R.string.update_available, s.release.version) to UpdateChecker.currentVersion(context)
+                UpdateChecker.State.Downloading -> stringResource(R.string.update_downloading) to ""
+                is UpdateChecker.State.Failed -> stringResource(R.string.update_failed) to s.message
+            }
+        Text(title, style = MaterialTheme.typography.bodyLargeEmphasized)
+        if (detail.isNotEmpty()) {
+            Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Spacer(Modifier.size(8.dp))
+        val s = state
+        if (s is UpdateChecker.State.Available && s.release.apkUrl != null) {
+            Button(onClick = {
+                // Android pide permitir "instalar apps desconocidas" la primera vez.
+                if (!context.packageManager.canRequestPackageInstalls()) {
+                    context.startActivity(
+                        Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${context.packageName}")),
+                    )
+                } else {
+                    scope.launch { UpdateChecker.install(context, s.release) }
+                }
+            }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.update_install)) }
+        } else {
+            FilledTonalButton(
+                onClick = { scope.launch { UpdateChecker.check(context) } },
+                enabled = s !is UpdateChecker.State.Checking && s !is UpdateChecker.State.Downloading,
+                shapes = ButtonDefaults.shapes(),
+            ) { Text(stringResource(R.string.update_check)) }
         }
     }
 }

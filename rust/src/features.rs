@@ -53,6 +53,46 @@ pub struct MobilePhoto {
     pub thumbnail: Vec<u8>,
 }
 
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct MobileSmsThread {
+    pub thread_id: String,
+    pub address: String,
+    pub name: String,
+    pub snippet: String,
+    pub date_ms: i64,
+    pub unread: bool,
+    pub count: u32,
+    pub outgoing: bool,
+}
+
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct MobileSms {
+    pub id: String,
+    pub address: String,
+    pub body: String,
+    pub date_ms: i64,
+    pub outgoing: bool,
+    pub read: bool,
+    pub failed: bool,
+}
+
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct MobileCallLogEntry {
+    pub number: String,
+    pub name: String,
+    pub date_ms: i64,
+    pub duration_s: u32,
+    /// incoming|outgoing|missed|rejected|blocked|voicemail
+    pub kind: String,
+}
+
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct MobileContact {
+    pub name: String,
+    pub numbers: Vec<String>,
+    pub starred: bool,
+}
+
 #[derive(Default)]
 pub struct LocalCache {
     battery: Option<pb::BatteryStatus>,
@@ -245,11 +285,55 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
             };
             callback.on_call_command(device_id, action.into())
         }
-        F::PhotoListRequest(req) => {
-            callback.on_photo_list_request(device_id, req.request_id, req.offset, req.limit.min(60))
+        F::PhotoListRequest(req) => callback.on_photo_list_request(
+            device_id,
+            req.request_id,
+            req.offset,
+            req.limit.min(60),
+            req.have_thumbnails,
+        ),
+        F::PhotoRequest(req) => {
+            let chunk = if req.chunk_size == 0 { 256 * 1024 } else { req.chunk_size.clamp(16 * 1024, 256 * 1024) };
+            callback.on_photo_request(device_id, req.request_id, req.id, chunk, req.background)
         }
-        F::PhotoRequest(req) => callback.on_photo_request(device_id, req.request_id, req.id),
-        // Solo los manda un teléfono; el PC no tiene timbre, llamadas ni galería.
-        F::RingerMode(_) | F::CallState(_) | F::PhotoList(_) | F::PhotoData(_) | F::PhotosChanged(_) => {}
+        F::Clipboard(c) => callback.on_clipboard(device_id, c.text),
+        F::SmsThreadsRequest(r) => callback.on_sms_threads_request(device_id, r.request_id, r.offset, r.limit.min(100)),
+        F::SmsMessagesRequest(r) => {
+            callback.on_sms_messages_request(device_id, r.request_id, r.thread_id, r.limit.min(200), r.before_ms)
+        }
+        F::SendSms(r) => callback.on_send_sms(device_id, r.request_id, r.address, r.body),
+        F::CallLogRequest(r) => callback.on_call_log_request(device_id, r.request_id, r.limit.min(500)),
+        F::ContactsRequest(r) => callback.on_contacts_request(device_id, r.request_id),
+        F::Dial(r) => callback.on_dial(device_id, r.request_id, r.number),
+        F::ActiveNotificationsRequest(r) => {
+            callback.on_active_notifications_request(device_id, r.request_id, r.have_icons)
+        }
+        F::WallpaperRequest(r) => callback.on_wallpaper_request(device_id, r.request_id, r.max_size.clamp(256, 2048)),
+        F::PhotoDelete(r) => callback.on_photo_delete(device_id, r.request_id, r.id),
+        // Solo los manda un teléfono (o son respuestas que el PC no pide al teléfono).
+        F::RingerMode(_)
+        | F::CallState(_)
+        | F::PhotoList(_)
+        | F::PhotoData(_)
+        | F::PhotosChanged(_)
+        | F::SmsThreads(_)
+        | F::SmsMessages(_)
+        | F::SmsChanged(_)
+        | F::CallLog(_)
+        | F::Contacts(_)
+        | F::ActiveNotifications(_)
+        | F::Wallpaper(_)
+        | F::CommandResult(_) => {}
+    }
+}
+
+pub fn call_type_from(kind: &str) -> pb::CallType {
+    match kind {
+        "outgoing" => pb::CallType::Outgoing,
+        "missed" => pb::CallType::Missed,
+        "rejected" => pb::CallType::Rejected,
+        "blocked" => pb::CallType::Blocked,
+        "voicemail" => pb::CallType::Voicemail,
+        _ => pb::CallType::Incoming,
     }
 }

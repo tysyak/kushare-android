@@ -266,11 +266,43 @@ object KushareLink {
 
         override fun onCallCommand(deviceId: String, action: String) = PhoneFeatures.callCommand(action)
 
-        override fun onPhotoListRequest(deviceId: String, requestId: ULong, offset: UInt, limit: UInt) =
-            PhoneFeatures.onPhotoListRequest(deviceId, requestId, offset, limit)
+        override fun onPhotoListRequest(
+            deviceId: String,
+            requestId: ULong,
+            offset: UInt,
+            limit: UInt,
+            haveThumbnails: List<String>,
+        ) = PhoneFeatures.onPhotoListRequest(deviceId, requestId, offset, limit, haveThumbnails.toSet())
 
-        override fun onPhotoRequest(deviceId: String, requestId: ULong, photoId: String) =
-            PhoneFeatures.onPhotoRequest(deviceId, requestId, photoId)
+        override fun onPhotoRequest(deviceId: String, requestId: ULong, photoId: String, chunkSize: UInt, background: Boolean) =
+            PhoneFeatures.onPhotoRequest(deviceId, requestId, photoId, chunkSize.toInt(), background)
+
+        override fun onClipboard(deviceId: String, text: String) = PhoneData.onClipboard(text)
+
+        override fun onSmsThreadsRequest(deviceId: String, requestId: ULong, offset: UInt, limit: UInt) =
+            PhoneData.onSmsThreadsRequest(deviceId, requestId, offset, limit)
+
+        override fun onSmsMessagesRequest(deviceId: String, requestId: ULong, threadId: String, limit: UInt, beforeMs: Long) =
+            PhoneData.onSmsMessagesRequest(deviceId, requestId, threadId, limit, beforeMs)
+
+        override fun onSendSms(deviceId: String, requestId: ULong, address: String, body: String) =
+            PhoneData.onSendSms(deviceId, requestId, address, body)
+
+        override fun onCallLogRequest(deviceId: String, requestId: ULong, limit: UInt) =
+            PhoneData.onCallLogRequest(deviceId, requestId, limit)
+
+        override fun onContactsRequest(deviceId: String, requestId: ULong) = PhoneData.onContactsRequest(deviceId, requestId)
+
+        override fun onDial(deviceId: String, requestId: ULong, number: String) = PhoneData.onDial(deviceId, requestId, number)
+
+        override fun onActiveNotificationsRequest(deviceId: String, requestId: ULong, haveIcons: List<String>) =
+            PhoneData.onActiveNotificationsRequest(deviceId, requestId, haveIcons)
+
+        override fun onWallpaperRequest(deviceId: String, requestId: ULong, maxSize: UInt) =
+            PhoneData.onWallpaperRequest(deviceId, requestId, maxSize)
+
+        override fun onPhotoDelete(deviceId: String, requestId: ULong, photoId: String) =
+            PhoneData.onPhotoDelete(deviceId, requestId, photoId)
     }
 
     fun onSighting(sighting: LinkSighting) {
