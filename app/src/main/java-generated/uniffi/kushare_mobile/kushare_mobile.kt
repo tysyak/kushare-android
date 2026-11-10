@@ -3899,6 +3899,11 @@ data class MobilePeer (
      */
     var `bulkTransport`: kotlin.String?
     , 
+    /**
+     * El PC comprobó que nos alcanza por Wi-Fi (modo híbrido listo).
+     */
+    var `wifiReady`: kotlin.Boolean
+    , 
     var `btAddress`: kotlin.String?
     , 
     /**
@@ -3938,6 +3943,7 @@ public object FfiConverterTypeMobilePeer: FfiConverterRustBuffer<MobilePeer> {
             FfiConverterBoolean.read(buf),
             FfiConverterOptionalString.read(buf),
             FfiConverterOptionalString.read(buf),
+            FfiConverterBoolean.read(buf),
             FfiConverterOptionalString.read(buf),
             FfiConverterBoolean.read(buf),
             FfiConverterBoolean.read(buf),
@@ -3954,6 +3960,7 @@ public object FfiConverterTypeMobilePeer: FfiConverterRustBuffer<MobilePeer> {
             FfiConverterBoolean.allocationSize(value.`connected`) +
             FfiConverterOptionalString.allocationSize(value.`transport`) +
             FfiConverterOptionalString.allocationSize(value.`bulkTransport`) +
+            FfiConverterBoolean.allocationSize(value.`wifiReady`) +
             FfiConverterOptionalString.allocationSize(value.`btAddress`) +
             FfiConverterBoolean.allocationSize(value.`outgoingEnabled`) +
             FfiConverterBoolean.allocationSize(value.`incomingEnabled`) +
@@ -3969,6 +3976,7 @@ public object FfiConverterTypeMobilePeer: FfiConverterRustBuffer<MobilePeer> {
             FfiConverterBoolean.write(value.`connected`, buf)
             FfiConverterOptionalString.write(value.`transport`, buf)
             FfiConverterOptionalString.write(value.`bulkTransport`, buf)
+            FfiConverterBoolean.write(value.`wifiReady`, buf)
             FfiConverterOptionalString.write(value.`btAddress`, buf)
             FfiConverterBoolean.write(value.`outgoingEnabled`, buf)
             FfiConverterBoolean.write(value.`incomingEnabled`, buf)

@@ -77,6 +77,8 @@ pub struct MobilePeer {
     pub transport: Option<String>,
     /// Enlace de datos por Wi-Fi abierto ahora (modo híbrido), si hay.
     pub bulk_transport: Option<String>,
+    /// El PC comprobó que nos alcanza por Wi-Fi (modo híbrido listo).
+    pub wifi_ready: bool,
     pub bt_address: Option<String>,
     /// ¿Se reenvían las notificaciones del teléfono a este peer?
     pub outgoing_enabled: bool,
@@ -196,7 +198,11 @@ pub struct LinkService {
     /// Tareas de fondo (eventos, reconexión, listener TCP), para poder
     /// detenerlas en [`LinkService::shutdown`].
     tasks: std::sync::Mutex<Vec<tokio::task::AbortHandle>>,
+    /// PCs que comprobaron que nos alcanzan por Wi-Fi (`LanStatus`).
+    wifi_ready: WifiReady,
 }
+
+type WifiReady = Arc<std::sync::Mutex<std::collections::HashSet<String>>>;
 
 #[uniffi::export]
 impl LinkService {
@@ -231,9 +237,11 @@ impl LinkService {
         let names = manager.clone();
         let cache = SharedCache::default();
         let events_cache = cache.clone();
+        let wifi_ready = WifiReady::default();
+        let events_ready = wifi_ready.clone();
         let events_task = RUNTIME.spawn(async move {
             while let Some(event) = events.recv().await {
-                dispatch(&*callback, &names, &events_cache, event);
+                dispatch(&*callback, &names, &events_cache, &events_ready, event);
             }
         });
         let reconnect = manager.clone();
@@ -241,6 +249,7 @@ impl LinkService {
         Ok(Arc::new(Self {
             manager,
             cache,
+            wifi_ready,
             tasks: std::sync::Mutex::new(vec![events_task.abort_handle(), reconnect_task.abort_handle()]),
         }))
     }
@@ -422,6 +431,8 @@ impl LinkService {
             .peers()
             .into_iter()
             .map(|p| MobilePeer {
+                wifi_ready: p.bulk_transport.is_some()
+                    || self.wifi_ready.lock().expect("mutex envenenado").contains(&p.device_id),
                 bt_address: p.bt_address,
                 device_id: p.device_id,
                 device_name: p.device_name,
@@ -783,8 +794,31 @@ fn notification_data(notification: MobileNotification) -> NotificationData {
     }
 }
 
-fn dispatch(callback: &dyn LinkCallback, manager: &LinkManager, cache: &SharedCache, event: LinkEvent) {
+fn dispatch(
+    callback: &dyn LinkCallback,
+    manager: &LinkManager,
+    cache: &SharedCache,
+    wifi_ready: &WifiReady,
+    event: LinkEvent,
+) {
     match event {
+        LinkEvent::Feature {
+            device_id,
+            feature: pb::Feature {
+                kind: Some(F::LanStatus(status)),
+            },
+        } => {
+            let mut ready = wifi_ready.lock().expect("mutex envenenado");
+            let changed = if status.ready {
+                ready.insert(device_id)
+            } else {
+                ready.remove(&device_id)
+            };
+            drop(ready);
+            if changed {
+                callback.on_peers_changed();
+            }
+        }
         LinkEvent::PeerConnected { device_id, .. } => {
             features::send_cached(manager, cache, &device_id);
             callback.on_peers_changed();
@@ -804,9 +838,11 @@ fn dispatch(callback: &dyn LinkCallback, manager: &LinkManager, cache: &SharedCa
             callback.on_pairing_finished(device_id, device_name, accepted);
             callback.on_peers_changed();
         }
-        LinkEvent::PeerDisconnected { .. }
-        | LinkEvent::PeerUnpaired { .. }
-        | LinkEvent::ConfigChanged { .. } => callback.on_peers_changed(),
+        LinkEvent::PeerDisconnected { device_id } | LinkEvent::PeerUnpaired { device_id } => {
+            wifi_ready.lock().expect("mutex envenenado").remove(&device_id);
+            callback.on_peers_changed();
+        }
+        LinkEvent::ConfigChanged { .. } => callback.on_peers_changed(),
         LinkEvent::NotificationPosted {
             device_id,
             notification: n,

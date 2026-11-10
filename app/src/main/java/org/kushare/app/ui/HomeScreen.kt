@@ -84,7 +84,15 @@ fun HomeScreen(
                 val viaBt = connected.any { it.transport?.startsWith("bluetooth") == true }
                 LinkStatus(
                     stringResource(R.string.home_connected),
-                    connected.joinToString(" · ") { it.deviceName },
+                    connected.joinToString("   ") { p ->
+                        val via =
+                            when {
+                                p.transport?.startsWith("bluetooth") == true && p.wifiReady -> "Bluetooth + Wi-Fi"
+                                p.transport?.startsWith("bluetooth") == true -> "Bluetooth"
+                                else -> "Wi-Fi"
+                            }
+                        "${p.deviceName} · $via"
+                    },
                     if (viaBt) Icons.Rounded.Bluetooth else Icons.Rounded.Wifi,
                     MaterialShapes.Cookie9Sided,
                     true,

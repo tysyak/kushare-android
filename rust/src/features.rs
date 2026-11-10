@@ -327,7 +327,8 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
         | F::ActiveNotifications(_)
         | F::Wallpaper(_)
         | F::CommandResult(_)
-        | F::LanAddress(_) => {}
+        | F::LanAddress(_)
+        | F::LanStatus(_) => {}
     }
 }
 

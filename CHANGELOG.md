@@ -6,6 +6,13 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.5.1] - 2026-11-10
+
+### Cambiado
+- El menú lateral y la tarjeta de inicio muestran «Bluetooth + Wi-Fi» en
+  cuanto el PC comprueba que se alcanzan por la red (no solo mientras se
+  transfiere), y vuelven a «Bluetooth» al salir de la Wi-Fi.
+
 ## [0.5.0] - 2026-11-07
 
 ### Añadido
