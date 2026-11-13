@@ -6,6 +6,14 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.6.0] - 2026-11-13
+
+### Añadido
+- Fotos de los contactos para el PC: el registro de llamadas y los contactos
+  llevan la clave de la foto (`photo_key`) y el PC pide las miniaturas que le
+  faltan (`ContactPhotosRequest`), que se leen con el permiso de contactos que
+  ya existía.
+
 ## [0.5.1] - 2026-11-10
 
 ### Cambiado

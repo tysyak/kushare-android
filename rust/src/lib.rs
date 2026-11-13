@@ -12,17 +12,18 @@ use std::sync::Mutex;
 use tokio::sync::mpsc;
 
 mod bt_bridge;
-mod link;
 pub mod features;
+mod link;
 pub use bt_bridge::ByteStreamIo;
-pub use link::{LinkCallback, LinkService};
 use bt_bridge::CallbackStream;
+pub use link::{LinkCallback, LinkService};
 
 uniffi::setup_scaffolding!();
 
-pub(crate) static RUNTIME: std::sync::LazyLock<tokio::runtime::Runtime> = std::sync::LazyLock::new(|| {
-    tokio::runtime::Runtime::new().expect("no se pudo crear el runtime de tokio")
-});
+pub(crate) static RUNTIME: std::sync::LazyLock<tokio::runtime::Runtime> =
+    std::sync::LazyLock::new(|| {
+        tokio::runtime::Runtime::new().expect("no se pudo crear el runtime de tokio")
+    });
 
 #[derive(Debug, thiserror::Error, uniffi::Error)]
 pub enum MobileError {
@@ -149,7 +150,9 @@ pub async fn send_file_bt(
             result
         })
         .await
-        .map_err(|join_err| anyhow::anyhow!("tarea de envío Bluetooth interrumpida: {join_err}"))??;
+        .map_err(|join_err| {
+            anyhow::anyhow!("tarea de envío Bluetooth interrumpida: {join_err}")
+        })??;
     Ok(())
 }
 

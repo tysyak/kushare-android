@@ -84,6 +84,8 @@ pub struct MobileCallLogEntry {
     pub duration_s: u32,
     /// incoming|outgoing|missed|rejected|blocked|voicemail
     pub kind: String,
+    /// "<contactId>-<photoId>" o "" (ver `ContactPhotosRequest`).
+    pub photo_key: String,
 }
 
 #[derive(Debug, Clone, uniffi::Record)]
@@ -91,7 +93,18 @@ pub struct MobileContact {
     pub name: String,
     pub numbers: Vec<String>,
     pub starred: bool,
+    pub photo_key: String,
 }
+
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct MobileContactPhoto {
+    pub key: String,
+    /// JPEG/PNG pequeño, como mucho [`CONTACT_PHOTO_MAX`] bytes.
+    pub image: Vec<u8>,
+}
+
+/// Tamaño máximo de una foto de contacto (las mayores se omiten).
+pub const CONTACT_PHOTO_MAX: usize = 64 * 1024;
 
 #[derive(Default)]
 pub struct LocalCache {
@@ -257,9 +270,10 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
                 charging: b.charging,
             },
         ),
-        F::MediaPlayers(p) => {
-            callback.on_peer_players(device_id, p.players.into_iter().map(player_from_pb).collect())
-        }
+        F::MediaPlayers(p) => callback.on_peer_players(
+            device_id,
+            p.players.into_iter().map(player_from_pb).collect(),
+        ),
         F::AudioOutputs(o) => callback.on_peer_audio_outputs(
             device_id,
             o.selectable,
@@ -296,22 +310,41 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
             req.have_thumbnails,
         ),
         F::PhotoRequest(req) => {
-            let chunk = if req.chunk_size == 0 { 256 * 1024 } else { req.chunk_size.clamp(16 * 1024, 256 * 1024) };
+            let chunk = if req.chunk_size == 0 {
+                256 * 1024
+            } else {
+                req.chunk_size.clamp(16 * 1024, 256 * 1024)
+            };
             callback.on_photo_request(device_id, req.request_id, req.id, chunk, req.background)
         }
         F::Clipboard(c) => callback.on_clipboard(device_id, c.text),
-        F::SmsThreadsRequest(r) => callback.on_sms_threads_request(device_id, r.request_id, r.offset, r.limit.min(100)),
-        F::SmsMessagesRequest(r) => {
-            callback.on_sms_messages_request(device_id, r.request_id, r.thread_id, r.limit.min(200), r.before_ms)
+        F::SmsThreadsRequest(r) => {
+            callback.on_sms_threads_request(device_id, r.request_id, r.offset, r.limit.min(100))
         }
+        F::SmsMessagesRequest(r) => callback.on_sms_messages_request(
+            device_id,
+            r.request_id,
+            r.thread_id,
+            r.limit.min(200),
+            r.before_ms,
+        ),
         F::SendSms(r) => callback.on_send_sms(device_id, r.request_id, r.address, r.body),
-        F::CallLogRequest(r) => callback.on_call_log_request(device_id, r.request_id, r.limit.min(500)),
+        F::CallLogRequest(r) => {
+            callback.on_call_log_request(device_id, r.request_id, r.limit.min(500))
+        }
         F::ContactsRequest(r) => callback.on_contacts_request(device_id, r.request_id),
+        F::ContactPhotosRequest(r) => {
+            let mut keys = r.keys;
+            keys.truncate(60);
+            callback.on_contact_photos_request(device_id, r.request_id, keys)
+        }
         F::Dial(r) => callback.on_dial(device_id, r.request_id, r.number),
         F::ActiveNotificationsRequest(r) => {
             callback.on_active_notifications_request(device_id, r.request_id, r.have_icons)
         }
-        F::WallpaperRequest(r) => callback.on_wallpaper_request(device_id, r.request_id, r.max_size.clamp(256, 2048)),
+        F::WallpaperRequest(r) => {
+            callback.on_wallpaper_request(device_id, r.request_id, r.max_size.clamp(256, 2048))
+        }
         F::PhotoDelete(r) => callback.on_photo_delete(device_id, r.request_id, r.id),
         // Solo los manda un teléfono (o son respuestas que el PC no pide al teléfono).
         F::RingerMode(_)
@@ -324,6 +357,7 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
         | F::SmsChanged(_)
         | F::CallLog(_)
         | F::Contacts(_)
+        | F::ContactPhotos(_)
         | F::ActiveNotifications(_)
         | F::Wallpaper(_)
         | F::CommandResult(_)

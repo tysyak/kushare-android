@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 import uniffi.kushare_mobile.LinkService
 import uniffi.kushare_mobile.MobileCallLogEntry
 import uniffi.kushare_mobile.MobileContact
+import uniffi.kushare_mobile.MobileContactPhoto
 import uniffi.kushare_mobile.MobileSms
 import uniffi.kushare_mobile.MobileSmsThread
 
@@ -48,6 +49,7 @@ private const val TAG = "KushareData"
 
 /** Código de error que el PC traduce a "falta el permiso en el teléfono". */
 private const val NO_PERMISSION = "permission"
+private const val CONTACT_PHOTO_MAX = 64 * 1024
 
 /**
  * Datos del teléfono que pide el PC (al estilo de Enlace Móvil): SMS,
@@ -128,6 +130,19 @@ object PhoneData {
             }.getOrNull().orEmpty()
         synchronized(names) { names[number] = name }
         return name
+    }
+
+    /** Clave de la foto del contacto de un número ("<id>-<photoId>"), o "". */
+    private fun photoKey(ctx: Context, number: String): String {
+        if (number.isBlank()) return ""
+        return runCatching {
+            val uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number))
+            ctx.contentResolver
+                .query(uri, arrayOf(ContactsContract.PhoneLookup._ID, ContactsContract.PhoneLookup.PHOTO_ID), null, null, null)
+                ?.use { c ->
+                    if (c.moveToFirst() && c.getLong(1) > 0) "${c.getLong(0)}-${c.getLong(1)}" else null
+                }
+        }.getOrNull().orEmpty()
     }
 
     fun onSmsThreadsRequest(deviceId: String, requestId: ULong, offset: UInt, limit: UInt) {
@@ -296,6 +311,8 @@ object PhoneData {
                 runCatching { svc.sendCallLog(deviceId, requestId, emptyList(), NO_PERMISSION) }
                 return@launch
             }
+            val contacts = has(app, Manifest.permission.READ_CONTACTS)
+            val keys = HashMap<String, String>()
             val result =
                 runCatching {
                     val out = mutableListOf<MobileCallLogEntry>()
@@ -323,13 +340,15 @@ object PhoneData {
                                         CallLog.Calls.VOICEMAIL_TYPE -> "voicemail"
                                         else -> "incoming"
                                     }
+                                val number = c.getString(0).orEmpty()
                                 out +=
                                     MobileCallLogEntry(
-                                        number = c.getString(0).orEmpty(),
+                                        number = number,
                                         name = c.getString(1).orEmpty(),
                                         dateMs = c.getLong(2),
                                         durationS = c.getLong(3).coerceIn(0, Int.MAX_VALUE.toLong()).toUInt(),
                                         kind = kind,
+                                        photoKey = if (contacts) keys.getOrPut(number) { photoKey(app, number) } else "",
                                     )
                             }
                         }
@@ -352,7 +371,8 @@ object PhoneData {
             }
             val result =
                 runCatching {
-                    val byId = LinkedHashMap<Long, Triple<String, MutableList<String>, Boolean>>()
+                    class Entry(val name: String, val numbers: MutableList<String>, val starred: Boolean, val photoKey: String)
+                    val byId = LinkedHashMap<Long, Entry>()
                     app.contentResolver
                         .query(
                             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -361,6 +381,7 @@ object PhoneData {
                                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                                 ContactsContract.CommonDataKinds.Phone.NUMBER,
                                 ContactsContract.CommonDataKinds.Phone.STARRED,
+                                ContactsContract.CommonDataKinds.Phone.PHOTO_ID,
                             ),
                             null,
                             null,
@@ -369,20 +390,45 @@ object PhoneData {
                             while (c.moveToNext()) {
                                 val number = c.getString(2)?.trim().orEmpty()
                                 if (number.isEmpty()) continue
+                                val id = c.getLong(0)
                                 val entry =
-                                    byId.getOrPut(c.getLong(0)) {
-                                        Triple(c.getString(1).orEmpty(), mutableListOf(), c.getInt(3) != 0)
+                                    byId.getOrPut(id) {
+                                        val photo = c.getLong(4)
+                                        Entry(c.getString(1).orEmpty(), mutableListOf(), c.getInt(3) != 0, if (photo > 0) "$id-$photo" else "")
                                     }
                                 val digits = number.filter { it.isDigit() }
-                                if (entry.second.none { it.filter(Char::isDigit) == digits }) entry.second += number
+                                if (entry.numbers.none { it.filter(Char::isDigit) == digits }) entry.numbers += number
                             }
                         }
-                    byId.values.map { (name, numbers, starred) -> MobileContact(name, numbers, starred) }
+                    byId.values.map { MobileContact(it.name, it.numbers, it.starred, it.photoKey) }
                 }
             result.onFailure { Log.w(TAG, "no se pudieron leer los contactos", it) }
             runCatching {
                 svc.sendContacts(deviceId, requestId, result.getOrDefault(emptyList()), result.exceptionOrNull()?.message.orEmpty())
             }
+        }
+    }
+
+    /** Miniaturas (~96 px) de las fotos de contacto pedidas por el PC. */
+    fun onContactPhotosRequest(deviceId: String, requestId: ULong, keys: List<String>) {
+        val app = context ?: return
+        scope.launch {
+            val svc = svc() ?: return@launch
+            if (!has(app, Manifest.permission.READ_CONTACTS)) {
+                runCatching { svc.sendContactPhotos(deviceId, requestId, emptyList(), NO_PERMISSION) }
+                return@launch
+            }
+            val photos =
+                keys.mapNotNull { key ->
+                    val id = key.substringBefore('-').toLongOrNull() ?: return@mapNotNull null
+                    runCatching {
+                        val uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id)
+                        ContactsContract.Contacts.openContactPhotoInputStream(app.contentResolver, uri, false)?.use { it.readBytes() }
+                    }.getOrNull()
+                        ?.takeIf { it.isNotEmpty() && it.size <= CONTACT_PHOTO_MAX }
+                        ?.let { MobileContactPhoto(key, it) }
+                }
+            runCatching { svc.sendContactPhotos(deviceId, requestId, photos, "") }
         }
     }
 

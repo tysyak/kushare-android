@@ -10,8 +10,8 @@
 //! hace el propio Rust.
 
 use kushare_link::{
-    ConnectIntent, DialFuture, Dialer, Direction, LinkConfig, LinkEvent, LinkManager, LinkStream, LocalDevice,
-    NotificationAction, NotificationData, PeerRecord, Transport,
+    ConnectIntent, DialFuture, Dialer, Direction, LinkConfig, LinkEvent, LinkManager, LinkStream,
+    LocalDevice, NotificationAction, NotificationData, PeerRecord, Transport,
 };
 use std::net::SocketAddr;
 use std::path::PathBuf;
@@ -21,11 +21,11 @@ use tokio::net::{TcpListener, TcpStream};
 
 use crate::bt_bridge::{ByteStreamIo, CallbackStream};
 use crate::features::{
-    self, MobileAudioOutput, MobileBattery, MobileCallLogEntry, MobileContact, MobilePhoto, MobilePlayer, MobileSms,
-    MobileSmsThread, SharedCache,
+    self, MobileAudioOutput, MobileBattery, MobileCallLogEntry, MobileContact, MobileContactPhoto,
+    MobilePhoto, MobilePlayer, MobileSms, MobileSmsThread, SharedCache,
 };
-use kushare_link::pb::{self, feature::Kind as F};
 use crate::{MobileError, RUNTIME};
+use kushare_link::pb::{self, feature::Kind as F};
 
 #[derive(Debug, Clone, uniffi::Record)]
 pub struct MobileAction {
@@ -93,7 +93,13 @@ pub struct MobilePeer {
 /// Rust (no el hilo principal de Android).
 #[uniffi::export(callback_interface)]
 pub trait LinkCallback: Send + Sync {
-    fn on_pairing_requested(&self, device_id: String, device_name: String, pin: String, initiated_locally: bool);
+    fn on_pairing_requested(
+        &self,
+        device_id: String,
+        device_name: String,
+        pin: String,
+        initiated_locally: bool,
+    );
     fn on_pairing_finished(&self, device_id: String, device_name: String, accepted: bool);
     /// Cambió algo de la lista de peers (conexión, configuración, …).
     fn on_peers_changed(&self);
@@ -108,7 +114,12 @@ pub trait LinkCallback: Send + Sync {
     // --- Funciones extra (ver `features.rs`) ---
     fn on_peer_battery(&self, device_id: String, battery: MobileBattery);
     fn on_peer_players(&self, device_id: String, players: Vec<MobilePlayer>);
-    fn on_peer_audio_outputs(&self, device_id: String, selectable: bool, outputs: Vec<MobileAudioOutput>);
+    fn on_peer_audio_outputs(
+        &self,
+        device_id: String,
+        selectable: bool,
+        outputs: Vec<MobileAudioOutput>,
+    );
     /// El peer pide controlar un reproductor del teléfono (`player_id`
     /// vacío = todos). `action`: play-pause|play|pause|next|previous|stop.
     fn on_media_command(&self, device_id: String, player_id: String, action: String);
@@ -130,23 +141,45 @@ pub trait LinkCallback: Send + Sync {
     /// Responder con [`LinkService::send_photo_data`] (uno o varios trozos
     /// de como mucho `chunk_size` bytes). `background`: precarga, mandarla
     /// con `background = true` para no frenar el resto del enlace.
-    fn on_photo_request(&self, device_id: String, request_id: u64, photo_id: String, chunk_size: u32, background: bool);
+    fn on_photo_request(
+        &self,
+        device_id: String,
+        request_id: u64,
+        photo_id: String,
+        chunk_size: u32,
+        background: bool,
+    );
     /// El PC copió texto: ponerlo en el portapapeles del teléfono.
     fn on_clipboard(&self, device_id: String, text: String);
     /// Responder con [`LinkService::send_sms_threads`].
     fn on_sms_threads_request(&self, device_id: String, request_id: u64, offset: u32, limit: u32);
     /// Responder con [`LinkService::send_sms_messages`].
-    fn on_sms_messages_request(&self, device_id: String, request_id: u64, thread_id: String, limit: u32, before_ms: i64);
+    fn on_sms_messages_request(
+        &self,
+        device_id: String,
+        request_id: u64,
+        thread_id: String,
+        limit: u32,
+        before_ms: i64,
+    );
     /// Mandar un SMS; responder con [`LinkService::send_command_result`].
     fn on_send_sms(&self, device_id: String, request_id: u64, address: String, body: String);
     /// Responder con [`LinkService::send_call_log`].
     fn on_call_log_request(&self, device_id: String, request_id: u64, limit: u32);
     /// Responder con [`LinkService::send_contacts`].
     fn on_contacts_request(&self, device_id: String, request_id: u64);
+    /// Miniaturas de las fotos de contacto con estas claves; responder con
+    /// [`LinkService::send_contact_photos`].
+    fn on_contact_photos_request(&self, device_id: String, request_id: u64, keys: Vec<String>);
     /// Llamar; responder con [`LinkService::send_command_result`].
     fn on_dial(&self, device_id: String, request_id: u64, number: String);
     /// Responder con [`LinkService::send_active_notifications`].
-    fn on_active_notifications_request(&self, device_id: String, request_id: u64, have_icons: Vec<String>);
+    fn on_active_notifications_request(
+        &self,
+        device_id: String,
+        request_id: u64,
+        have_icons: Vec<String>,
+    );
     /// Responder con [`LinkService::send_wallpaper`].
     fn on_wallpaper_request(&self, device_id: String, request_id: u64, max_size: u32);
     /// Borrar la foto; responder con [`LinkService::send_command_result`].
@@ -166,17 +199,26 @@ impl Dialer for TcpDialer {
                 .last_tcp_addr
                 .as_deref()
                 .and_then(|a| a.parse().ok())
-                .ok_or_else(|| anyhow::anyhow!("{} no tiene dirección Wi-Fi conocida", peer.device_name))?;
+                .ok_or_else(|| {
+                    anyhow::anyhow!("{} no tiene dirección Wi-Fi conocida", peer.device_name)
+                })?;
             let stream = tokio::time::timeout(TCP_DIAL_TIMEOUT, TcpStream::connect(addr))
                 .await
                 .map_err(|_| anyhow::anyhow!("tiempo agotado conectando a {addr}"))??;
-            Ok((Box::new(stream) as Box<dyn LinkStream>, Transport::Tcp(addr)))
+            Ok((
+                Box::new(stream) as Box<dyn LinkStream>,
+                Transport::Tcp(addr),
+            ))
         })
     }
 }
 
 fn dir(outgoing: bool) -> Direction {
-    if outgoing { Direction::Outgoing } else { Direction::Incoming }
+    if outgoing {
+        Direction::Outgoing
+    } else {
+        Direction::Incoming
+    }
 }
 
 fn actions_from(actions: Vec<NotificationAction>) -> Vec<MobileAction> {
@@ -250,7 +292,10 @@ impl LinkService {
             manager,
             cache,
             wifi_ready,
-            tasks: std::sync::Mutex::new(vec![events_task.abort_handle(), reconnect_task.abort_handle()]),
+            tasks: std::sync::Mutex::new(vec![
+                events_task.abort_handle(),
+                reconnect_task.abort_handle(),
+            ]),
         }))
     }
 
@@ -274,7 +319,9 @@ impl LinkService {
                 manager.set_tcp_port(port);
                 let task = tokio::spawn(async move {
                     loop {
-                        let Ok((stream, addr)) = listener.accept().await else { continue };
+                        let Ok((stream, addr)) = listener.accept().await else {
+                            continue;
+                        };
                         let manager = manager.clone();
                         tokio::spawn(async move {
                             let _ = manager.accept(stream, Transport::Tcp(addr)).await;
@@ -293,7 +340,8 @@ impl LinkService {
     /// El peer `device_id` se anuncia por mDNS en `host:port`.
     pub fn note_sighting(&self, device_id: String, host: String, port: u16) {
         if let Ok(ip) = host.parse() {
-            self.manager.note_sighting(&device_id, SocketAddr::new(ip, port));
+            self.manager
+                .note_sighting(&device_id, SocketAddr::new(ip, port));
         }
     }
 
@@ -308,7 +356,9 @@ impl LinkService {
                 let stream = tokio::time::timeout(TCP_DIAL_TIMEOUT, TcpStream::connect(addr))
                     .await
                     .map_err(|_| anyhow::anyhow!("tiempo agotado conectando a {addr}"))??;
-                manager.connect(stream, Transport::Tcp(addr), ConnectIntent::Pair).await
+                manager
+                    .connect(stream, Transport::Tcp(addr), ConnectIntent::Pair)
+                    .await
             })
             .await
             .map_err(|e| anyhow::anyhow!("tarea interrumpida: {e}"))??;
@@ -316,7 +366,11 @@ impl LinkService {
     }
 
     /// Atiende una conexión RFCOMM entrante ya aceptada por Kotlin.
-    pub async fn accept_bt(&self, io: Box<dyn ByteStreamIo>, address: String) -> Result<String, MobileError> {
+    pub async fn accept_bt(
+        &self,
+        io: Box<dyn ByteStreamIo>,
+        address: String,
+    ) -> Result<String, MobileError> {
         let manager = self.manager.clone();
         let id = RUNTIME
             .spawn(async move {
@@ -330,13 +384,21 @@ impl LinkService {
 
     /// Reconecta con un peer emparejado por un `BluetoothSocket` que Kotlin
     /// ya conectó.
-    pub async fn connect_bt(&self, io: Box<dyn ByteStreamIo>, address: String) -> Result<String, MobileError> {
+    pub async fn connect_bt(
+        &self,
+        io: Box<dyn ByteStreamIo>,
+        address: String,
+    ) -> Result<String, MobileError> {
         let manager = self.manager.clone();
         let id = RUNTIME
             .spawn(async move {
                 let stream = CallbackStream::new(io);
                 manager
-                    .connect(stream, Transport::Bluetooth(address), ConnectIntent::Reconnect)
+                    .connect(
+                        stream,
+                        Transport::Bluetooth(address),
+                        ConnectIntent::Reconnect,
+                    )
                     .await
             })
             .await
@@ -347,7 +409,11 @@ impl LinkService {
     /// Empareja (con PIN) por un `BluetoothSocket` que Kotlin ya conectó al
     /// servicio RFCOMM del enlace. Para redes que aíslan a los clientes
     /// entre sí, donde el Wi-Fi no sirve.
-    pub async fn pair_bt(&self, io: Box<dyn ByteStreamIo>, address: String) -> Result<String, MobileError> {
+    pub async fn pair_bt(
+        &self,
+        io: Box<dyn ByteStreamIo>,
+        address: String,
+    ) -> Result<String, MobileError> {
         let manager = self.manager.clone();
         let id = RUNTIME
             .spawn(async move {
@@ -388,8 +454,15 @@ impl LinkService {
     }
 
     /// `outgoing`: true = teléfono → peer; false = peer → teléfono.
-    pub fn set_direction(&self, device_id: String, outgoing: bool, enabled: bool) -> Result<(), MobileError> {
-        Ok(self.manager.set_direction(&device_id, dir(outgoing), enabled)?)
+    pub fn set_direction(
+        &self,
+        device_id: String,
+        outgoing: bool,
+        enabled: bool,
+    ) -> Result<(), MobileError> {
+        Ok(self
+            .manager
+            .set_direction(&device_id, dir(outgoing), enabled)?)
     }
 
     pub fn set_app_blocked(
@@ -399,11 +472,14 @@ impl LinkService {
         app_id: String,
         blocked: bool,
     ) -> Result<(), MobileError> {
-        Ok(self.manager.set_app_blocked(&device_id, dir(outgoing), &app_id, blocked)?)
+        Ok(self
+            .manager
+            .set_app_blocked(&device_id, dir(outgoing), &app_id, blocked)?)
     }
 
     pub fn post_local_notification(&self, notification: MobileNotification) {
-        self.manager.post_local_notification(notification_data(notification));
+        self.manager
+            .post_local_notification(notification_data(notification));
     }
 
     pub fn remove_local_notification(&self, key: String) {
@@ -415,11 +491,13 @@ impl LinkService {
     }
 
     pub fn invoke_remote_action(&self, device_id: String, key: String, action_id: String) {
-        self.manager.invoke_remote_action(&device_id, &key, &action_id);
+        self.manager
+            .invoke_remote_action(&device_id, &key, &action_id);
     }
 
     pub fn reply_remote(&self, device_id: String, key: String, action_id: String, text: String) {
-        self.manager.reply_remote(&device_id, &key, &action_id, &text);
+        self.manager
+            .reply_remote(&device_id, &key, &action_id, &text);
     }
 
     pub fn is_connected(&self, device_id: String) -> bool {
@@ -432,7 +510,11 @@ impl LinkService {
             .into_iter()
             .map(|p| MobilePeer {
                 wifi_ready: p.bulk_transport.is_some()
-                    || self.wifi_ready.lock().expect("mutex envenenado").contains(&p.device_id),
+                    || self
+                        .wifi_ready
+                        .lock()
+                        .expect("mutex envenenado")
+                        .contains(&p.device_id),
                 bt_address: p.bt_address,
                 device_id: p.device_id,
                 device_name: p.device_name,
@@ -552,7 +634,12 @@ impl LinkService {
         RUNTIME
             .spawn(async move {
                 manager
-                    .send_feature_wait(&device_id, pb::Feature { kind: Some(F::PhotoList(list)) })
+                    .send_feature_wait(
+                        &device_id,
+                        pb::Feature {
+                            kind: Some(F::PhotoList(list)),
+                        },
+                    )
                     .await
             })
             .await
@@ -588,7 +675,9 @@ impl LinkService {
         let manager = self.manager.clone();
         RUNTIME
             .spawn(async move {
-                let feature = pb::Feature { kind: Some(F::PhotoData(chunk)) };
+                let feature = pb::Feature {
+                    kind: Some(F::PhotoData(chunk)),
+                };
                 if background {
                     manager.send_feature_idle(&device_id, feature).await
                 } else {
@@ -609,7 +698,10 @@ impl LinkService {
             .map(|d| d.as_millis() as i64)
             .unwrap_or_default();
         self.manager.broadcast_feature(pb::Feature {
-            kind: Some(F::Clipboard(pb::ClipboardContent { text, timestamp_ms: now })),
+            kind: Some(F::Clipboard(pb::ClipboardContent {
+                text,
+                timestamp_ms: now,
+            })),
         });
     }
 
@@ -634,8 +726,16 @@ impl LinkService {
                 outgoing: t.outgoing,
             })
             .collect();
-        self.reply(&device_id, F::SmsThreads(pb::SmsThreads { request_id, threads, error, total }))
-            .await
+        self.reply(
+            &device_id,
+            F::SmsThreads(pb::SmsThreads {
+                request_id,
+                threads,
+                error,
+                total,
+            }),
+        )
+        .await
     }
 
     pub async fn send_sms_messages(
@@ -658,8 +758,16 @@ impl LinkService {
                 failed: m.failed,
             })
             .collect();
-        self.reply(&device_id, F::SmsMessages(pb::SmsMessages { request_id, thread_id, messages, error }))
-            .await
+        self.reply(
+            &device_id,
+            F::SmsMessages(pb::SmsMessages {
+                request_id,
+                thread_id,
+                messages,
+                error,
+            }),
+        )
+        .await
     }
 
     /// Llegó o se mandó un SMS.
@@ -684,9 +792,18 @@ impl LinkService {
                 name: e.name,
                 date_ms: e.date_ms,
                 duration_s: e.duration_s,
+                photo_key: e.photo_key,
             })
             .collect();
-        self.reply(&device_id, F::CallLog(pb::CallLog { request_id, entries, error })).await
+        self.reply(
+            &device_id,
+            F::CallLog(pb::CallLog {
+                request_id,
+                entries,
+                error,
+            }),
+        )
+        .await
     }
 
     pub async fn send_contacts(
@@ -698,9 +815,48 @@ impl LinkService {
     ) -> Result<(), MobileError> {
         let contacts = contacts
             .into_iter()
-            .map(|c| pb::Contact { name: c.name, numbers: c.numbers, starred: c.starred })
+            .map(|c| pb::Contact {
+                name: c.name,
+                numbers: c.numbers,
+                starred: c.starred,
+                photo_key: c.photo_key,
+            })
             .collect();
-        self.reply(&device_id, F::Contacts(pb::Contacts { request_id, contacts, error })).await
+        self.reply(
+            &device_id,
+            F::Contacts(pb::Contacts {
+                request_id,
+                contacts,
+                error,
+            }),
+        )
+        .await
+    }
+
+    pub async fn send_contact_photos(
+        &self,
+        device_id: String,
+        request_id: u64,
+        photos: Vec<MobileContactPhoto>,
+        error: String,
+    ) -> Result<(), MobileError> {
+        let photos = photos
+            .into_iter()
+            .filter(|p| !p.image.is_empty() && p.image.len() <= features::CONTACT_PHOTO_MAX)
+            .map(|p| pb::ContactPhoto {
+                key: p.key,
+                image: p.image,
+            })
+            .collect();
+        self.reply(
+            &device_id,
+            F::ContactPhotos(pb::ContactPhotos {
+                request_id,
+                photos,
+                error,
+            }),
+        )
+        .await
     }
 
     /// Las notificaciones activas del teléfono (sin el PNG de los iconos
@@ -720,7 +876,11 @@ impl LinkService {
             .collect();
         self.reply(
             &device_id,
-            F::ActiveNotifications(pb::ActiveNotifications { request_id, notifications, error }),
+            F::ActiveNotifications(pb::ActiveNotifications {
+                request_id,
+                notifications,
+                error,
+            }),
         )
         .await
     }
@@ -733,18 +893,40 @@ impl LinkService {
         colors: Vec<u32>,
         error: String,
     ) -> Result<(), MobileError> {
-        self.reply(&device_id, F::Wallpaper(pb::Wallpaper { request_id, jpeg, colors, error })).await
+        self.reply(
+            &device_id,
+            F::Wallpaper(pb::Wallpaper {
+                request_id,
+                jpeg,
+                colors,
+                error,
+            }),
+        )
+        .await
     }
 
     /// Resultado de `on_send_sms`, `on_dial` u `on_photo_delete`.
     /// `status`: "done" | "confirm".
-    pub fn send_command_result(&self, device_id: String, request_id: u64, ok: bool, error: String, status: String) {
+    pub fn send_command_result(
+        &self,
+        device_id: String,
+        request_id: u64,
+        ok: bool,
+        error: String,
+        status: String,
+    ) {
         self.manager.send_feature(
             &device_id,
-            pb::Feature { kind: Some(F::CommandResult(pb::CommandResult { request_id, ok, error, status })) },
+            pb::Feature {
+                kind: Some(F::CommandResult(pb::CommandResult {
+                    request_id,
+                    ok,
+                    error,
+                    status,
+                })),
+            },
         );
     }
-
 
     // --- Funciones extra: control del peer (el PC) ------------------------
 
@@ -754,14 +936,22 @@ impl LinkService {
             player_id,
             action: features::media_action_from(&action).into(),
         };
-        self.manager
-            .send_feature(&device_id, pb::Feature { kind: Some(F::MediaCommand(cmd)) });
+        self.manager.send_feature(
+            &device_id,
+            pb::Feature {
+                kind: Some(F::MediaCommand(cmd)),
+            },
+        );
     }
 
     pub fn send_set_audio_output(&self, device_id: String, output_id: String) {
         let set = pb::SetAudioOutput { id: output_id };
-        self.manager
-            .send_feature(&device_id, pb::Feature { kind: Some(F::SetAudioOutput(set)) });
+        self.manager.send_feature(
+            &device_id,
+            pb::Feature {
+                kind: Some(F::SetAudioOutput(set)),
+            },
+        );
     }
 
     pub fn local_apps(&self) -> Vec<MobileApp> {
@@ -823,7 +1013,9 @@ fn dispatch(
             features::send_cached(manager, cache, &device_id);
             callback.on_peers_changed();
         }
-        LinkEvent::Feature { device_id, feature } => features::dispatch(callback, device_id, feature),
+        LinkEvent::Feature { device_id, feature } => {
+            features::dispatch(callback, device_id, feature)
+        }
         LinkEvent::PairingRequested {
             device_id,
             device_name,
@@ -839,7 +1031,10 @@ fn dispatch(
             callback.on_peers_changed();
         }
         LinkEvent::PeerDisconnected { device_id } | LinkEvent::PeerUnpaired { device_id } => {
-            wifi_ready.lock().expect("mutex envenenado").remove(&device_id);
+            wifi_ready
+                .lock()
+                .expect("mutex envenenado")
+                .remove(&device_id);
             callback.on_peers_changed();
         }
         LinkEvent::ConfigChanged { .. } => callback.on_peers_changed(),
@@ -866,7 +1061,9 @@ fn dispatch(
                 actions: actions_from(n.actions),
             });
         }
-        LinkEvent::NotificationRemoved { device_id, key } => callback.on_notification_removed(device_id, key),
+        LinkEvent::NotificationRemoved { device_id, key } => {
+            callback.on_notification_removed(device_id, key)
+        }
         LinkEvent::DismissLocal { device_id, key } => callback.on_dismiss_local(device_id, key),
         LinkEvent::ActionRequested {
             device_id,
@@ -882,14 +1079,17 @@ fn dispatch(
     }
 }
 
-
 impl LinkService {
     /// Manda una respuesta (grande) esperando sitio en la cola del enlace.
     async fn reply(&self, device_id: &str, kind: F) -> Result<(), MobileError> {
         let manager = self.manager.clone();
         let device_id = device_id.to_string();
         RUNTIME
-            .spawn(async move { manager.send_feature_wait(&device_id, pb::Feature { kind: Some(kind) }).await })
+            .spawn(async move {
+                manager
+                    .send_feature_wait(&device_id, pb::Feature { kind: Some(kind) })
+                    .await
+            })
             .await
             .map_err(|e| anyhow::anyhow!(e))??;
         Ok(())

@@ -293,6 +293,9 @@ object KushareLink {
 
         override fun onContactsRequest(deviceId: String, requestId: ULong) = PhoneData.onContactsRequest(deviceId, requestId)
 
+        override fun onContactPhotosRequest(deviceId: String, requestId: ULong, keys: List<String>) =
+            PhoneData.onContactPhotosRequest(deviceId, requestId, keys)
+
         override fun onDial(deviceId: String, requestId: ULong, number: String) = PhoneData.onDial(deviceId, requestId, number)
 
         override fun onActiveNotificationsRequest(deviceId: String, requestId: ULong, haveIcons: List<String>) =
