@@ -15,6 +15,15 @@ Todos los cambios notables de kushare-android. Formato basado en
   *Permisos*: pantalla completa (con el teléfono bloqueado) y «Mostrar sobre
   otras apps» (para abrirla también si se está usando).
 - Los reproductores mandan su carátula (~200 px), posición y duración al PC.
+- **Webcam para el PC**: lista las cámaras (Camera2, todas las que da el
+  sistema) y manda la elegida en JPEG por el enlace Wi-Fi, desde un servicio
+  en primer plano de tipo cámara (se puede salir de la pantalla); sigue la
+  orientación del teléfono (de lado = vídeo apaisado). Como mucho 2
+  fotogramas sin confirmar; sin Wi-Fi se para sola.
+- **Escáner de QR y códigos de barras** (CameraX + ZXing, sin servicios de
+  Google), desde el menú lateral o pedido por el PC: elegir cámara, linterna,
+  y lo leído se manda al PC y se puede abrir o copiar aquí.
+- Permiso nuevo: cámara (se pide al usarla).
 
 ## [0.6.0] - 2026-11-13
 

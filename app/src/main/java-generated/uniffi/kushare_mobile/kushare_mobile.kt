@@ -765,6 +765,21 @@ internal interface UniffiCallbackInterfaceLinkCallbackMethod27 : com.sun.jna.Cal
 internal interface UniffiCallbackInterfaceLinkCallbackMethod28 : com.sun.jna.Callback {
     fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`ring`: Byte,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
 }
+internal interface UniffiCallbackInterfaceLinkCallbackMethod29 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod30 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`cameraId`: RustBuffer.ByValue,`width`: Int,`height`: Int,`fps`: Int,`quality`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod31 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod32 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`seq`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod33 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
 @Structure.FieldOrder("uniffiFree", "uniffiClone", "onIncomingRequest", "onCompleted", "onFailed")
 internal open class UniffiVTableCallbackInterfaceReceiveCallback(
     @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
@@ -834,7 +849,7 @@ internal open class UniffiVTableCallbackInterfaceByteStreamIo(
     }
 
 }
-@Structure.FieldOrder("uniffiFree", "uniffiClone", "onPairingRequested", "onPairingFinished", "onPeersChanged", "onNotificationPosted", "onNotificationRemoved", "onDismissLocal", "onActionRequested", "onReplyRequested", "onPeerBattery", "onPeerPlayers", "onPeerAudioOutputs", "onMediaCommand", "onSetAudioOutput", "onSetRinger", "onCallCommand", "onPhotoListRequest", "onPhotoRequest", "onClipboard", "onSmsThreadsRequest", "onSmsMessagesRequest", "onSendSms", "onCallLogRequest", "onContactsRequest", "onContactPhotosRequest", "onDial", "onActiveNotificationsRequest", "onWallpaperRequest", "onPhotoDelete", "onFindPhone")
+@Structure.FieldOrder("uniffiFree", "uniffiClone", "onPairingRequested", "onPairingFinished", "onPeersChanged", "onNotificationPosted", "onNotificationRemoved", "onDismissLocal", "onActionRequested", "onReplyRequested", "onPeerBattery", "onPeerPlayers", "onPeerAudioOutputs", "onMediaCommand", "onSetAudioOutput", "onSetRinger", "onCallCommand", "onPhotoListRequest", "onPhotoRequest", "onClipboard", "onSmsThreadsRequest", "onSmsMessagesRequest", "onSendSms", "onCallLogRequest", "onContactsRequest", "onContactPhotosRequest", "onDial", "onActiveNotificationsRequest", "onWallpaperRequest", "onPhotoDelete", "onFindPhone", "onCamerasRequest", "onWebcamStart", "onWebcamStop", "onWebcamAck", "onQrScan")
 internal open class UniffiVTableCallbackInterfaceLinkCallback(
     @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
     @JvmField internal var `uniffiClone`: UniffiCallbackInterfaceClone? = null,
@@ -867,6 +882,11 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
     @JvmField internal var `onWallpaperRequest`: UniffiCallbackInterfaceLinkCallbackMethod26? = null,
     @JvmField internal var `onPhotoDelete`: UniffiCallbackInterfaceLinkCallbackMethod27? = null,
     @JvmField internal var `onFindPhone`: UniffiCallbackInterfaceLinkCallbackMethod28? = null,
+    @JvmField internal var `onCamerasRequest`: UniffiCallbackInterfaceLinkCallbackMethod29? = null,
+    @JvmField internal var `onWebcamStart`: UniffiCallbackInterfaceLinkCallbackMethod30? = null,
+    @JvmField internal var `onWebcamStop`: UniffiCallbackInterfaceLinkCallbackMethod31? = null,
+    @JvmField internal var `onWebcamAck`: UniffiCallbackInterfaceLinkCallbackMethod32? = null,
+    @JvmField internal var `onQrScan`: UniffiCallbackInterfaceLinkCallbackMethod33? = null,
 ) : Structure() {
     class UniffiByValue(
         `uniffiFree`: UniffiCallbackInterfaceFree? = null,
@@ -900,7 +920,12 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
         `onWallpaperRequest`: UniffiCallbackInterfaceLinkCallbackMethod26? = null,
         `onPhotoDelete`: UniffiCallbackInterfaceLinkCallbackMethod27? = null,
         `onFindPhone`: UniffiCallbackInterfaceLinkCallbackMethod28? = null,
-    ): UniffiVTableCallbackInterfaceLinkCallback(`uniffiFree`,`uniffiClone`,`onPairingRequested`,`onPairingFinished`,`onPeersChanged`,`onNotificationPosted`,`onNotificationRemoved`,`onDismissLocal`,`onActionRequested`,`onReplyRequested`,`onPeerBattery`,`onPeerPlayers`,`onPeerAudioOutputs`,`onMediaCommand`,`onSetAudioOutput`,`onSetRinger`,`onCallCommand`,`onPhotoListRequest`,`onPhotoRequest`,`onClipboard`,`onSmsThreadsRequest`,`onSmsMessagesRequest`,`onSendSms`,`onCallLogRequest`,`onContactsRequest`,`onContactPhotosRequest`,`onDial`,`onActiveNotificationsRequest`,`onWallpaperRequest`,`onPhotoDelete`,`onFindPhone`,), Structure.ByValue
+        `onCamerasRequest`: UniffiCallbackInterfaceLinkCallbackMethod29? = null,
+        `onWebcamStart`: UniffiCallbackInterfaceLinkCallbackMethod30? = null,
+        `onWebcamStop`: UniffiCallbackInterfaceLinkCallbackMethod31? = null,
+        `onWebcamAck`: UniffiCallbackInterfaceLinkCallbackMethod32? = null,
+        `onQrScan`: UniffiCallbackInterfaceLinkCallbackMethod33? = null,
+    ): UniffiVTableCallbackInterfaceLinkCallback(`uniffiFree`,`uniffiClone`,`onPairingRequested`,`onPairingFinished`,`onPeersChanged`,`onNotificationPosted`,`onNotificationRemoved`,`onDismissLocal`,`onActionRequested`,`onReplyRequested`,`onPeerBattery`,`onPeerPlayers`,`onPeerAudioOutputs`,`onMediaCommand`,`onSetAudioOutput`,`onSetRinger`,`onCallCommand`,`onPhotoListRequest`,`onPhotoRequest`,`onClipboard`,`onSmsThreadsRequest`,`onSmsMessagesRequest`,`onSendSms`,`onCallLogRequest`,`onContactsRequest`,`onContactPhotosRequest`,`onDial`,`onActiveNotificationsRequest`,`onWallpaperRequest`,`onPhotoDelete`,`onFindPhone`,`onCamerasRequest`,`onWebcamStart`,`onWebcamStop`,`onWebcamAck`,`onQrScan`,), Structure.ByValue
 
    internal fun uniffiSetValue(other: UniffiVTableCallbackInterfaceLinkCallback) {
         `uniffiFree` = other.`uniffiFree`
@@ -934,6 +959,11 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
         `onWallpaperRequest` = other.`onWallpaperRequest`
         `onPhotoDelete` = other.`onPhotoDelete`
         `onFindPhone` = other.`onFindPhone`
+        `onCamerasRequest` = other.`onCamerasRequest`
+        `onWebcamStart` = other.`onWebcamStart`
+        `onWebcamStop` = other.`onWebcamStop`
+        `onWebcamAck` = other.`onWebcamAck`
+        `onQrScan` = other.`onQrScan`
     }
 
 }
@@ -1022,11 +1052,15 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_report_find_phone(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_report_webcam_state(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_respond_pairing(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_active_notifications(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_call_log(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_cameras(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_command_result(
     ): Int
@@ -1040,6 +1074,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_photo_list(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_qr_result(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_set_audio_output(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_sms_messages(
@@ -1047,6 +1083,8 @@ internal object IntegrityCheckingUniffiLib {
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_sms_threads(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_wallpaper(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_webcam_frame(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_set_app_blocked(
     ): Int
@@ -1134,6 +1172,16 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_find_phone(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_cameras_request(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_webcam_start(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_webcam_stop(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_webcam_ack(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_qr_scan(
+    ): Int
     external fun ffi_kushare_mobile_uniffi_contract_version(
     ): Int
 
@@ -1218,11 +1266,15 @@ internal object UniffiLib {
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_report_find_phone(`ptr`: Long,`ring`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_report_webcam_state(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`active`: Byte,`cameraId`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_respond_pairing(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`accept`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Byte
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_active_notifications(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`notifications`: RustBuffer.ByValue,`haveIcons`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
     ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_call_log(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`entries`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
+    ): Long
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_cameras(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`cameras`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
     ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_command_result(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`ok`: Byte,`error`: RustBuffer.ByValue,`status`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
@@ -1236,6 +1288,8 @@ internal object UniffiLib {
     ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_photo_list(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`total`: Int,`photos`: RustBuffer.ByValue,
     ): Long
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_qr_result(`ptr`: Long,`text`: RustBuffer.ByValue,`format`: RustBuffer.ByValue,`dateMs`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_set_audio_output(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outputId`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_sms_messages(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`threadId`: RustBuffer.ByValue,`messages`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
@@ -1244,6 +1298,8 @@ internal object UniffiLib {
     ): Long
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_wallpaper(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`jpeg`: RustBuffer.ByValue,`colors`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
     ): Long
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_webcam_frame(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`seq`: Int,`jpeg`: RustBuffer.ByValue,`rotation`: Int,`mirror`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+    ): Byte
     external fun uniffi_kushare_mobile_fn_method_linkservice_set_app_blocked(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outgoing`: Byte,`appId`: RustBuffer.ByValue,`blocked`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_set_direction(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outgoing`: Byte,`enabled`: Byte,uniffi_out_err: UniffiRustCallStatus, 
@@ -1486,6 +1542,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_report_find_phone() and 0xFFFF) != 32077) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_report_webcam_state() and 0xFFFF) != 56197) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_respond_pairing() and 0xFFFF) != 37658) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1493,6 +1552,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_call_log() and 0xFFFF) != 38388) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_cameras() and 0xFFFF) != 41897) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_command_result() and 0xFFFF) != 9251) {
@@ -1513,6 +1575,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_photo_list() and 0xFFFF) != 1724) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_qr_result() and 0xFFFF) != 48503) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_set_audio_output() and 0xFFFF) != 1181) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1523,6 +1588,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_wallpaper() and 0xFFFF) != 40714) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_webcam_frame() and 0xFFFF) != 63360) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_set_app_blocked() and 0xFFFF) != 35477) {
@@ -1652,6 +1720,21 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_find_phone() and 0xFFFF) != 32843) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_cameras_request() and 0xFFFF) != 62465) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_webcam_start() and 0xFFFF) != 27871) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_webcam_stop() and 0xFFFF) != 42182) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_webcam_ack() and 0xFFFF) != 61304) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_qr_scan() and 0xFFFF) != 38661) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
 }
@@ -1981,6 +2064,29 @@ public object FfiConverterLong: FfiConverter<Long, Long> {
 /**
  * @suppress
  */
+public object FfiConverterFloat: FfiConverter<Float, Float> {
+    override fun lift(value: Float): Float {
+        return value
+    }
+
+    override fun read(buf: ByteBuffer): Float {
+        return buf.getFloat()
+    }
+
+    override fun lower(value: Float): Float {
+        return value
+    }
+
+    override fun allocationSize(value: Float) = 4UL
+
+    override fun write(value: Float, buf: ByteBuffer) {
+        buf.putFloat(value)
+    }
+}
+
+/**
+ * @suppress
+ */
 public object FfiConverterBoolean: FfiConverter<Boolean, Byte> {
     override fun lift(value: Byte): Boolean {
         return value.toInt() != 0
@@ -2266,6 +2372,11 @@ public interface LinkServiceInterface {
      */
     fun `reportFindPhone`(`ring`: kotlin.Boolean)
     
+    /**
+     * Estado de la webcam para el PC que la pidió.
+     */
+    fun `reportWebcamState`(`deviceId`: kotlin.String, `active`: kotlin.Boolean, `cameraId`: kotlin.String, `error`: kotlin.String)
+    
     fun `respondPairing`(`deviceId`: kotlin.String, `accept`: kotlin.Boolean): kotlin.Boolean
     
     /**
@@ -2275,6 +2386,8 @@ public interface LinkServiceInterface {
     suspend fun `sendActiveNotifications`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `notifications`: List<MobileNotification>, `haveIcons`: List<kotlin.String>, `error`: kotlin.String)
     
     suspend fun `sendCallLog`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `entries`: List<MobileCallLogEntry>, `error`: kotlin.String)
+    
+    suspend fun `sendCameras`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `cameras`: List<MobileCamera>, `error`: kotlin.String)
     
     /**
      * Resultado de `on_send_sms`, `on_dial` u `on_photo_delete`.
@@ -2303,6 +2416,11 @@ public interface LinkServiceInterface {
      */
     suspend fun `sendPhotoList`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `total`: kotlin.UInt, `photos`: List<MobilePhoto>)
     
+    /**
+     * Código leído con el escáner: a todos los PC conectados.
+     */
+    fun `sendQrResult`(`text`: kotlin.String, `format`: kotlin.String, `dateMs`: kotlin.Long)
+    
     fun `sendSetAudioOutput`(`deviceId`: kotlin.String, `outputId`: kotlin.String)
     
     suspend fun `sendSmsMessages`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `threadId`: kotlin.String, `messages`: List<MobileSms>, `error`: kotlin.String)
@@ -2310,6 +2428,12 @@ public interface LinkServiceInterface {
     suspend fun `sendSmsThreads`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `total`: kotlin.UInt, `threads`: List<MobileSmsThread>, `error`: kotlin.String)
     
     suspend fun `sendWallpaper`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `jpeg`: kotlin.ByteArray, `colors`: List<kotlin.UInt>, `error`: kotlin.String)
+    
+    /**
+     * Un fotograma de la webcam. Solo por el enlace de datos Wi-Fi: si no
+     * lo hay, no se manda (por Bluetooth no cabe) y devuelve `false`.
+     */
+    fun `sendWebcamFrame`(`deviceId`: kotlin.String, `seq`: kotlin.UInt, `jpeg`: kotlin.ByteArray, `rotation`: kotlin.UInt, `mirror`: kotlin.Boolean): kotlin.Boolean
     
     fun `setAppBlocked`(`deviceId`: kotlin.String, `outgoing`: kotlin.Boolean, `appId`: kotlin.String, `blocked`: kotlin.Boolean)
     
@@ -2870,6 +2994,25 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
     
     
 
+    
+    /**
+     * Estado de la webcam para el PC que la pidió.
+     */override fun `reportWebcamState`(`deviceId`: kotlin.String, `active`: kotlin.Boolean, `cameraId`: kotlin.String, `error`: kotlin.String)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_report_webcam_state(
+        it,
+        
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterBoolean.lower(`active`),
+        FfiConverterString.lower(`cameraId`),
+        FfiConverterString.lower(`error`),_status)
+}
+    }
+    
+    
+
     override fun `respondPairing`(`deviceId`: kotlin.String, `accept`: kotlin.Boolean): kotlin.Boolean {
             return FfiConverterBoolean.lift(
     callWithHandle {
@@ -2928,6 +3071,32 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
         FfiConverterString.lower(`deviceId`),
         FfiConverterULong.lower(`requestId`),
         FfiConverterSequenceTypeMobileCallLogEntry.lower(`entries`),
+        FfiConverterString.lower(`error`),
+            )
+        },
+        { future, callback, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_poll_void(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_kushare_mobile_rust_future_complete_void(future, continuation) },
+        { future -> UniffiLib.ffi_kushare_mobile_rust_future_free_void(future) },
+        // lift function
+        { Unit },
+        
+        // Error FFI converter
+        MobileException.ErrorHandler,
+    )
+    }
+
+    
+    @Throws(MobileException::class)
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+    override suspend fun `sendCameras`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `cameras`: List<MobileCamera>, `error`: kotlin.String) {
+        return uniffiRustCallAsync(
+        callWithHandle { uniffiHandle ->
+            UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_cameras(
+                uniffiHandle,
+                
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterULong.lower(`requestId`),
+        FfiConverterSequenceTypeMobileCamera.lower(`cameras`),
         FfiConverterString.lower(`error`),
             )
         },
@@ -3098,6 +3267,24 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
     )
     }
 
+    
+    /**
+     * Código leído con el escáner: a todos los PC conectados.
+     */override fun `sendQrResult`(`text`: kotlin.String, `format`: kotlin.String, `dateMs`: kotlin.Long)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_qr_result(
+        it,
+        
+        FfiConverterString.lower(`text`),
+        FfiConverterString.lower(`format`),
+        FfiConverterLong.lower(`dateMs`),_status)
+}
+    }
+    
+    
+
     override fun `sendSetAudioOutput`(`deviceId`: kotlin.String, `outputId`: kotlin.String)
         = 
     callWithHandle {
@@ -3192,6 +3379,28 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
         MobileException.ErrorHandler,
     )
     }
+
+    
+    /**
+     * Un fotograma de la webcam. Solo por el enlace de datos Wi-Fi: si no
+     * lo hay, no se manda (por Bluetooth no cabe) y devuelve `false`.
+     */override fun `sendWebcamFrame`(`deviceId`: kotlin.String, `seq`: kotlin.UInt, `jpeg`: kotlin.ByteArray, `rotation`: kotlin.UInt, `mirror`: kotlin.Boolean): kotlin.Boolean {
+            return FfiConverterBoolean.lift(
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_webcam_frame(
+        it,
+        
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterUInt.lower(`seq`),
+        FfiConverterByteArray.lower(`jpeg`),
+        FfiConverterUInt.lower(`rotation`),
+        FfiConverterBoolean.lower(`mirror`),_status)
+}
+    }
+    )
+    }
+    
 
     
     @Throws(MobileException::class)override fun `setAppBlocked`(`deviceId`: kotlin.String, `outgoing`: kotlin.Boolean, `appId`: kotlin.String, `blocked`: kotlin.Boolean)
@@ -3857,6 +4066,75 @@ public object FfiConverterTypeMobileCallLogEntry: FfiConverterRustBuffer<MobileC
             FfiConverterUInt.write(value.`durationS`, buf)
             FfiConverterString.write(value.`kind`, buf)
             FfiConverterString.write(value.`photoKey`, buf)
+    }
+}
+
+
+
+/**
+ * Cámara del teléfono, para la webcam y el escáner de QR.
+ */
+data class MobileCamera (
+    var `id`: kotlin.String
+    , 
+    /**
+     * "back" | "front" | "external".
+     */
+    var `facing`: kotlin.String
+    , 
+    var `megapixels`: kotlin.Float
+    , 
+    var `focalMm`: kotlin.Float
+    , 
+    var `logical`: kotlin.Boolean
+    , 
+    var `infrared`: kotlin.Boolean
+    , 
+    var `monochrome`: kotlin.Boolean
+    
+){
+    
+
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeMobileCamera: FfiConverterRustBuffer<MobileCamera> {
+    override fun read(buf: ByteBuffer): MobileCamera {
+        return MobileCamera(
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterFloat.read(buf),
+            FfiConverterFloat.read(buf),
+            FfiConverterBoolean.read(buf),
+            FfiConverterBoolean.read(buf),
+            FfiConverterBoolean.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: MobileCamera) = (
+            FfiConverterString.allocationSize(value.`id`) +
+            FfiConverterString.allocationSize(value.`facing`) +
+            FfiConverterFloat.allocationSize(value.`megapixels`) +
+            FfiConverterFloat.allocationSize(value.`focalMm`) +
+            FfiConverterBoolean.allocationSize(value.`logical`) +
+            FfiConverterBoolean.allocationSize(value.`infrared`) +
+            FfiConverterBoolean.allocationSize(value.`monochrome`)
+    )
+
+    override fun write(value: MobileCamera, buf: ByteBuffer) {
+            FfiConverterString.write(value.`id`, buf)
+            FfiConverterString.write(value.`facing`, buf)
+            FfiConverterFloat.write(value.`megapixels`, buf)
+            FfiConverterFloat.write(value.`focalMm`, buf)
+            FfiConverterBoolean.write(value.`logical`, buf)
+            FfiConverterBoolean.write(value.`infrared`, buf)
+            FfiConverterBoolean.write(value.`monochrome`, buf)
     }
 }
 
@@ -4809,6 +5087,29 @@ public interface LinkCallback {
      */
     fun `onFindPhone`(`deviceId`: kotlin.String, `ring`: kotlin.Boolean)
     
+    /**
+     * Lista de cámaras; responder con [`LinkService::send_cameras`].
+     */
+    fun `onCamerasRequest`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong)
+    
+    /**
+     * Usar la cámara como webcam del PC: mandar fotogramas con
+     * [`LinkService::send_webcam_frame`] hasta `on_webcam_stop`.
+     */
+    fun `onWebcamStart`(`deviceId`: kotlin.String, `cameraId`: kotlin.String, `width`: kotlin.UInt, `height`: kotlin.UInt, `fps`: kotlin.UInt, `quality`: kotlin.UInt)
+    
+    fun `onWebcamStop`(`deviceId`: kotlin.String)
+    
+    /**
+     * El PC ya mostró el fotograma `seq` (control de flujo).
+     */
+    fun `onWebcamAck`(`deviceId`: kotlin.String, `seq`: kotlin.UInt)
+    
+    /**
+     * Abrir el escáner de QR.
+     */
+    fun `onQrScan`(`deviceId`: kotlin.String)
+    
     companion object
 }
 
@@ -5217,6 +5518,73 @@ internal object uniffiCallbackInterfaceLinkCallback {
             uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
         }
     }
+    internal object `onCamerasRequest`: UniffiCallbackInterfaceLinkCallbackMethod29 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onCamerasRequest`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterULong.lift(`requestId`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onWebcamStart`: UniffiCallbackInterfaceLinkCallbackMethod30 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`cameraId`: RustBuffer.ByValue,`width`: Int,`height`: Int,`fps`: Int,`quality`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onWebcamStart`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterString.lift(`cameraId`),
+                    FfiConverterUInt.lift(`width`),
+                    FfiConverterUInt.lift(`height`),
+                    FfiConverterUInt.lift(`fps`),
+                    FfiConverterUInt.lift(`quality`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onWebcamStop`: UniffiCallbackInterfaceLinkCallbackMethod31 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onWebcamStop`(
+                    FfiConverterString.lift(`deviceId`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onWebcamAck`: UniffiCallbackInterfaceLinkCallbackMethod32 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`seq`: Int,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onWebcamAck`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterUInt.lift(`seq`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onQrScan`: UniffiCallbackInterfaceLinkCallbackMethod33 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onQrScan`(
+                    FfiConverterString.lift(`deviceId`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
 
     internal object uniffiFree: UniffiCallbackInterfaceFree {
         override fun callback(handle: Long) {
@@ -5262,6 +5630,11 @@ internal object uniffiCallbackInterfaceLinkCallback {
         `onWallpaperRequest`,
         `onPhotoDelete`,
         `onFindPhone`,
+        `onCamerasRequest`,
+        `onWebcamStart`,
+        `onWebcamStop`,
+        `onWebcamAck`,
+        `onQrScan`,
     )
 
     // Registers the foreign callback with the Rust side.
@@ -5662,6 +6035,34 @@ public object FfiConverterSequenceTypeMobileCallLogEntry: FfiConverterRustBuffer
         buf.putInt(value.size)
         value.iterator().forEach {
             FfiConverterTypeMobileCallLogEntry.write(it, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterSequenceTypeMobileCamera: FfiConverterRustBuffer<List<MobileCamera>> {
+    override fun read(buf: ByteBuffer): List<MobileCamera> {
+        val len = buf.getInt()
+        return List<MobileCamera>(len) {
+            FfiConverterTypeMobileCamera.read(buf)
+        }
+    }
+
+    override fun allocationSize(value: List<MobileCamera>): ULong {
+        val sizeForLength = 4UL
+        val sizeForItems = value.map { FfiConverterTypeMobileCamera.allocationSize(it) }.sum()
+        return sizeForLength + sizeForItems
+    }
+
+    override fun write(value: List<MobileCamera>, buf: ByteBuffer) {
+        buf.putInt(value.size)
+        value.iterator().forEach {
+            FfiConverterTypeMobileCamera.write(it, buf)
         }
     }
 }

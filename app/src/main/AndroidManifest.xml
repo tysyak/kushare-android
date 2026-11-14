@@ -40,6 +40,10 @@
          PC y el PIN) y arranque al encender el teléfono. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <!-- Webcam para el PC y escáner de QR. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -161,6 +165,26 @@
             android:name=".KushareService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
+
+        <!-- Webcam y escáner de QR (no exportados). -->
+        <service
+            android:name=".WebcamService"
+            android:exported="false"
+            android:foregroundServiceType="camera" />
+
+        <activity
+            android:name=".WebcamActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="" />
+
+        <activity
+            android:name=".QrScanActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Kushare" />
 
         <service
             android:name=".KushareNotificationListener"

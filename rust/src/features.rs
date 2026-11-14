@@ -108,6 +108,19 @@ pub struct MobileContactPhoto {
     pub image: Vec<u8>,
 }
 
+/// Cámara del teléfono, para la webcam y el escáner de QR.
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct MobileCamera {
+    pub id: String,
+    /// "back" | "front" | "external".
+    pub facing: String,
+    pub megapixels: f32,
+    pub focal_mm: f32,
+    pub logical: bool,
+    pub infrared: bool,
+    pub monochrome: bool,
+}
+
 /// Tamaño máximo de una foto de contacto (las mayores se omiten).
 pub const CONTACT_PHOTO_MAX: usize = 64 * 1024;
 
@@ -330,6 +343,18 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
         }
         F::Clipboard(c) => callback.on_clipboard(device_id, c.text),
         F::FindPhone(f) => callback.on_find_phone(device_id, f.ring),
+        F::CamerasRequest(r) => callback.on_cameras_request(device_id, r.request_id),
+        F::WebcamStart(w) => callback.on_webcam_start(
+            device_id,
+            w.camera_id,
+            w.width.clamp(160, 1920),
+            w.height.clamp(120, 1080),
+            w.fps.clamp(1, 30),
+            w.quality.clamp(10, 95),
+        ),
+        F::WebcamStop(_) => callback.on_webcam_stop(device_id),
+        F::WebcamAck(a) => callback.on_webcam_ack(device_id, a.seq),
+        F::QrScan(_) => callback.on_qr_scan(device_id),
         F::SmsThreadsRequest(r) => {
             callback.on_sms_threads_request(device_id, r.request_id, r.offset, r.limit.min(100))
         }
@@ -370,6 +395,10 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
         | F::CallLog(_)
         | F::Contacts(_)
         | F::ContactPhotos(_)
+        | F::Cameras(_)
+        | F::WebcamFrame(_)
+        | F::WebcamState(_)
+        | F::QrResult(_)
         | F::ActiveNotifications(_)
         | F::Wallpaper(_)
         | F::CommandResult(_)

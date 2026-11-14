@@ -21,8 +21,8 @@ use tokio::net::{TcpListener, TcpStream};
 
 use crate::bt_bridge::{ByteStreamIo, CallbackStream};
 use crate::features::{
-    self, MobileAudioOutput, MobileBattery, MobileCallLogEntry, MobileContact, MobileContactPhoto,
-    MobilePhoto, MobilePlayer, MobileSms, MobileSmsThread, SharedCache,
+    self, MobileAudioOutput, MobileBattery, MobileCallLogEntry, MobileCamera, MobileContact,
+    MobileContactPhoto, MobilePhoto, MobilePlayer, MobileSms, MobileSmsThread, SharedCache,
 };
 use crate::{MobileError, RUNTIME};
 use kushare_link::pb::{self, feature::Kind as F};
@@ -186,6 +186,24 @@ pub trait LinkCallback: Send + Sync {
     fn on_photo_delete(&self, device_id: String, request_id: u64, photo_id: String);
     /// Sonar para que encuentren el teléfono (`ring = false`: parar).
     fn on_find_phone(&self, device_id: String, ring: bool);
+    /// Lista de cámaras; responder con [`LinkService::send_cameras`].
+    fn on_cameras_request(&self, device_id: String, request_id: u64);
+    /// Usar la cámara como webcam del PC: mandar fotogramas con
+    /// [`LinkService::send_webcam_frame`] hasta `on_webcam_stop`.
+    fn on_webcam_start(
+        &self,
+        device_id: String,
+        camera_id: String,
+        width: u32,
+        height: u32,
+        fps: u32,
+        quality: u32,
+    );
+    fn on_webcam_stop(&self, device_id: String);
+    /// El PC ya mostró el fotograma `seq` (control de flujo).
+    fn on_webcam_ack(&self, device_id: String, seq: u32);
+    /// Abrir el escáner de QR.
+    fn on_qr_scan(&self, device_id: String);
 }
 
 const TCP_DIAL_TIMEOUT: Duration = Duration::from_secs(4);
@@ -553,6 +571,94 @@ impl LinkService {
             players: players.into_iter().map(features::player_to_pb).collect(),
         };
         features::publish(&self.manager, &self.cache, F::MediaPlayers(players));
+    }
+
+    pub async fn send_cameras(
+        &self,
+        device_id: String,
+        request_id: u64,
+        cameras: Vec<MobileCamera>,
+        error: String,
+    ) -> Result<(), MobileError> {
+        let cameras = cameras
+            .into_iter()
+            .map(|c| pb::CameraInfo {
+                id: c.id,
+                facing: c.facing,
+                megapixels: c.megapixels,
+                focal_mm: c.focal_mm,
+                logical: c.logical,
+                infrared: c.infrared,
+                monochrome: c.monochrome,
+            })
+            .collect();
+        self.reply(
+            &device_id,
+            F::Cameras(pb::Cameras {
+                request_id,
+                cameras,
+                error,
+            }),
+        )
+        .await
+    }
+
+    /// Un fotograma de la webcam. Solo por el enlace de datos Wi-Fi: si no
+    /// lo hay, no se manda (por Bluetooth no cabe) y devuelve `false`.
+    pub fn send_webcam_frame(
+        &self,
+        device_id: String,
+        seq: u32,
+        jpeg: Vec<u8>,
+        rotation: u32,
+        mirror: bool,
+    ) -> bool {
+        if !self.manager.has_bulk(&device_id) {
+            return false;
+        }
+        self.manager.send_feature(
+            &device_id,
+            pb::Feature {
+                kind: Some(F::WebcamFrame(pb::WebcamFrame {
+                    seq,
+                    jpeg,
+                    rotation,
+                    mirror,
+                })),
+            },
+        );
+        true
+    }
+
+    /// Estado de la webcam para el PC que la pidió.
+    pub fn report_webcam_state(
+        &self,
+        device_id: String,
+        active: bool,
+        camera_id: String,
+        error: String,
+    ) {
+        self.manager.send_feature(
+            &device_id,
+            pb::Feature {
+                kind: Some(F::WebcamState(pb::WebcamState {
+                    active,
+                    camera_id,
+                    error,
+                })),
+            },
+        );
+    }
+
+    /// Código leído con el escáner: a todos los PC conectados.
+    pub fn send_qr_result(&self, text: String, format: String, date_ms: i64) {
+        self.manager.broadcast_feature(pb::Feature {
+            kind: Some(F::QrResult(pb::QrResult {
+                text,
+                format,
+                date_ms,
+            })),
+        });
     }
 
     /// Avisa a los PC de si el teléfono está sonando para encontrarlo.

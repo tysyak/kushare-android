@@ -214,4 +214,31 @@
     <string name="find_text">El PC está buscando este teléfono.</string>
     <string name="find_silence">Silenciar</string>
     <string name="find_silence_big">Presiona para silenciar</string>
+
+    <!-- Cámaras: webcam y QR -->
+    <string name="camera_front">Frontal</string>
+    <string name="camera_back">Trasera</string>
+    <string name="camera_external">Externa</string>
+    <string name="camera_infrared">infrarroja</string>
+    <string name="camera_mono">monocromo</string>
+    <string name="camera_logical">multicámara</string>
+    <string name="channel_webcam">Webcam para el PC</string>
+    <string name="webcam_request_title">El PC quiere usar la cámara</string>
+    <string name="webcam_request_text">Toca para empezar a usar el teléfono como webcam.</string>
+    <string name="webcam_starting">Preparando la webcam…</string>
+    <string name="webcam_active">Webcam para el PC activa</string>
+    <string name="webcam_active_detail">La imagen va al PC por la Wi-Fi, cifrada. Puedes salir de esta pantalla: sigue funcionando hasta que la pares.</string>
+    <string name="webcam_stop">Detener la webcam</string>
+    <string name="webcam_hide">Seguir en segundo plano</string>
+    <string name="qr_title">Escanear QR</string>
+    <string name="qr_hint">Apunta a un código QR o de barras</string>
+    <string name="qr_request_title">El PC quiere escanear un QR</string>
+    <string name="qr_request_text">Toca para abrir el escáner.</string>
+    <string name="qr_torch_on">Encender linterna</string>
+    <string name="qr_torch_off">Apagar linterna</string>
+    <string name="qr_sent">Enviado al PC.</string>
+    <string name="qr_not_sent">No hay ningún PC conectado: solo se queda aquí.</string>
+    <string name="qr_open">Abrir</string>
+    <string name="qr_copy">Copiar</string>
+    <string name="qr_again">Escanear otro</string>
 </resources>

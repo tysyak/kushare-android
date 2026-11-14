@@ -315,6 +315,7 @@ private fun KushareApp(activity: ComponentActivity, openDevices: MutableState<Bo
                         screen = Screen.Settings
                         scope.launch { UpdateChecker.check(activity) }
                     }
+                    DrawerTarget.ScanQr -> activity.startActivity(Intent(activity, QrScanActivity::class.java))
                     DrawerTarget.Feedback ->
                         runCatching {
                             activity.startActivity(

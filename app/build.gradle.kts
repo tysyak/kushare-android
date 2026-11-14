@@ -95,4 +95,13 @@ dependencies {
     // Requerido por el código generado por uniffi-bindgen para llamar al
     // cdylib de Rust (crates/kushare-mobile) vía JNI.
     implementation("net.java.dev.jna:jna:5.14.0@aar")
+
+    // Cámara: webcam para el PC y escáner de QR (0.7).
+    implementation("androidx.camera:camera-core:1.4.2")
+    implementation("androidx.camera:camera-camera2:1.4.2")
+    implementation("androidx.camera:camera-lifecycle:1.4.2")
+    implementation("androidx.camera:camera-view:1.4.2")
+    implementation("androidx.lifecycle:lifecycle-service:2.8.7")
+    // Lectura de QR y códigos de barras sin servicios de Google (Apache 2.0).
+    implementation("com.google.zxing:core:3.5.3")
 }

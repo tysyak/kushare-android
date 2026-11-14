@@ -24,6 +24,7 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ContentPaste
 import androidx.compose.material.icons.rounded.Feedback
 import androidx.compose.material.icons.rounded.Laptop
+import androidx.compose.material.icons.rounded.QrCodeScanner
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.SystemUpdate
@@ -49,7 +50,7 @@ import org.kushare.app.R
 import org.kushare.app.UpdateChecker
 
 /** Destinos del menú lateral. */
-enum class DrawerTarget { Devices, Clipboard, Permissions, Settings, Updates, Feedback }
+enum class DrawerTarget { Devices, Clipboard, ScanQr, Permissions, Settings, Updates, Feedback }
 
 /**
  * Menú lateral al estilo de Enlace Móvil: este teléfono arriba, los PC
@@ -151,6 +152,7 @@ fun DrawerContent(onSelect: (DrawerTarget) -> Unit) {
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             DrawerItem(Icons.Rounded.ContentPaste, stringResource(R.string.settings_clipboard)) { onSelect(DrawerTarget.Clipboard) }
+            DrawerItem(Icons.Rounded.QrCodeScanner, stringResource(R.string.qr_title)) { onSelect(DrawerTarget.ScanQr) }
             DrawerItem(Icons.Rounded.Security, stringResource(R.string.drawer_permissions)) { onSelect(DrawerTarget.Permissions) }
             DrawerItem(Icons.Rounded.Settings, stringResource(R.string.settings_title)) { onSelect(DrawerTarget.Settings) }
             DrawerItem(Icons.Rounded.SystemUpdate, stringResource(R.string.update_check)) { onSelect(DrawerTarget.Updates) }

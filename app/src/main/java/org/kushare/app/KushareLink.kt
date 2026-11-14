@@ -11,6 +11,7 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import java.io.File
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import uniffi.kushare_mobile.LinkCallback
@@ -292,6 +293,23 @@ object KushareLink {
             PhoneData.onCallLogRequest(deviceId, requestId, limit)
 
         override fun onContactsRequest(deviceId: String, requestId: ULong) = PhoneData.onContactsRequest(deviceId, requestId)
+
+        override fun onCamerasRequest(deviceId: String, requestId: ULong) {
+            // Listar las cámaras no necesita el permiso de cámara.
+            val cameras = PhoneCameras.list(appContext)
+            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                runCatching { service?.sendCameras(deviceId, requestId, cameras, "") }
+            }
+        }
+
+        override fun onWebcamStart(deviceId: String, cameraId: String, width: UInt, height: UInt, fps: UInt, quality: UInt) =
+            Webcam.requestStart(appContext, WebcamRequest(deviceId, cameraId, width.toInt(), height.toInt(), fps.toInt(), quality.toInt()))
+
+        override fun onWebcamStop(deviceId: String) = Webcam.stop(appContext)
+
+        override fun onWebcamAck(deviceId: String, seq: UInt) = Webcam.onAck()
+
+        override fun onQrScan(deviceId: String) = QrScan.open(appContext)
 
         override fun onFindPhone(deviceId: String, ring: Boolean) {
             // El enlace solo existe después de `attach`: `appContext` ya está.

@@ -208,4 +208,31 @@
     <string name="find_text">The PC is looking for this phone.</string>
     <string name="find_silence">Silence</string>
     <string name="find_silence_big">Press to silence</string>
+
+    <!-- Cameras: webcam and QR -->
+    <string name="camera_front">Front</string>
+    <string name="camera_back">Back</string>
+    <string name="camera_external">External</string>
+    <string name="camera_infrared">infrared</string>
+    <string name="camera_mono">monochrome</string>
+    <string name="camera_logical">multi-camera</string>
+    <string name="channel_webcam">Webcam for the PC</string>
+    <string name="webcam_request_title">The PC wants to use the camera</string>
+    <string name="webcam_request_text">Tap to start using the phone as a webcam.</string>
+    <string name="webcam_starting">Preparing the webcam…</string>
+    <string name="webcam_active">Webcam for the PC is on</string>
+    <string name="webcam_active_detail">The picture goes to the PC over Wi-Fi, encrypted. You can leave this screen: it keeps working until you stop it.</string>
+    <string name="webcam_stop">Stop the webcam</string>
+    <string name="webcam_hide">Keep in background</string>
+    <string name="qr_title">Scan QR</string>
+    <string name="qr_hint">Point at a QR code or barcode</string>
+    <string name="qr_request_title">The PC wants to scan a QR code</string>
+    <string name="qr_request_text">Tap to open the scanner.</string>
+    <string name="qr_torch_on">Turn on flashlight</string>
+    <string name="qr_torch_off">Turn off flashlight</string>
+    <string name="qr_sent">Sent to the PC.</string>
+    <string name="qr_not_sent">No PC is connected: it stays here only.</string>
+    <string name="qr_open">Open</string>
+    <string name="qr_copy">Copy</string>
+    <string name="qr_again">Scan another</string>
 </resources>
