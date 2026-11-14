@@ -6,6 +6,8 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.7.0] - 2026-11-13
+
 ### Añadido
 - **Encontrar teléfono** (pedido desde el PC): suena por el canal de alarma a
   todo volumen aunque esté en silencio o vibración (y quita No molestar si
