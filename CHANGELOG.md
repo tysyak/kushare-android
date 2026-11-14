@@ -24,6 +24,9 @@ Todos los cambios notables de kushare-android. Formato basado en
   Google), desde el menú lateral o pedido por el PC: elegir cámara, linterna,
   y lo leído se manda al PC y se puede abrir o copiar aquí.
 - Permiso nuevo: cámara (se pide al usarla).
+- Modo híbrido también con el **punto de acceso del propio teléfono**: si el PC
+  se conecta a su hotspot, el teléfono anuncia esa IP y lo pesado (y la webcam)
+  va por ahí.
 
 ## [0.6.0] - 2026-11-13
 

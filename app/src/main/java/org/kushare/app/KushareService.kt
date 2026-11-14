@@ -41,6 +41,9 @@ private const val FOREGROUND_ID = 1
 /** Puerto fijo del enlace (como en el escritorio); si está ocupado se usa otro. */
 private const val LINK_PORT = 47816
 
+/** Interfaces del punto de acceso propio (cambian según el fabricante). */
+private val HOTSPOT_IFACE = Regex("^(ap\\d+|swlan\\d+|softap\\d*|wlan[1-9]|ap_br.*)$")
+
 /** Duración de una búsqueda de dispositivos pedida por el usuario. */
 private const val SCAN_DURATION_MS = 30_000L
 
@@ -169,20 +172,50 @@ class KushareService : Service() {
         val link = KushareLink.service ?: return
         val network = wifiNetwork
         val addrs =
-            if (network == null || !KushareSwitch.isHybrid(this)) {
+            if (!KushareSwitch.isHybrid(this)) {
                 emptyList()
             } else {
-                runCatching {
-                    getSystemService(ConnectivityManager::class.java)
-                        .getLinkProperties(network)
-                        ?.linkAddresses
-                        ?.map { it.address }
-                        ?.filterIsInstance<Inet4Address>()
-                        ?.mapNotNull { it.hostAddress }
-                }.getOrNull().orEmpty()
+                val wifi =
+                    network?.let {
+                        runCatching {
+                            getSystemService(ConnectivityManager::class.java)
+                                .getLinkProperties(it)
+                                ?.linkAddresses
+                                ?.map { a -> a.address }
+                                ?.filterIsInstance<Inet4Address>()
+                                ?.mapNotNull { a -> a.hostAddress }
+                        }.getOrNull()
+                    }.orEmpty()
+                (wifi + hotspotAddresses()).distinct()
             }
         runCatching { link.publishLanAddress(addrs, LINK_PORT.toUShort()) }
     }
+
+    /**
+     * IPv4 del punto de acceso del propio teléfono (si comparte su conexión
+     * por Wi-Fi): el PC conectado a él también puede abrir el enlace de datos.
+     * Android no lo da como "red Wi-Fi", así que se mira la interfaz.
+     */
+    private fun hotspotAddresses(): List<String> =
+        runCatching {
+            java.net.NetworkInterface
+                .getNetworkInterfaces()
+                .toList()
+                .filter { it.isUp && !it.isLoopback && HOTSPOT_IFACE.matches(it.name) }
+                .flatMap { it.inetAddresses.toList() }
+                .filterIsInstance<Inet4Address>()
+                .filter { it.isSiteLocalAddress }
+                .mapNotNull { it.hostAddress }
+        }.getOrDefault(emptyList())
+
+    /** El punto de acceso se encendió o apagó: volver a anunciar las IP. */
+    private val hotspotEvents =
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                // La IP tarda un momento en asignarse.
+                android.os.Handler(mainLooper).postDelayed({ publishLan() }, 3000)
+            }
+        }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -195,6 +228,12 @@ class KushareService : Service() {
             stopSelf()
             return
         }
+        androidx.core.content.ContextCompat.registerReceiver(
+            this,
+            hotspotEvents,
+            IntentFilter("android.net.wifi.WIFI_AP_STATE_CHANGED"),
+            androidx.core.content.ContextCompat.RECEIVER_EXPORTED,
+        )
         registerReceiver(
             bluetoothEvents,
             IntentFilter().apply {
@@ -219,6 +258,7 @@ class KushareService : Service() {
     override fun onDestroy() {
         if (instance === this) instance = null
         runCatching { unregisterReceiver(bluetoothEvents) }
+        runCatching { unregisterReceiver(hotspotEvents) }
         runCatching { getSystemService(ConnectivityManager::class.java).unregisterNetworkCallback(networkCallback) }
         stopLink()
         serviceScope.cancel()
