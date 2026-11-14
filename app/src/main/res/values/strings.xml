@@ -59,7 +59,11 @@
     <string name="features_calls">Llamadas</string>
     <string name="features_calls_detail">Ver quién llama en el PC, y contestar o colgar desde allí.</string>
     <string name="features_dnd">No molestar</string>
-    <string name="features_dnd_detail">Que el PC pueda poner el teléfono en silencio.</string>
+    <string name="features_dnd_detail">Que el PC pueda poner el teléfono en silencio (y quitar No molestar al buscarlo).</string>
+    <string name="features_full_screen">Pantalla de «Encontrar teléfono»</string>
+    <string name="features_overlay">Mostrar sobre otras apps</string>
+    <string name="features_overlay_detail">Para que «Encontrar teléfono» abra su pantalla también si lo estás usando (si no, sale como notificación).</string>
+    <string name="features_full_screen_detail">Al buscarlo desde el PC, mostrar el botón para silenciarlo aunque esté bloqueado.</string>
     <string name="features_granted">Concedido</string>
     <string name="features_intro">La batería, el timbre y la música se comparten siempre con el PC. Esto es opcional:</string>
     <string name="features_output">Elegir salida de audio</string>
@@ -203,4 +207,11 @@
     <string name="channel_clipboard">Portapapeles del PC</string>
     <string name="settings_hybrid">Conexión híbrida (recomendada)</string>
     <string name="settings_hybrid_detail">Notificaciones, llamadas y control por Bluetooth (bajo consumo); fotos, SMS y listas por Wi-Fi cuando el PC está en la misma red. Apagado: todo por Bluetooth.</string>
+
+    <!-- Encontrar teléfono -->
+    <string name="channel_find_phone">Encontrar teléfono</string>
+    <string name="find_title">Buscando este teléfono</string>
+    <string name="find_text">El PC está buscando este teléfono.</string>
+    <string name="find_silence">Silenciar</string>
+    <string name="find_silence_big">Presiona para silenciar</string>
 </resources>

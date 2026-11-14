@@ -281,6 +281,8 @@ internal fun PhoneFeaturesCard() {
     var sms by remember { mutableStateOf(PhoneData.hasSmsPermissions(context)) }
     var callLog by remember { mutableStateOf(PhoneData.hasCallLogPermissions(context)) }
     var wallpaper by remember { mutableStateOf(PhoneData.hasWallpaperAccess()) }
+    var fullScreen by remember { mutableStateOf(canFullScreen(context)) }
+    var overlay by remember { mutableStateOf(Settings.canDrawOverlays(context)) }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer =
@@ -292,6 +294,8 @@ internal fun PhoneFeaturesCard() {
                     sms = PhoneData.hasSmsPermissions(context)
                     callLog = PhoneData.hasCallLogPermissions(context)
                     wallpaper = PhoneData.hasWallpaperAccess()
+                    fullScreen = canFullScreen(context)
+                    overlay = Settings.canDrawOverlays(context)
                 }
             }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -371,12 +375,38 @@ internal fun PhoneFeaturesCard() {
             granted = dnd,
             onGrant = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) },
         )
+        // Android 14+ no da por defecto la pantalla completa (Encontrar teléfono).
+        if (android.os.Build.VERSION.SDK_INT >= 34) {
+            PermissionRow(
+                title = stringResource(R.string.features_full_screen),
+                subtitle = stringResource(R.string.features_full_screen_detail),
+                granted = fullScreen,
+                onGrant = {
+                    context.startActivity(
+                        Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT, Uri.parse("package:${context.packageName}")),
+                    )
+                },
+            )
+        }
+        PermissionRow(
+            title = stringResource(R.string.features_overlay),
+            subtitle = stringResource(R.string.features_overlay_detail),
+            granted = overlay,
+            onGrant = {
+                context.startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")))
+            },
+        )
         Spacer(Modifier.size(8.dp))
         FilledTonalButton(onClick = { PhoneFeatures.openOutputSwitcher(context) }, shapes = ButtonDefaults.shapes()) {
             Text(stringResource(R.string.features_output))
         }
     }
 }
+
+/** ¿Puede kushare mostrar la pantalla de «Encontrar teléfono» con el teléfono bloqueado? */
+private fun canFullScreen(context: android.content.Context): Boolean =
+    android.os.Build.VERSION.SDK_INT < 34 ||
+        context.getSystemService(android.app.NotificationManager::class.java).canUseFullScreenIntent()
 
 @Composable
 private fun PermissionRow(title: String, subtitle: String, granted: Boolean, onGrant: () -> Unit) {

@@ -317,6 +317,46 @@ object PhoneFeatures {
             pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString()
         }.getOrDefault(pkg)
 
+    /** Carátula ya codificada por reproductor (para no recodificarla en cada cambio). */
+    private val artCache = HashMap<String, Pair<android.graphics.Bitmap, ByteArray>>()
+
+    /** Carátula en JPEG de ~200 px (la del PC es pequeña) o vacía. */
+    private fun artBytes(id: String, md: MediaMetadata?): ByteArray {
+        val bmp =
+            md?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
+                ?: md?.getBitmap(MediaMetadata.METADATA_KEY_ART)
+                ?: md?.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON)
+                ?: return ByteArray(0).also { artCache.remove(id) }
+        artCache[id]?.let { (cached, bytes) -> if (cached === bmp) return bytes }
+        val bytes =
+            runCatching {
+                val side = 200
+                val scale = side.toFloat() / maxOf(bmp.width, bmp.height)
+                val small =
+                    if (scale < 1f) {
+                        android.graphics.Bitmap.createScaledBitmap(
+                            bmp,
+                            (bmp.width * scale).toInt().coerceAtLeast(1),
+                            (bmp.height * scale).toInt().coerceAtLeast(1),
+                            true,
+                        )
+                    } else {
+                        bmp
+                    }
+                java.io.ByteArrayOutputStream().also { small.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, it) }.toByteArray()
+            }.getOrDefault(ByteArray(0))
+        artCache[id] = bmp to bytes
+        return bytes
+    }
+
+    /** Posición actual (extrapolada desde la última medida si está sonando). */
+    private fun positionNow(ps: PlaybackState?): Long {
+        ps ?: return 0
+        if (ps.state != PlaybackState.STATE_PLAYING || ps.lastPositionUpdateTime <= 0) return ps.position.coerceAtLeast(0)
+        val elapsed = android.os.SystemClock.elapsedRealtime() - ps.lastPositionUpdateTime
+        return (ps.position + (elapsed * ps.playbackSpeed).toLong()).coerceAtLeast(0)
+    }
+
     private fun publishPlayers() {
         val app = context ?: return
         val players =
@@ -343,6 +383,9 @@ object PhoneFeatures {
                     canPause = actions and (PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE) != 0L,
                     canNext = actions and PlaybackState.ACTION_SKIP_TO_NEXT != 0L,
                     canPrevious = actions and PlaybackState.ACTION_SKIP_TO_PREVIOUS != 0L,
+                    art = artBytes(playerId(c), md),
+                    positionMs = positionNow(ps),
+                    durationMs = md?.getLong(MediaMetadata.METADATA_KEY_DURATION)?.coerceAtLeast(0) ?: 0,
                 )
             }
         svc()?.publishPlayers(players)

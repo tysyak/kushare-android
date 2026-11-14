@@ -6,6 +6,16 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+### Añadido
+- **Encontrar teléfono** (pedido desde el PC): suena por el canal de alarma a
+  todo volumen aunque esté en silencio o vibración (y quita No molestar si
+  kushare tiene ese acceso), vibra y parpadea la linterna; pantalla de kushare
+  con un botón blanco grande «Presiona para silenciar». Se para sola a los
+  5 min y deja el volumen y el modo como estaban. Permisos opcionales nuevos en
+  *Permisos*: pantalla completa (con el teléfono bloqueado) y «Mostrar sobre
+  otras apps» (para abrirla también si se está usando).
+- Los reproductores mandan su carátula (~200 px), posición y duración al PC.
+
 ## [0.6.0] - 2026-11-13
 
 ### Añadido

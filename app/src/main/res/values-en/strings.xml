@@ -53,7 +53,11 @@
     <string name="features_calls">Calls</string>
     <string name="features_calls_detail">See who is calling on the PC, and answer or hang up from there.</string>
     <string name="features_dnd">Do not disturb</string>
-    <string name="features_dnd_detail">Let the PC silence the phone.</string>
+    <string name="features_dnd_detail">Let the PC silence the phone (and turn off Do not disturb when finding it).</string>
+    <string name="features_full_screen">“Find phone” screen</string>
+    <string name="features_overlay">Display over other apps</string>
+    <string name="features_overlay_detail">So “Find phone” opens its screen even while you are using it (otherwise it shows as a notification).</string>
+    <string name="features_full_screen_detail">When the PC is looking for it, show the button to silence it even when locked.</string>
     <string name="features_granted">Granted</string>
     <string name="features_intro">Battery, ringer and music are always shared with the PC. This is optional:</string>
     <string name="features_output">Choose audio output</string>
@@ -197,4 +201,11 @@
     <string name="channel_clipboard">PC clipboard</string>
     <string name="settings_hybrid">Hybrid connection (recommended)</string>
     <string name="settings_hybrid_detail">Notifications, calls and control over Bluetooth (low power); photos, texts and lists over Wi-Fi when the PC is on the same network. Off: everything over Bluetooth.</string>
+
+    <!-- Find phone -->
+    <string name="channel_find_phone">Find phone</string>
+    <string name="find_title">Looking for this phone</string>
+    <string name="find_text">The PC is looking for this phone.</string>
+    <string name="find_silence">Silence</string>
+    <string name="find_silence_big">Press to silence</string>
 </resources>

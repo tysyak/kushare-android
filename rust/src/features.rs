@@ -32,6 +32,11 @@ pub struct MobilePlayer {
     pub can_pause: bool,
     pub can_next: bool,
     pub can_previous: bool,
+    /// Carátula (JPEG pequeño) o vacía.
+    pub art: Vec<u8>,
+    /// Posición ahora mismo y duración, en ms (0 = no se sabe).
+    pub position_ms: i64,
+    pub duration_ms: i64,
 }
 
 #[derive(Debug, Clone, uniffi::Record)]
@@ -233,6 +238,9 @@ pub fn player_to_pb(p: MobilePlayer) -> pb::MediaPlayer {
         can_pause: p.can_pause,
         can_next: p.can_next,
         can_previous: p.can_previous,
+        art: p.art,
+        position_ms: p.position_ms,
+        duration_ms: p.duration_ms,
     }
 }
 
@@ -253,6 +261,9 @@ fn player_from_pb(p: pb::MediaPlayer) -> MobilePlayer {
         can_pause: p.can_pause,
         can_next: p.can_next,
         can_previous: p.can_previous,
+        art: p.art,
+        position_ms: p.position_ms,
+        duration_ms: p.duration_ms,
     }
 }
 
@@ -318,6 +329,7 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
             callback.on_photo_request(device_id, req.request_id, req.id, chunk, req.background)
         }
         F::Clipboard(c) => callback.on_clipboard(device_id, c.text),
+        F::FindPhone(f) => callback.on_find_phone(device_id, f.ring),
         F::SmsThreadsRequest(r) => {
             callback.on_sms_threads_request(device_id, r.request_id, r.offset, r.limit.min(100))
         }

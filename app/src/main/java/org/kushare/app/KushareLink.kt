@@ -293,6 +293,11 @@ object KushareLink {
 
         override fun onContactsRequest(deviceId: String, requestId: ULong) = PhoneData.onContactsRequest(deviceId, requestId)
 
+        override fun onFindPhone(deviceId: String, ring: Boolean) {
+            // El enlace solo existe después de `attach`: `appContext` ya está.
+            if (ring) FindPhone.start(appContext) else FindPhone.stop(appContext)
+        }
+
         override fun onContactPhotosRequest(deviceId: String, requestId: ULong, keys: List<String>) =
             PhoneData.onContactPhotosRequest(deviceId, requestId, keys)
 

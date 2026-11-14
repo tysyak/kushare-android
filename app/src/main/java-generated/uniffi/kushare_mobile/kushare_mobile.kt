@@ -762,6 +762,9 @@ internal interface UniffiCallbackInterfaceLinkCallbackMethod26 : com.sun.jna.Cal
 internal interface UniffiCallbackInterfaceLinkCallbackMethod27 : com.sun.jna.Callback {
     fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`photoId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
 }
+internal interface UniffiCallbackInterfaceLinkCallbackMethod28 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`ring`: Byte,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
 @Structure.FieldOrder("uniffiFree", "uniffiClone", "onIncomingRequest", "onCompleted", "onFailed")
 internal open class UniffiVTableCallbackInterfaceReceiveCallback(
     @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
@@ -831,7 +834,7 @@ internal open class UniffiVTableCallbackInterfaceByteStreamIo(
     }
 
 }
-@Structure.FieldOrder("uniffiFree", "uniffiClone", "onPairingRequested", "onPairingFinished", "onPeersChanged", "onNotificationPosted", "onNotificationRemoved", "onDismissLocal", "onActionRequested", "onReplyRequested", "onPeerBattery", "onPeerPlayers", "onPeerAudioOutputs", "onMediaCommand", "onSetAudioOutput", "onSetRinger", "onCallCommand", "onPhotoListRequest", "onPhotoRequest", "onClipboard", "onSmsThreadsRequest", "onSmsMessagesRequest", "onSendSms", "onCallLogRequest", "onContactsRequest", "onContactPhotosRequest", "onDial", "onActiveNotificationsRequest", "onWallpaperRequest", "onPhotoDelete")
+@Structure.FieldOrder("uniffiFree", "uniffiClone", "onPairingRequested", "onPairingFinished", "onPeersChanged", "onNotificationPosted", "onNotificationRemoved", "onDismissLocal", "onActionRequested", "onReplyRequested", "onPeerBattery", "onPeerPlayers", "onPeerAudioOutputs", "onMediaCommand", "onSetAudioOutput", "onSetRinger", "onCallCommand", "onPhotoListRequest", "onPhotoRequest", "onClipboard", "onSmsThreadsRequest", "onSmsMessagesRequest", "onSendSms", "onCallLogRequest", "onContactsRequest", "onContactPhotosRequest", "onDial", "onActiveNotificationsRequest", "onWallpaperRequest", "onPhotoDelete", "onFindPhone")
 internal open class UniffiVTableCallbackInterfaceLinkCallback(
     @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
     @JvmField internal var `uniffiClone`: UniffiCallbackInterfaceClone? = null,
@@ -863,6 +866,7 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
     @JvmField internal var `onActiveNotificationsRequest`: UniffiCallbackInterfaceLinkCallbackMethod25? = null,
     @JvmField internal var `onWallpaperRequest`: UniffiCallbackInterfaceLinkCallbackMethod26? = null,
     @JvmField internal var `onPhotoDelete`: UniffiCallbackInterfaceLinkCallbackMethod27? = null,
+    @JvmField internal var `onFindPhone`: UniffiCallbackInterfaceLinkCallbackMethod28? = null,
 ) : Structure() {
     class UniffiByValue(
         `uniffiFree`: UniffiCallbackInterfaceFree? = null,
@@ -895,7 +899,8 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
         `onActiveNotificationsRequest`: UniffiCallbackInterfaceLinkCallbackMethod25? = null,
         `onWallpaperRequest`: UniffiCallbackInterfaceLinkCallbackMethod26? = null,
         `onPhotoDelete`: UniffiCallbackInterfaceLinkCallbackMethod27? = null,
-    ): UniffiVTableCallbackInterfaceLinkCallback(`uniffiFree`,`uniffiClone`,`onPairingRequested`,`onPairingFinished`,`onPeersChanged`,`onNotificationPosted`,`onNotificationRemoved`,`onDismissLocal`,`onActionRequested`,`onReplyRequested`,`onPeerBattery`,`onPeerPlayers`,`onPeerAudioOutputs`,`onMediaCommand`,`onSetAudioOutput`,`onSetRinger`,`onCallCommand`,`onPhotoListRequest`,`onPhotoRequest`,`onClipboard`,`onSmsThreadsRequest`,`onSmsMessagesRequest`,`onSendSms`,`onCallLogRequest`,`onContactsRequest`,`onContactPhotosRequest`,`onDial`,`onActiveNotificationsRequest`,`onWallpaperRequest`,`onPhotoDelete`,), Structure.ByValue
+        `onFindPhone`: UniffiCallbackInterfaceLinkCallbackMethod28? = null,
+    ): UniffiVTableCallbackInterfaceLinkCallback(`uniffiFree`,`uniffiClone`,`onPairingRequested`,`onPairingFinished`,`onPeersChanged`,`onNotificationPosted`,`onNotificationRemoved`,`onDismissLocal`,`onActionRequested`,`onReplyRequested`,`onPeerBattery`,`onPeerPlayers`,`onPeerAudioOutputs`,`onMediaCommand`,`onSetAudioOutput`,`onSetRinger`,`onCallCommand`,`onPhotoListRequest`,`onPhotoRequest`,`onClipboard`,`onSmsThreadsRequest`,`onSmsMessagesRequest`,`onSendSms`,`onCallLogRequest`,`onContactsRequest`,`onContactPhotosRequest`,`onDial`,`onActiveNotificationsRequest`,`onWallpaperRequest`,`onPhotoDelete`,`onFindPhone`,), Structure.ByValue
 
    internal fun uniffiSetValue(other: UniffiVTableCallbackInterfaceLinkCallback) {
         `uniffiFree` = other.`uniffiFree`
@@ -928,6 +933,7 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
         `onActiveNotificationsRequest` = other.`onActiveNotificationsRequest`
         `onWallpaperRequest` = other.`onWallpaperRequest`
         `onPhotoDelete` = other.`onPhotoDelete`
+        `onFindPhone` = other.`onFindPhone`
     }
 
 }
@@ -1013,6 +1019,8 @@ internal object IntegrityCheckingUniffiLib {
     external fun uniffi_kushare_mobile_checksum_method_linkservice_remove_local_notification(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_reply_remote(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_report_find_phone(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_respond_pairing(
     ): Int
@@ -1124,6 +1132,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_delete(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_find_phone(
+    ): Int
     external fun ffi_kushare_mobile_uniffi_contract_version(
     ): Int
 
@@ -1205,6 +1215,8 @@ internal object UniffiLib {
     external fun uniffi_kushare_mobile_fn_method_linkservice_remove_local_notification(`ptr`: Long,`key`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_reply_remote(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`key`: RustBuffer.ByValue,`actionId`: RustBuffer.ByValue,`text`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_report_find_phone(`ptr`: Long,`ring`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_respond_pairing(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`accept`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Byte
@@ -1471,6 +1483,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_reply_remote() and 0xFFFF) != 44831) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_report_find_phone() and 0xFFFF) != 32077) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_respond_pairing() and 0xFFFF) != 37658) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1634,6 +1649,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_photo_delete() and 0xFFFF) != 9338) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_find_phone() and 0xFFFF) != 32843) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
 }
@@ -2243,6 +2261,11 @@ public interface LinkServiceInterface {
     
     fun `replyRemote`(`deviceId`: kotlin.String, `key`: kotlin.String, `actionId`: kotlin.String, `text`: kotlin.String)
     
+    /**
+     * Avisa a los PC de si el teléfono está sonando para encontrarlo.
+     */
+    fun `reportFindPhone`(`ring`: kotlin.Boolean)
+    
     fun `respondPairing`(`deviceId`: kotlin.String, `accept`: kotlin.Boolean): kotlin.Boolean
     
     /**
@@ -2826,6 +2849,22 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
         FfiConverterString.lower(`key`),
         FfiConverterString.lower(`actionId`),
         FfiConverterString.lower(`text`),_status)
+}
+    }
+    
+    
+
+    
+    /**
+     * Avisa a los PC de si el teléfono está sonando para encontrarlo.
+     */override fun `reportFindPhone`(`ring`: kotlin.Boolean)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_report_find_phone(
+        it,
+        
+        FfiConverterBoolean.lower(`ring`),_status)
 }
     }
     
@@ -4177,6 +4216,18 @@ data class MobilePlayer (
     var `canNext`: kotlin.Boolean
     , 
     var `canPrevious`: kotlin.Boolean
+    , 
+    /**
+     * Carátula (JPEG pequeño) o vacía.
+     */
+    var `art`: kotlin.ByteArray
+    , 
+    /**
+     * Posición ahora mismo y duración, en ms (0 = no se sabe).
+     */
+    var `positionMs`: kotlin.Long
+    , 
+    var `durationMs`: kotlin.Long
     
 ){
     
@@ -4203,6 +4254,9 @@ public object FfiConverterTypeMobilePlayer: FfiConverterRustBuffer<MobilePlayer>
             FfiConverterBoolean.read(buf),
             FfiConverterBoolean.read(buf),
             FfiConverterBoolean.read(buf),
+            FfiConverterByteArray.read(buf),
+            FfiConverterLong.read(buf),
+            FfiConverterLong.read(buf),
         )
     }
 
@@ -4216,7 +4270,10 @@ public object FfiConverterTypeMobilePlayer: FfiConverterRustBuffer<MobilePlayer>
             FfiConverterBoolean.allocationSize(value.`canPlay`) +
             FfiConverterBoolean.allocationSize(value.`canPause`) +
             FfiConverterBoolean.allocationSize(value.`canNext`) +
-            FfiConverterBoolean.allocationSize(value.`canPrevious`)
+            FfiConverterBoolean.allocationSize(value.`canPrevious`) +
+            FfiConverterByteArray.allocationSize(value.`art`) +
+            FfiConverterLong.allocationSize(value.`positionMs`) +
+            FfiConverterLong.allocationSize(value.`durationMs`)
     )
 
     override fun write(value: MobilePlayer, buf: ByteBuffer) {
@@ -4230,6 +4287,9 @@ public object FfiConverterTypeMobilePlayer: FfiConverterRustBuffer<MobilePlayer>
             FfiConverterBoolean.write(value.`canPause`, buf)
             FfiConverterBoolean.write(value.`canNext`, buf)
             FfiConverterBoolean.write(value.`canPrevious`, buf)
+            FfiConverterByteArray.write(value.`art`, buf)
+            FfiConverterLong.write(value.`positionMs`, buf)
+            FfiConverterLong.write(value.`durationMs`, buf)
     }
 }
 
@@ -4744,6 +4804,11 @@ public interface LinkCallback {
      */
     fun `onPhotoDelete`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `photoId`: kotlin.String)
     
+    /**
+     * Sonar para que encuentren el teléfono (`ring = false`: parar).
+     */
+    fun `onFindPhone`(`deviceId`: kotlin.String, `ring`: kotlin.Boolean)
+    
     companion object
 }
 
@@ -5139,6 +5204,19 @@ internal object uniffiCallbackInterfaceLinkCallback {
             uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
         }
     }
+    internal object `onFindPhone`: UniffiCallbackInterfaceLinkCallbackMethod28 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`ring`: Byte,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onFindPhone`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterBoolean.lift(`ring`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
 
     internal object uniffiFree: UniffiCallbackInterfaceFree {
         override fun callback(handle: Long) {
@@ -5183,6 +5261,7 @@ internal object uniffiCallbackInterfaceLinkCallback {
         `onActiveNotificationsRequest`,
         `onWallpaperRequest`,
         `onPhotoDelete`,
+        `onFindPhone`,
     )
 
     // Registers the foreign callback with the Rust side.

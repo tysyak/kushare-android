@@ -69,6 +69,11 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- «Encontrar teléfono»: pantalla para silenciarlo aunque esté bloqueado. -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <!-- Opcional: abrirla también con el teléfono desbloqueado y en uso
+         (Android no deja abrir pantallas desde segundo plano sin él). -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <!-- Nombre e icono de las apps cuyas notificaciones se reenvían (respaldo
          si la notificación no trae su ApplicationInfo en los extras). -->
@@ -126,6 +131,20 @@
 
         <receiver
             android:name=".UpdateStatusReceiver"
+            android:exported="false" />
+
+        <!-- «Encontrar teléfono» pedido desde el PC (no exportadas). -->
+        <activity
+            android:name=".FindPhoneActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:showWhenLocked="true"
+            android:taskAffinity=""
+            android:turnScreenOn="true" />
+
+        <receiver
+            android:name=".FindPhoneReceiver"
             android:exported="false" />
 
         <activity

@@ -184,6 +184,8 @@ pub trait LinkCallback: Send + Sync {
     fn on_wallpaper_request(&self, device_id: String, request_id: u64, max_size: u32);
     /// Borrar la foto; responder con [`LinkService::send_command_result`].
     fn on_photo_delete(&self, device_id: String, request_id: u64, photo_id: String);
+    /// Sonar para que encuentren el teléfono (`ring = false`: parar).
+    fn on_find_phone(&self, device_id: String, ring: bool);
 }
 
 const TCP_DIAL_TIMEOUT: Duration = Duration::from_secs(4);
@@ -551,6 +553,13 @@ impl LinkService {
             players: players.into_iter().map(features::player_to_pb).collect(),
         };
         features::publish(&self.manager, &self.cache, F::MediaPlayers(players));
+    }
+
+    /// Avisa a los PC de si el teléfono está sonando para encontrarlo.
+    pub fn report_find_phone(&self, ring: bool) {
+        self.manager.broadcast_feature(pb::Feature {
+            kind: Some(F::FindPhone(pb::FindPhone { ring })),
+        });
     }
 
     pub fn publish_audio_outputs(&self, selectable: bool, outputs: Vec<MobileAudioOutput>) {
