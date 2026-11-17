@@ -22,7 +22,15 @@ uniffi::setup_scaffolding!();
 
 pub(crate) static RUNTIME: std::sync::LazyLock<tokio::runtime::Runtime> =
     std::sync::LazyLock::new(|| {
-        tokio::runtime::Runtime::new().expect("no se pudo crear el runtime de tokio")
+        // Dos hilos bastan (el enlace pasa casi todo el tiempo esperando) y
+        // el teléfono no tiene que mantener uno por núcleo, como haría
+        // `Runtime::new()` (8 en un móvil de gama media).
+        tokio::runtime::Builder::new_multi_thread()
+            .worker_threads(2)
+            .thread_name("kushare-rt")
+            .enable_all()
+            .build()
+            .expect("no se pudo crear el runtime de tokio")
     });
 
 #[derive(Debug, thiserror::Error, uniffi::Error)]

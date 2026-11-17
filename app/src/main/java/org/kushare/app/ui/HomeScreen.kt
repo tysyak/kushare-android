@@ -61,6 +61,7 @@ private data class LinkStatus(
     val active: Boolean,
 )
 
+/** Pantalla de inicio: estado del enlace, accesos rápidos y lo que manda el PC. */
 @Composable
 fun HomeScreen(
     deviceName: String,

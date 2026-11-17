@@ -67,12 +67,16 @@ data class MicRequest(
  * con una notificación) y esta arranca [MicService].
  */
 object Mic {
+    /** Si el micrófono está mandando audio al PC. */
     val active = MutableStateFlow(false)
 
+    /** Lo que pidió el PC, a la espera de que [MicActivity] arranque el servicio. */
     @Volatile var pending: MicRequest? = null
 
+    /** Si kushare tiene permiso de micrófono. */
     fun hasPermission(ctx: Context) = ctx.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
 
+    /** Atiende la petición del PC: abre [MicActivity] (Android exige que la app esté a la vista) o, si no puede, avisa con una notificación. */
     fun requestStart(ctx: Context, req: MicRequest) {
         val app = ctx.applicationContext
         pending = req
@@ -97,6 +101,7 @@ object Mic {
         )
     }
 
+    /** Para el micrófono y su servicio. */
     fun stop(ctx: Context) {
         pending = null
         ctx.applicationContext.stopService(Intent(ctx.applicationContext, MicService::class.java))

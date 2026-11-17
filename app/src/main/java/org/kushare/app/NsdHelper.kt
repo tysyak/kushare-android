@@ -18,13 +18,16 @@ import java.util.concurrent.atomic.AtomicBoolean
 private const val SERVICE_TYPE = "_FC9F5ED42C8A._tcp."
 private const val TAG = "NsdHelper"
 
+/** Dispositivo Quick Share visto en la red. */
 data class DiscoveredPeer(val name: String, val host: String, val port: Int)
 
+/** Anuncio y búsqueda de Quick Share por mDNS (`_FC9F5ED42C8A._tcp`) con NsdManager. */
 class NsdHelper(context: Context) {
     private val nsdManager = context.getSystemService(Context.NSD_SERVICE) as NsdManager
     private var registrationListener: NsdManager.RegistrationListener? = null
     private var discoveryListener: NsdManager.DiscoveryListener? = null
 
+    /** Anuncia este teléfono como receptor de Quick Share en [port]. */
     fun advertise(endpointId: String, deviceName: String, port: Int) {
         stopAdvertising()
         val info = NsdServiceInfo().apply {
@@ -51,6 +54,7 @@ class NsdHelper(context: Context) {
         nsdManager.registerService(info, NsdManager.PROTOCOL_DNS_SD, listener)
     }
 
+    /** Deja de anunciarse como receptor. */
     fun stopAdvertising() {
         registrationListener?.let {
             runCatching { nsdManager.unregisterService(it) }
@@ -115,6 +119,7 @@ class NsdHelper(context: Context) {
         nsdManager.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, listener)
     }
 
+    /** Termina la búsqueda de receptores en curso, si hay una. */
     fun stopDiscovery() {
         discoveryListener?.let {
             runCatching { nsdManager.stopServiceDiscovery(it) }

@@ -66,6 +66,7 @@ private const val BLINK_MS = 500L
  * la notificación, desde el PC o a los 5 min, y deja todo como estaba.
  */
 object FindPhone {
+    /** Si está sonando ahora (lo observa la pantalla «Presiona para silenciar»). */
     val ringing = MutableStateFlow(false)
 
     private val main = Handler(Looper.getMainLooper())
@@ -89,6 +90,7 @@ object FindPhone {
         }
     private var appContext: Context? = null
 
+    /** Empieza a sonar (alarma, vibración y linterna) y abre la pantalla para pararlo. */
     fun start(ctx: Context) {
         main.post {
             if (ringing.value) return@post

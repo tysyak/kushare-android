@@ -37,22 +37,30 @@ data class PairingPrompt(val deviceId: String, val deviceName: String, val pin: 
  * aquí, una sola instancia por proceso.
  */
 object KushareLink {
+    /** Canal de notificaciones para las notificaciones que llegan del PC. */
     const val CHANNEL_PC = "pc_notifications"
+    /** Canal de notificaciones para las peticiones de emparejado (PIN). */
     const val CHANNEL_PAIRING = "pairing"
+    /** Canal de la notificación fija del servicio en primer plano. */
     const val CHANNEL_SERVICE = "service"
 
+    /** Servicio Rust del enlace, o `null` si kushare está apagado o en pausa. */
     @Volatile
     var service: LinkService? = null
         private set
 
     private lateinit var appContext: Context
 
+    /** Dispositivos emparejados con su estado de conexión (para la interfaz). */
     val peers = MutableStateFlow<List<MobilePeer>>(emptyList())
+    /** Dispositivos vistos en la última búsqueda por mDNS, por id. */
     val discovered = MutableStateFlow<Map<String, LinkSighting>>(emptyMap())
 
     /** Hay una búsqueda de dispositivos en curso (solo bajo demanda). */
     val scanning = MutableStateFlow(false)
+    /** Petición de emparejado pendiente de que el usuario confirme el PIN. */
     val pendingPairing = MutableStateFlow<PairingPrompt?>(null)
+    /** Mensaje breve para mostrar al usuario (snackbar); la interfaz lo borra al mostrarlo. */
     val messages = MutableStateFlow<String?>(null)
 
     /** Prepara contexto y canales de notificación, sin abrir el enlace. */
@@ -82,11 +90,13 @@ object KushareLink {
         return svc
     }
 
+    /** Nombre con el que este teléfono se presenta al PC. */
     fun deviceName(context: Context): String =
         Settings.Global.getString(context.contentResolver, Settings.Global.DEVICE_NAME)
             ?: Build.MODEL
             ?: "Android"
 
+    /** Vuelve a leer la lista de dispositivos emparejados desde Rust. */
     fun refreshPeers() {
         service?.let { svc ->
             peers.value = svc.peers()
@@ -120,6 +130,7 @@ object KushareLink {
         Log.i(TAG, "enlace cerrado")
     }
 
+    /** Responde a la petición de emparejado de [deviceId] (el usuario aceptó o rechazó el PIN). */
     fun respondPairing(deviceId: String, accept: Boolean) {
         service?.respondPairing(deviceId, accept)
         pendingPairing.update { if (it?.deviceId == deviceId) null else it }
@@ -339,6 +350,7 @@ object KushareLink {
             PhoneData.onPhotoDelete(deviceId, requestId, photoId)
     }
 
+    /** Se vio un dispositivo kushare en la red durante una búsqueda. */
     fun onSighting(sighting: LinkSighting) {
         val svc = service ?: return
         if (sighting.deviceId == svc.deviceId()) return
@@ -346,6 +358,7 @@ object KushareLink {
         svc.noteSighting(sighting.deviceId, sighting.host, sighting.port.toUShort())
     }
 
+    /** Un dispositivo visto en la búsqueda dejó de anunciarse. */
     fun onSightingLost(deviceId: String) {
         discovered.update { it - deviceId }
     }

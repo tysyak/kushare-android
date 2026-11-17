@@ -66,6 +66,7 @@ private const val NOTIFICATION_ID = 7302
 
 /** Cámaras del teléfono (Camera2), descritas para que el PC las distinga. */
 object PhoneCameras {
+    /** Cámaras del teléfono con su orientación, megapíxeles y tipo (para elegir la webcam). */
     fun list(ctx: Context): List<MobileCamera> {
         val cm = ctx.getSystemService(CameraManager::class.java)
         return cm.cameraIdList.mapNotNull { id ->
@@ -93,6 +94,7 @@ object PhoneCameras {
         }
     }
 
+    /** Si kushare tiene permiso de cámara. */
     fun hasPermission(ctx: Context) = ctx.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
 
     /** Selector de CameraX para la cámara `id` de Camera2 (vacía = trasera por defecto). */
@@ -108,6 +110,7 @@ object PhoneCameras {
                 .build()
         }
 
+    /** Si la cámara [id] es la frontal (su imagen se refleja). */
     fun isFront(ctx: Context, id: String): Boolean =
         runCatching {
             ctx.getSystemService(CameraManager::class.java).getCameraCharacteristics(id).get(CameraCharacteristics.LENS_FACING) ==
@@ -125,13 +128,16 @@ data class WebcamRequest(val deviceId: String, val cameraId: String, val width: 
  * ella la que arranca [WebcamService].
  */
 object Webcam {
+    /** Si la webcam está mandando imagen al PC. */
     val active = MutableStateFlow(false)
 
+    /** Lo que pidió el PC, a la espera de que [WebcamActivity] arranque el servicio. */
     @Volatile var pending: WebcamRequest? = null
 
     /** Fotogramas mandados y aún no confirmados por el PC. */
     val inFlight = AtomicInteger(0)
 
+    /** Atiende la petición de webcam del PC: abre [WebcamActivity] (Android exige que la app esté a la vista) o, si no puede, avisa con una notificación. */
     fun requestStart(ctx: Context, req: WebcamRequest) {
         val app = ctx.applicationContext
         if (!PhoneCameras.hasPermission(app)) {
@@ -169,11 +175,13 @@ object Webcam {
         )
     }
 
+    /** Para la webcam y su servicio. */
     fun stop(ctx: Context) {
         pending = null
         ctx.applicationContext.stopService(Intent(ctx.applicationContext, WebcamService::class.java))
     }
 
+    /** El PC confirmó un fotograma: se puede mandar el siguiente (como mucho dos en vuelo). */
     fun onAck() {
         if (inFlight.decrementAndGet() < 0) inFlight.set(0)
     }

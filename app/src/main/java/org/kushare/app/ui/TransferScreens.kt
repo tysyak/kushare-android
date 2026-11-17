@@ -76,6 +76,7 @@ private fun TransferScaffold(
     }
 }
 
+/** Pantalla Recibir: se hace visible para Quick Share y muestra lo recibido. */
 @Composable
 fun ReceiveScreen(
     deviceName: String,
@@ -139,6 +140,7 @@ fun ReceiveScreen(
     }
 }
 
+/** Pantalla Enviar: elige el archivo y el destino (Wi-Fi o Bluetooth). */
 @Composable
 fun SendScreen(
     fileName: String?,

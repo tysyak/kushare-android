@@ -65,21 +65,29 @@ import uniffi.kushare_mobile.sendFileBt
 import uniffi.kushare_mobile.startReceiver
 
 private sealed class Screen(val depth: Int) {
+    /** Pantalla de inicio. */
     data object Home : Screen(0)
 
+    /** Recibir archivos por Quick Share. */
     data object Receive : Screen(1)
 
+    /** Enviar un archivo; [filePath] y [fileName] vienen de *Compartir* si se abrió desde otra app. */
     data class Send(val filePath: String? = null, val fileName: String? = null) : Screen(1)
 
+    /** Dispositivos emparejados y búsqueda. */
     data object Devices : Screen(1)
 
+    /** Ajustes. */
     data object Settings : Screen(1)
 
+    /** Permisos opcionales (se abre desde Ajustes). */
     data object Permissions : Screen(2)
 
+    /** Historial del portapapeles. */
     data object Clipboard : Screen(1)
 }
 
+/** Actividad principal: aloja toda la interfaz de Compose y recibe lo que se comparte con kushare. */
 class MainActivity : ComponentActivity() {
     companion object {
         /** Abrir directamente la pantalla de dispositivos (desde una notificación). */

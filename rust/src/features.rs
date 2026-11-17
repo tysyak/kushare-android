@@ -89,7 +89,7 @@ pub struct MobileCallLogEntry {
     pub duration_s: u32,
     /// incoming|outgoing|missed|rejected|blocked|voicemail
     pub kind: String,
-    /// "<contactId>-<photoId>" o "" (ver `ContactPhotosRequest`).
+    /// `<contactId>-<photoId>` o `""` (ver `ContactPhotosRequest`).
     pub photo_key: String,
 }
 
@@ -127,7 +127,8 @@ pub const CONTACT_PHOTO_MAX: usize = 64 * 1024;
 #[derive(Default)]
 pub struct LocalCache {
     battery: Option<pb::BatteryStatus>,
-    players: Option<pb::MediaPlayers>,
+    /// Con el momento en que se mandó (para extrapolar la posición).
+    players: Option<(pb::MediaPlayers, std::time::Instant)>,
     outputs: Option<pb::AudioOutputs>,
     ringer: Option<pb::RingerMode>,
     call: Option<pb::CallState>,
@@ -138,7 +139,9 @@ impl LocalCache {
     fn messages(&self) -> Vec<F> {
         [
             self.battery.map(F::Battery),
-            self.players.clone().map(F::MediaPlayers),
+            self.players
+                .as_ref()
+                .map(|(p, at)| F::MediaPlayers(kushare_link::media::advanced(p, at.elapsed()))),
             self.outputs.clone().map(F::AudioOutputs),
             self.ringer.map(F::RingerMode),
             self.call.clone().map(F::CallState),
@@ -165,7 +168,16 @@ pub fn publish(manager: &LinkManager, cache: &SharedCache, kind: F) {
         let mut c = cache.lock().expect("mutex envenenado");
         let changed = match &kind {
             F::Battery(v) => replace(&mut c.battery, v),
-            F::MediaPlayers(v) => replace(&mut c.players, v),
+            F::MediaPlayers(v) => {
+                // Si solo avanzó la posición, el PC ya la calcula: no se manda.
+                let same = c.players.as_ref().is_some_and(|(old, at)| {
+                    kushare_link::media::same_players(old, v, at.elapsed())
+                });
+                if !same {
+                    c.players = Some((v.clone(), std::time::Instant::now()));
+                }
+                !same
+            }
             F::AudioOutputs(v) => replace(&mut c.outputs, v),
             F::RingerMode(v) => replace(&mut c.ringer, v),
             F::CallState(v) => replace(&mut c.call, v),

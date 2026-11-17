@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.dokka")
 }
 
 android {
@@ -77,6 +78,32 @@ kotlin {
     }
 }
 
+// Documentación HTML del código (KDoc) en app/build/dokka/html.
+// Los bindings generados por UniFFI (`uniffi.*`) se omiten: su referencia
+// es la del crate Rust (`cargo doc` en ../rust).
+dokka {
+    moduleName.set("kushare-android")
+    dokkaSourceSets.configureEach {
+        includes.from("dokka.md")
+        documentedVisibilities.set(
+            setOf(
+                org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier.Public,
+                org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier.Internal,
+                org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier.Private,
+            ),
+        )
+        perPackageOption {
+            matchingRegex.set("uniffi\\..*")
+            suppress.set(true)
+        }
+        sourceLink {
+            localDirectory.set(file("src/main/java"))
+            remoteUrl("https://github.com/tysyak/kushare-android/blob/main/app/src/main/java")
+            remoteLineSuffix.set("#L")
+        }
+    }
+}
+
 dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
@@ -104,4 +131,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-service:2.8.7")
     // Lectura de QR y códigos de barras sin servicios de Google (Apache 2.0).
     implementation("com.google.zxing:core:3.5.3")
+
+    // TEMPORAL: aviso sobre la verificación de desarrolladores de Google
+    // (https://github.com/woheller69/FreeDroidWarn, Apache 2.0). Se muestra
+    // una vez por versión al entrar en Ajustes. Quitar cuando deje de hacer
+    // falta (ver SettingsScreen.kt y el repositorio JitPack de settings.gradle.kts).
+    implementation("com.github.woheller69:FreeDroidWarn:V1.14")
 }

@@ -24,6 +24,7 @@ val KUSHARE_RFCOMM_UUID: UUID = UUID.fromString("b4ac1500-6c92-4e64-8f1e-7e1a0cd
  */
 val KUSHARE_LINK_RFCOMM_UUID: UUID = UUID.fromString("6f3a2d10-8c4e-4b7a-9e21-5d0c7b3e9a42")
 
+/** Dispositivo vinculado en los ajustes de Bluetooth del sistema. */
 data class BondedPeer(val name: String, val address: String)
 
 /**
@@ -64,6 +65,7 @@ class BluetoothSocketIo(private val socket: BluetoothSocket) : ByteStreamIo {
     }
 }
 
+/** Bluetooth clásico (RFCOMM): escucha y conecta los perfiles de transferencias y del enlace de kushare. */
 class BluetoothHelper(private val adapter: BluetoothAdapter) {
     /** Dispositivos ya emparejados (el único universo alcanzable sin
      * permiso de descubrimiento activo por BLE/escaneo clásico; kushare
@@ -93,6 +95,7 @@ class BluetoothHelper(private val adapter: BluetoothAdapter) {
     fun listen(): BluetoothServerSocket =
         adapter.listenUsingRfcommWithServiceRecord("kushare", KUSHARE_RFCOMM_UUID)
 
+    /** Si el Bluetooth del teléfono está encendido. */
     fun isEnabled(): Boolean = adapter.isEnabled
 
     /** Como [listen], pero para el servicio del enlace persistente. */

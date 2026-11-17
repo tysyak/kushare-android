@@ -97,6 +97,7 @@ private fun notificationAccessGranted(context: Context): Boolean =
 /** Qué filtro de apps se está editando. */
 private data class AppFilterTarget(val peer: MobilePeer, val outgoing: Boolean)
 
+/** Pantalla Dispositivos: emparejados, búsqueda, emparejado por PIN y ajustes de cada PC. */
 @Composable
 fun DevicesScreen(onBack: () -> Unit) {
     val context = LocalContext.current

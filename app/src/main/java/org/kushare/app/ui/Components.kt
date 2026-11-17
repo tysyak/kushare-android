@@ -52,11 +52,17 @@ import androidx.graphics.shapes.RoundedPolygon
  * sobrias. Así cada tipo de contenedor se reconoce por su silueta.
  */
 object KushareShapes {
+    /** Botón de acción del lado izquierdo de una pareja. */
     val ActionLeading = RoundedCornerShape(topStart = 44.dp, topEnd = 16.dp, bottomEnd = 44.dp, bottomStart = 16.dp)
+    /** Botón de acción del lado derecho de una pareja. */
     val ActionTrailing = RoundedCornerShape(topStart = 16.dp, topEnd = 44.dp, bottomEnd = 16.dp, bottomStart = 44.dp)
+    /** Tarjeta principal de la pantalla de inicio. */
     val Hero = RoundedCornerShape(topStart = 56.dp, topEnd = 56.dp, bottomEnd = 56.dp, bottomStart = 20.dp)
+    /** Tarjeta ancha. */
     val Wide = RoundedCornerShape(topStart = 20.dp, topEnd = 44.dp, bottomEnd = 44.dp, bottomStart = 44.dp)
+    /** Tarjeta de lista. */
     val ListCard = RoundedCornerShape(28.dp)
+    /** Diálogos. */
     val Dialog = RoundedCornerShape(topStart = 44.dp, topEnd = 44.dp, bottomEnd = 44.dp, bottomStart = 16.dp)
 }
 

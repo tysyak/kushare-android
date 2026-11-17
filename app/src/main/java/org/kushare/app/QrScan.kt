@@ -87,6 +87,7 @@ fun cameraLabel(ctx: Context, c: uniffi.kushare_mobile.MobileCamera): String {
 
 /** El PC pidió escanear: abrir el escáner (o avisar con una notificación). */
 object QrScan {
+    /** Abre el escáner de QR a petición del PC. */
     fun open(ctx: Context) {
         val app = ctx.applicationContext
         val intent = Intent(app, QrScanActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

@@ -72,6 +72,7 @@ data class PeerExtras(
  * al cerrarlo. Cada función degrada sola si falta su permiso.
  */
 object PhoneFeatures {
+    /** Estado que manda cada PC (batería, reproductores y salidas de audio), por id de dispositivo. */
     val peerExtras = MutableStateFlow<Map<String, PeerExtras>>(emptyMap())
 
     private var context: Context? = null
@@ -91,6 +92,7 @@ object PhoneFeatures {
 
     private fun svc(): LinkService? = KushareLink.service
 
+    /** Empieza a vigilar batería, timbre, salidas de audio, llamadas, fotos y reproductores, y a mandar sus cambios al PC. */
     @Synchronized
     fun start(ctx: Context) {
         if (context != null) return
@@ -106,6 +108,7 @@ object PhoneFeatures {
         PhoneData.start(app)
     }
 
+    /** Deja de vigilarlo todo (el enlace se cerró). */
     @Synchronized
     fun stop() {
         val app = context ?: return
@@ -217,6 +220,7 @@ object PhoneFeatures {
     fun canChangeRinger(ctx: Context) =
         ctx.getSystemService(NotificationManager::class.java).isNotificationPolicyAccessGranted
 
+    /** Cambia el modo del timbre (`normal`, `vibrate` o `silent`) a petición del PC. */
     fun setRinger(mode: String) {
         val app = context ?: return
         val audio = app.getSystemService(AudioManager::class.java)
@@ -430,6 +434,7 @@ object PhoneFeatures {
         }.onFailure { Log.i(TAG, "sin acceso a notificaciones: no se leen los reproductores") }
     }
 
+    /** Manda [action] (`play`, `pause`, `next`…) al reproductor [playerId] del teléfono. */
     fun mediaCommand(playerId: String, action: String) {
         main.post {
             val targets =
@@ -452,6 +457,7 @@ object PhoneFeatures {
 
     // --- Llamadas ----------------------------------------------------------
 
+    /** Si kushare puede leer el estado de las llamadas y contestarlas o colgarlas. */
     fun hasCallPermissions(ctx: Context) =
         ctx.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
 
@@ -499,6 +505,7 @@ object PhoneFeatures {
         )
     }
 
+    /** Contesta, cuelga o silencia la llamada en curso a petición del PC. */
     @SuppressLint("MissingPermission")
     fun callCommand(action: String) {
         val app = context ?: return
@@ -522,11 +529,14 @@ object PhoneFeatures {
 
     // --- Fotos ---------------------------------------------------------------
 
+    /** Permiso para leer las fotos (cambia según la versión de Android). */
     val photoPermission =
         if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE
 
+    /** Si kushare puede leer la galería. */
     fun hasPhotoPermission(ctx: Context) = ctx.checkSelfPermission(photoPermission) == PackageManager.PERMISSION_GRANTED
 
+    /** Petición del PC: una página de fotos de la galería; no se repiten las miniaturas que ya tiene ([haveThumbnails]). */
     fun onPhotoListRequest(deviceId: String, requestId: ULong, offset: UInt, limit: UInt, haveThumbnails: Set<String>) {
         val app = context ?: return
         val s = scope ?: return
@@ -601,6 +611,7 @@ object PhoneFeatures {
         return n
     }
 
+    /** Petición del PC: la foto [photoId] completa, en trozos de [chunkSize] bytes; [background] si es una precarga. */
     fun onPhotoRequest(deviceId: String, requestId: ULong, photoId: String, chunkSize: Int, background: Boolean) {
         val app = context ?: return
         val s = scope ?: return
@@ -650,12 +661,15 @@ object PhoneFeatures {
 
     // --- Lo que publica el peer ---------------------------------------------
 
+    /** El PC [deviceId] mandó su batería. */
     fun onPeerBattery(deviceId: String, battery: MobileBattery) =
         peerExtras.update { it + (deviceId to (it[deviceId] ?: PeerExtras()).copy(battery = battery)) }
 
+    /** El PC [deviceId] mandó sus reproductores. */
     fun onPeerPlayers(deviceId: String, players: List<MobilePlayer>) =
         peerExtras.update { it + (deviceId to (it[deviceId] ?: PeerExtras()).copy(players = players)) }
 
+    /** El PC [deviceId] mandó sus salidas de audio. */
     fun onPeerOutputs(deviceId: String, selectable: Boolean, outputs: List<MobileAudioOutput>) =
         peerExtras.update {
             it + (deviceId to (it[deviceId] ?: PeerExtras()).copy(outputsSelectable = selectable, outputs = outputs))

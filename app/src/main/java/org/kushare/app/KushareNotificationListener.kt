@@ -52,6 +52,12 @@ class KushareNotificationListener : NotificationListenerService() {
     private val active = ConcurrentHashMap<String, StatusBarNotification>()
     private val appIcons = LruCache<String, ByteArray>(64)
 
+    /**
+     * Último icono grande por notificación (64 px y su PNG): un chat que se
+     * actualiza repite casi siempre la misma foto y así no se recodifica.
+     */
+    private val largeIcons = LruCache<String, Pair<Bitmap, ByteArray>>(32)
+
     override fun onListenerConnected() {
         instance = this
         KushareLink.attach(this)
@@ -87,6 +93,7 @@ class KushareNotificationListener : NotificationListenerService() {
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
+        largeIcons.remove(sbn.key)
         if (active.remove(sbn.key) != null) {
             KushareLink.service?.removeLocalNotification(sbn.key)
         }
@@ -149,24 +156,33 @@ class KushareNotificationListener : NotificationListenerService() {
 
     /** El icono grande de la notificación (p. ej. foto del contacto) o, si no hay, el de la app. */
     private fun iconFor(sbn: StatusBarNotification, appInfo: ApplicationInfo?): ByteArray? {
-        sbn.notification.getLargeIcon()?.loadDrawable(this)?.let { drawable -> return toPng(drawable) }
+        sbn.notification.getLargeIcon()?.loadDrawable(this)?.let { drawable ->
+            val small = toBitmap(drawable) ?: return null
+            largeIcons.get(sbn.key)?.let { (cached, png) -> if (cached.sameAs(small)) return png }
+            return encodePng(small)?.also { largeIcons.put(sbn.key, small to it) }
+        }
         appIcons.get(sbn.packageName)?.let { return it }
         val drawable = appInfo?.let { runCatching { packageManager.getApplicationIcon(it) }.getOrNull() } ?: return null
         return toPng(drawable)?.also { appIcons.put(sbn.packageName, it) }
     }
 
-    private fun toPng(drawable: Drawable): ByteArray? =
+    private fun toPng(drawable: Drawable): ByteArray? = toBitmap(drawable)?.let(::encodePng)
+
+    private fun toBitmap(drawable: Drawable): Bitmap? =
         runCatching {
-            val bitmap =
-                if (drawable is BitmapDrawable && drawable.bitmap != null) {
-                    Bitmap.createScaledBitmap(drawable.bitmap, ICON_SIZE, ICON_SIZE, true)
-                } else {
-                    Bitmap.createBitmap(ICON_SIZE, ICON_SIZE, Bitmap.Config.ARGB_8888).also {
-                        val canvas = Canvas(it)
-                        drawable.setBounds(0, 0, ICON_SIZE, ICON_SIZE)
-                        drawable.draw(canvas)
-                    }
+            if (drawable is BitmapDrawable && drawable.bitmap != null) {
+                Bitmap.createScaledBitmap(drawable.bitmap, ICON_SIZE, ICON_SIZE, true)
+            } else {
+                Bitmap.createBitmap(ICON_SIZE, ICON_SIZE, Bitmap.Config.ARGB_8888).also {
+                    val canvas = Canvas(it)
+                    drawable.setBounds(0, 0, ICON_SIZE, ICON_SIZE)
+                    drawable.draw(canvas)
                 }
+            }
+        }.getOrNull()
+
+    private fun encodePng(bitmap: Bitmap): ByteArray? =
+        runCatching {
             ByteArrayOutputStream().use { out ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
                 out.toByteArray()
@@ -175,15 +191,18 @@ class KushareNotificationListener : NotificationListenerService() {
 
     // --- Lo que pide el PC ---
 
+    /** Descarta la notificación [key] del teléfono (el PC descartó su copia). */
     fun dismiss(key: String) {
         runCatching { cancelNotification(key) }.onFailure { Log.w(TAG, "no se pudo descartar $key", it) }
     }
 
+    /** Pulsa la acción [actionId] de la notificación [key], como si se tocara en el teléfono. */
     fun invokeAction(key: String, actionId: String) {
         val action = actionFor(key, actionId) ?: return
         sendPendingIntent(action.actionIntent, null)
     }
 
+    /** Responde a la notificación [key] con [text] a través de su acción de respuesta ([actionId]). */
     fun reply(key: String, actionId: String, text: String) {
         val action = actionFor(key, actionId) ?: return
         val inputs = action.remoteInputs ?: return

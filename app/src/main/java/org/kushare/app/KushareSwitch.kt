@@ -36,16 +36,19 @@ object KushareSwitch {
     fun isHybrid(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_HYBRID, true)
 
+    /** Activa o desactiva el modo híbrido (Bluetooth para el control y Wi-Fi para lo pesado) y avisa al PC. */
     fun setHybrid(context: Context, on: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_HYBRID, on).apply()
         KushareService.onLinkModeChanged()
     }
 
+    /** Si el usuario tiene kushare encendido (botón principal o ajuste rápido). */
     fun isEnabled(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_ENABLED, true).also {
             enabled.value = it
         }
 
+    /** Enciende o apaga kushare: arranca o para [KushareService] y actualiza el ajuste rápido. */
     fun setEnabled(context: Context, on: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_ENABLED, on).apply()
         enabled.value = on
@@ -53,6 +56,7 @@ object KushareSwitch {
         refreshTile(context)
     }
 
+    /** Si el Bluetooth está encendido. */
     fun isBluetoothOn(context: Context): Boolean =
         context.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled == true
 

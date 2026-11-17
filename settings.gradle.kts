@@ -11,6 +11,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // TEMPORAL (aviso FreeDroidWarn, ver CHANGELOG/notas): JitPack solo
+        // para esa biblioteca. Quitar junto con la dependencia.
+        maven("https://jitpack.io") {
+            content { includeGroup("com.github.woheller69") }
+        }
     }
 }
 

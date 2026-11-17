@@ -44,7 +44,7 @@ pub trait ByteStreamIo: Send + Sync {
     /// cerrado o error de E/S).
     fn write(&self, data: Vec<u8>) -> bool;
 
-    /// Cierra el socket. Lo llama [`CallbackStream`] al soltarse, para
+    /// Cierra el socket. Lo llama `CallbackStream` al soltarse, para
     /// desbloquear el hilo que espera en `read` (sin esto, un enlace
     /// cerrado desde Rust dejaría el `BluetoothSocket` abierto).
     fn close(&self);

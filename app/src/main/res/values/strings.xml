@@ -63,6 +63,8 @@
     <string name="features_full_screen">Pantalla de «Encontrar teléfono»</string>
     <string name="features_overlay">Mostrar sobre otras apps</string>
     <string name="features_overlay_detail">Para que «Encontrar teléfono» abra su pantalla también si lo estás usando (si no, sale como notificación).</string>
+    <string name="features_battery">Uso de batería sin restricciones</string>
+    <string name="features_battery_detail">Opcional. Algunas marcas cierran las apps en segundo plano y cortan el enlace con el PC. En reposo kushare apenas gasta: solo mantiene abierto el Bluetooth.</string>
     <string name="features_full_screen_detail">Al buscarlo desde el PC, mostrar el botón para silenciarlo aunque esté bloqueado.</string>
     <string name="features_granted">Concedido</string>
     <string name="features_intro">La batería, el timbre y la música se comparten siempre con el PC. Esto es opcional:</string>

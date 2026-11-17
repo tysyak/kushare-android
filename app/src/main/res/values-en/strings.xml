@@ -57,6 +57,8 @@
     <string name="features_full_screen">“Find phone” screen</string>
     <string name="features_overlay">Display over other apps</string>
     <string name="features_overlay_detail">So “Find phone” opens its screen even while you are using it (otherwise it shows as a notification).</string>
+    <string name="features_battery">Unrestricted battery use</string>
+    <string name="features_battery_detail">Optional. Some brands close background apps and cut the link with the PC. When idle kushare barely uses any battery: it only keeps Bluetooth open.</string>
     <string name="features_full_screen_detail">When the PC is looking for it, show the button to silence it even when locked.</string>
     <string name="features_granted">Granted</string>
     <string name="features_intro">Battery, ringer and music are always shared with the PC. This is optional:</string>

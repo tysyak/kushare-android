@@ -1677,7 +1677,7 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if ((lib.uniffi_kushare_mobile_checksum_method_bytestreamio_write() and 0xFFFF) != 28558) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if ((lib.uniffi_kushare_mobile_checksum_method_bytestreamio_close() and 0xFFFF) != 15806) {
+    if ((lib.uniffi_kushare_mobile_checksum_method_bytestreamio_close() and 0xFFFF) != 7314) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_pairing_requested() and 0xFFFF) != 54453) {
@@ -4152,7 +4152,7 @@ data class MobileCallLogEntry (
     var `kind`: kotlin.String
     , 
     /**
-     * "<contactId>-<photoId>" o "" (ver `ContactPhotosRequest`).
+     * `<contactId>-<photoId>` o `""` (ver `ContactPhotosRequest`).
      */
     var `photoKey`: kotlin.String
     
@@ -5003,7 +5003,7 @@ public interface ByteStreamIo {
     fun `write`(`data`: kotlin.ByteArray): kotlin.Boolean
     
     /**
-     * Cierra el socket. Lo llama [`CallbackStream`] al soltarse, para
+     * Cierra el socket. Lo llama `CallbackStream` al soltarse, para
      * desbloquear el hilo que espera en `read` (sin esto, un enlace
      * cerrado desde Rust dejaría el `BluetoothSocket` abierto).
      */

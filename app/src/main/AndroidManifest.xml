@@ -87,6 +87,8 @@
     <!-- Opcional: abrirla también con el teléfono desbloqueado y en uso
          (Android no deja abrir pantallas desde segundo plano sin él). -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Para ofrecer quitar la restricción de batería (Permisos). -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <!-- Nombre e icono de las apps cuyas notificaciones se reenvían (respaldo
          si la notificación no trae su ApplicationInfo en los extras). -->

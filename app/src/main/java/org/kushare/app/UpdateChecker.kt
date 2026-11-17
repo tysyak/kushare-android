@@ -24,8 +24,10 @@ private const val REPO = "tysyak/kushare-android"
  * que la app instalada: un APK ajeno no puede sustituirla).
  */
 object UpdateChecker {
+    /** Versión publicada en GitHub: número, página del release y APK, si lo hay. */
     data class Release(val version: String, val page: String, val apkUrl: String?)
 
+    /** Estado de la comprobación de actualizaciones (lo muestra Ajustes). */
     sealed interface State {
         data object Idle : State
 
@@ -40,11 +42,14 @@ object UpdateChecker {
         data class Failed(val message: String) : State
     }
 
+    /** Estado actual de la comprobación. */
     val state = MutableStateFlow<State>(State.Idle)
 
+    /** Versión instalada de la app. */
     fun currentVersion(ctx: Context): String =
         runCatching { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName }.getOrNull() ?: "0"
 
+    /** Si [latest] es posterior a [current] (comparando los números de la versión). */
     fun isNewer(latest: String, current: String): Boolean {
         fun parse(v: String) = v.trimStart('v').split('.', '-', '+').take(3).map { it.toIntOrNull() ?: 0 }
         val (a, b) = parse(latest) to parse(current)
@@ -63,6 +68,7 @@ object UpdateChecker {
             setRequestProperty("Accept", "application/vnd.github+json")
         }
 
+    /** Pregunta a GitHub por la última versión y actualiza [state]. */
     suspend fun check(ctx: Context): State =
         withContext(Dispatchers.IO) {
             state.value = State.Checking

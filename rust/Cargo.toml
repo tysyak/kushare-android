@@ -34,3 +34,9 @@ default = []
 # Solo para compilar el binario uniffi-bindgen (ver uniffi-bindgen.rs): así
 # el cdylib que termina en el APK no carga el CLI completo de uniffi.
 cli = ["uniffi/cli"]
+
+# Binario más pequeño y algo más rápido: optimización entre crates (LTO) y
+# una sola unidad de código. Compila más lento, solo afecta a --release.
+[profile.release]
+lto = true
+codegen-units = 1

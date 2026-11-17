@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 /** Variante de esquema realmente aplicada. */
 enum class Appearance { LIGHT, DARK, OLED }
 
+/** Apariencia efectiva (clara, oscura u OLED) según el ajuste y el tema del sistema. */
 @Composable
 fun currentAppearance(config: ThemeConfig): Appearance {
     val systemDark = isSystemInDarkTheme()
@@ -156,6 +157,7 @@ private val ExpressiveShapes =
         extraExtraLarge = RoundedCornerShape(56.dp),
     )
 
+/** Tema Material 3 Expressive de kushare (violeta o color dinámico, según los ajustes). */
 @Composable
 fun KushareTheme(content: @Composable () -> Unit) {
     val config by ThemeSettings.config.collectAsState()

@@ -14,7 +14,7 @@ APK       = app/build/outputs/apk/debug/app-debug.apk
 APK_RELEASE = app/build/outputs/apk/release/app-release.apk
 PKG       = org.kushare.app
 
-.PHONY: all native bindings apk release install install-release run logs grant-listener clean
+.PHONY: all native bindings apk release install install-release run logs grant-listener docs clean
 
 all: apk
 
@@ -51,6 +51,12 @@ run: install
 
 logs:
 	adb logcat -s KushareService KushareLink KushareNotif LinkNsd AndroidRuntime
+
+# Documentación: Kotlin con Dokka (app/build/dokka/html) y el crate Rust
+# con rustdoc (rust/target/doc/kushare_mobile).
+docs:
+	./gradlew :app:dokkaGenerate
+	cd rust && cargo doc --no-deps
 
 clean:
 	./gradlew clean

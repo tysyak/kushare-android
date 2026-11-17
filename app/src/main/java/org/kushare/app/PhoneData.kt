@@ -70,14 +70,17 @@ object PhoneData {
     private fun has(ctx: Context, vararg permissions: String) =
         permissions.all { ctx.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED }
 
+    /** Si kushare puede leer y mandar SMS. */
     fun hasSmsPermissions(ctx: Context) = has(ctx, Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS)
 
+    /** Si kushare puede leer el registro de llamadas y los contactos. */
     fun hasCallLogPermissions(ctx: Context) =
         has(ctx, Manifest.permission.READ_CALL_LOG, Manifest.permission.READ_CONTACTS, Manifest.permission.CALL_PHONE)
 
     /** El fondo de pantalla solo se puede leer con "acceso a todos los archivos". */
     fun hasWallpaperAccess() = Build.VERSION.SDK_INT >= 30 && Environment.isExternalStorageManager()
 
+    /** Empieza a vigilar los SMS para avisar al PC de mensajes nuevos. */
     @Synchronized
     fun start(ctx: Context) {
         if (context != null) return
@@ -85,6 +88,7 @@ object PhoneData {
         startSmsObserver(ctx.applicationContext)
     }
 
+    /** Deja de vigilar los SMS. */
     @Synchronized
     fun stop() {
         val app = context ?: return
@@ -94,6 +98,7 @@ object PhoneData {
         context = null
     }
 
+    /** El usuario concedió permisos: empezar la vigilancia que faltaba. */
     fun onPermissionsChanged() {
         val app = context ?: return
         main.post { if (smsObserver == null) startSmsObserver(app) }
@@ -145,6 +150,7 @@ object PhoneData {
         }.getOrNull().orEmpty()
     }
 
+    /** Petición del PC: conversaciones de SMS, de la [offset] a la [offset] + [limit]. */
     fun onSmsThreadsRequest(deviceId: String, requestId: ULong, offset: UInt, limit: UInt) {
         val app = context ?: return
         scope.launch {
@@ -212,6 +218,7 @@ object PhoneData {
         return total to out
     }
 
+    /** Petición del PC: hasta [limit] mensajes de la conversación [threadId], anteriores a [beforeMs] (0 = los últimos). */
     fun onSmsMessagesRequest(deviceId: String, requestId: ULong, threadId: String, limit: UInt, beforeMs: Long) {
         val app = context ?: return
         scope.launch {
@@ -273,6 +280,7 @@ object PhoneData {
         }
     }
 
+    /** Petición del PC: mandar el SMS [body] a [address]. */
     @SuppressLint("MissingPermission")
     fun onSendSms(deviceId: String, requestId: ULong, address: String, body: String) {
         val app = context ?: return
@@ -303,6 +311,7 @@ object PhoneData {
 
     // --- Llamadas y contactos ---------------------------------------------
 
+    /** Petición del PC: las [limit] llamadas más recientes del registro. */
     fun onCallLogRequest(deviceId: String, requestId: ULong, limit: UInt) {
         val app = context ?: return
         scope.launch {
@@ -361,6 +370,7 @@ object PhoneData {
         }
     }
 
+    /** Petición del PC: la lista de contactos con sus números. */
     fun onContactsRequest(deviceId: String, requestId: ULong) {
         val app = context ?: return
         scope.launch {
@@ -432,6 +442,7 @@ object PhoneData {
         }
     }
 
+    /** Petición del PC: llamar a [number] (con el marcador del sistema). */
     @SuppressLint("MissingPermission")
     fun onDial(deviceId: String, requestId: ULong, number: String) {
         val app = context ?: return
@@ -454,6 +465,7 @@ object PhoneData {
 
     // --- Notificaciones activas -----------------------------------------------
 
+    /** Petición del PC: notificaciones activas del teléfono; no se repiten los iconos que ya tiene ([haveIcons]). */
     fun onActiveNotificationsRequest(deviceId: String, requestId: ULong, haveIcons: List<String>) {
         scope.launch {
             val svc = svc() ?: return@launch
@@ -470,6 +482,7 @@ object PhoneData {
 
     // --- Fondo de pantalla ----------------------------------------------------
 
+    /** Petición del PC: el fondo de pantalla, reducido a [maxSize] px de lado. */
     @SuppressLint("MissingPermission")
     fun onWallpaperRequest(deviceId: String, requestId: ULong, maxSize: UInt) {
         val app = context ?: return
@@ -517,6 +530,7 @@ object PhoneData {
 
     // --- Borrar fotos -----------------------------------------------------------
 
+    /** Petición del PC: mover la foto [photoId] a la papelera (el usuario lo confirma en el teléfono). */
     fun onPhotoDelete(deviceId: String, requestId: ULong, photoId: String) {
         val app = context ?: return
         scope.launch {
@@ -580,13 +594,16 @@ object PhoneData {
     /** Lo copiado con el PC en esta sesión (solo en memoria, máx. 20). */
     data class ClipEntry(val text: String, val fromPc: Boolean, val timeMs: Long)
 
+    /** Últimos textos que se copiaron entre el teléfono y el PC (pantalla Portapapeles). */
     val clipboardLog = MutableStateFlow<List<ClipEntry>>(emptyList())
 
     private fun logClip(text: String, fromPc: Boolean) =
         clipboardLog.update { (listOf(ClipEntry(text, fromPc, System.currentTimeMillis())) + it.filter { e -> e.text != text }).take(20) }
 
+    /** Si se muestra una notificación cuando llega texto del PC al portapapeles. */
     fun clipboardNotify(ctx: Context) = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_CLIPBOARD_NOTIFY, true)
 
+    /** Activa o desactiva la notificación al recibir el portapapeles del PC. */
     fun setClipboardNotify(ctx: Context, on: Boolean) =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_CLIPBOARD_NOTIFY, on).apply()
 
@@ -620,8 +637,10 @@ object PhoneData {
     @Volatile
     private var lastClip: String? = null
 
+    /** Si el portapapeles del PC se copia solo en el teléfono. */
     fun clipboardSync(ctx: Context) = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_CLIPBOARD, true)
 
+    /** Activa o desactiva la copia automática del portapapeles del PC. */
     fun setClipboardSync(ctx: Context, on: Boolean) =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_CLIPBOARD, on).apply()
 

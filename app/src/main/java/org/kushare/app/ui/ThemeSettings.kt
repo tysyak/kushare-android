@@ -14,6 +14,7 @@ enum class ThemeMode(@StringRes val labelRes: Int) {
     OLED(R.string.theme_oled),
 }
 
+/** Ajustes de tema elegidos por el usuario. */
 data class ThemeConfig(
     val mode: ThemeMode = ThemeMode.SYSTEM,
     /**
@@ -30,8 +31,10 @@ data class ThemeConfig(
 object ThemeSettings {
     private const val PREFS = "kushare_ui"
     private val state = MutableStateFlow(ThemeConfig())
+    /** Ajustes de tema actuales; la interfaz se recompone al cambiar. */
     val config: StateFlow<ThemeConfig> = state
 
+    /** Lee los ajustes de tema guardados. */
     fun load(context: Context) {
         val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         state.value =
@@ -42,6 +45,7 @@ object ThemeSettings {
             )
     }
 
+    /** Cambia los ajustes de tema con [transform] y los guarda. */
     fun update(context: Context, transform: (ThemeConfig) -> ThemeConfig) {
         val next = transform(state.value)
         state.value = next

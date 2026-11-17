@@ -17,11 +17,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 private const val LINK_SERVICE_TYPE = "_kushare-link._tcp."
 private const val TAG = "LinkNsd"
 
+/** Anuncio y búsqueda del enlace de kushare por mDNS (`_kushare-link._tcp`) con NsdManager. */
 class LinkNsd(context: Context) {
     private val nsdManager = context.getSystemService(Context.NSD_SERVICE) as NsdManager
     private var registration: NsdManager.RegistrationListener? = null
     private var discovery: NsdManager.DiscoveryListener? = null
 
+    /** Anuncia este teléfono en la Wi-Fi para que el PC pueda abrir el enlace por TCP. */
     fun advertise(deviceId: String, deviceName: String, port: Int) {
         stopAdvertising()
         val info =
@@ -50,6 +52,7 @@ class LinkNsd(context: Context) {
         nsdManager.registerService(info, NsdManager.PROTOCOL_DNS_SD, listener)
     }
 
+    /** Deja de anunciarse en la red. */
     fun stopAdvertising() {
         registration?.let { runCatching { nsdManager.unregisterService(it) } }
         registration = null
@@ -120,6 +123,7 @@ class LinkNsd(context: Context) {
         nsdManager.discoverServices(LINK_SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, listener)
     }
 
+    /** Termina la búsqueda de dispositivos en curso, si hay una. */
     fun stopDiscovery() {
         discovery?.let { runCatching { nsdManager.stopServiceDiscovery(it) } }
         discovery = null

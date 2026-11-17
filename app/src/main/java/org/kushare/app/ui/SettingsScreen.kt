@@ -65,6 +65,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -89,8 +90,16 @@ private fun ThemeMode.icon(): ImageVector =
 @Composable
 private fun ThemeMode.shortLabel(): String = stringResource(if (this == ThemeMode.OLED) R.string.theme_oled_short else labelRes)
 
+/** Pantalla Ajustes: nombre, conexión, tema, portapapeles, actualizaciones y acceso a Permisos. */
 @Composable
 fun SettingsScreen(onBack: () -> Unit, onPermissions: () -> Unit) {
+    // TEMPORAL (FreeDroidWarn): aviso sobre la verificación de desarrolladores
+    // de Google, una vez por versión y solo aquí, no al abrir la app.
+    val warnContext = LocalContext.current
+    LaunchedEffect(Unit) {
+        val code = warnContext.packageManager.getPackageInfo(warnContext.packageName, 0).longVersionCode.toInt()
+        org.woheller69.freeDroidWarn.FreeDroidWarn.showWarningOnUpgrade(warnContext, code)
+    }
     val context = LocalContext.current
     val config by ThemeSettings.config.collectAsState()
     val enabled by KushareSwitch.enabled.collectAsState()
@@ -284,6 +293,7 @@ internal fun PhoneFeaturesCard() {
     var fullScreen by remember { mutableStateOf(canFullScreen(context)) }
     var overlay by remember { mutableStateOf(Settings.canDrawOverlays(context)) }
     var mic by remember { mutableStateOf(org.kushare.app.Mic.hasPermission(context)) }
+    var unrestricted by remember { mutableStateOf(batteryUnrestricted(context)) }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer =
@@ -298,6 +308,7 @@ internal fun PhoneFeaturesCard() {
                     fullScreen = canFullScreen(context)
                     overlay = Settings.canDrawOverlays(context)
                     mic = org.kushare.app.Mic.hasPermission(context)
+                    unrestricted = batteryUnrestricted(context)
                 }
             }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -408,12 +419,27 @@ internal fun PhoneFeaturesCard() {
                 context.startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")))
             },
         )
+        PermissionRow(
+            title = stringResource(R.string.features_battery),
+            subtitle = stringResource(R.string.features_battery_detail),
+            granted = unrestricted,
+            onGrant = {
+                @android.annotation.SuppressLint("BatteryLife")
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${context.packageName}"))
+                runCatching { context.startActivity(intent) }
+                    .onFailure { runCatching { context.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) } }
+            },
+        )
         Spacer(Modifier.size(8.dp))
         FilledTonalButton(onClick = { PhoneFeatures.openOutputSwitcher(context) }, shapes = ButtonDefaults.shapes()) {
             Text(stringResource(R.string.features_output))
         }
     }
 }
+
+/** ¿Está kushare fuera del ahorro de batería del sistema (que en algunas marcas corta el enlace)? */
+private fun batteryUnrestricted(context: android.content.Context): Boolean =
+    context.getSystemService(android.os.PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)
 
 /** ¿Puede kushare mostrar la pantalla de «Encontrar teléfono» con el teléfono bloqueado? */
 private fun canFullScreen(context: android.content.Context): Boolean =

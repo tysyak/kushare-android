@@ -6,6 +6,21 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+### Añadido
+- Permisos: fila opcional «Uso de batería sin restricciones», para las marcas que cierran las apps en segundo plano.
+- Aviso (temporal) sobre la verificación de desarrolladores de Google con
+  [FreeDroidWarn](https://github.com/woheller69/FreeDroidWarn): una vez por versión, al entrar en Ajustes.
+- Documentación del código con Dokka (`make docs`: Kotlin en `app/build/dokka/html` y el crate Rust con rustdoc).
+
+### Cambiado
+- Menos batería: la lista de reproductores no se reenvía cuando solo avanza la posición, el keepalive se omite si
+  acaba de llegar tráfico y el icono grande de cada notificación no se vuelve a codificar si no cambió.
+- El runtime de Rust usa 2 hilos en lugar de uno por núcleo (37→32 hilos en total).
+- Biblioteca nativa con LTO: 4,8→3,5 MB (APK 8,4→7,8 MB).
+
+Medido antes de estos cambios con `dumpsys batterystats`: 0,23 mAh en 3,5 h sin cable (el 0,08 % del consumo del
+teléfono), con 15 s de CPU.
+
 ## [0.8.2] - 2026-11-16
 
 ### Corregido
