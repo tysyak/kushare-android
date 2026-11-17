@@ -2,6 +2,14 @@
 
 App Android de [kushare](https://github.com/tysyak/kushare): transferencia de archivos y **notificaciones sincronizadas** con el PC, al estilo de KDE Connect. La interfaz es Kotlin + Jetpack Compose con **Material 3 Expressive** (formas de `MaterialShapes`, tipografía enfática, esquema de movimiento expresivo y color dinámico). En *Ajustes* se elige el tema: Sistema, Claro, Oscuro u **Oscuro OLED** (negro puro). El protocolo, la criptografía y la lógica del enlace son **el mismo código Rust** que usa el cliente de escritorio, expuesto a Kotlin con [UniFFI](https://mozilla.github.io/uniffi-rs/).
 
+## Capturas
+
+![Inicio, menú lateral y dispositivos](docs/capturas/android-inicio-menu-dispositivos.png)
+
+![Ajustes y permisos](docs/capturas/android-ajustes-permisos.png)
+
+Del lado del PC (cliente [kushare](https://github.com/tysyak/kushare)): ver sus [capturas](https://github.com/tysyak/kushare#capturas).
+
 ## Qué hace
 
 - **Enviar y recibir archivos** con kushare de escritorio, por Wi-Fi (mDNS) o Bluetooth RFCOMM.
