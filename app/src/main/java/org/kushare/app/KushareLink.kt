@@ -311,6 +311,14 @@ object KushareLink {
 
         override fun onQrScan(deviceId: String) = QrScan.open(appContext)
 
+        override fun onMicStart(deviceId: String, rate: UInt, adpcm: Boolean) =
+            Mic.requestStart(appContext, MicRequest(deviceId, rate.toInt(), adpcm))
+
+        override fun onMicStop(deviceId: String) = Mic.stop(appContext)
+
+        override fun onDtmf(deviceId: String, requestId: ULong, digits: String) =
+            KushareInCallService.onDtmf(deviceId, requestId, digits)
+
         override fun onFindPhone(deviceId: String, ring: Boolean) {
             // El enlace solo existe después de `attach`: `appContext` ya está.
             if (ring) FindPhone.start(appContext) else FindPhone.stop(appContext)

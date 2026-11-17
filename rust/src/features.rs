@@ -355,6 +355,17 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
         F::WebcamStop(_) => callback.on_webcam_stop(device_id),
         F::WebcamAck(a) => callback.on_webcam_ack(device_id, a.seq),
         F::QrScan(_) => callback.on_qr_scan(device_id),
+        F::MicStart(m) => callback.on_mic_start(
+            device_id,
+            if m.rate == 0 {
+                16_000
+            } else {
+                m.rate.clamp(8_000, 48_000)
+            },
+            m.codec == pb::MicCodec::MicImaAdpcm as i32,
+        ),
+        F::MicStop(_) => callback.on_mic_stop(device_id),
+        F::Dtmf(d) => callback.on_dtmf(device_id, d.request_id, d.digits),
         F::SmsThreadsRequest(r) => {
             callback.on_sms_threads_request(device_id, r.request_id, r.offset, r.limit.min(100))
         }
@@ -398,6 +409,8 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
         | F::Cameras(_)
         | F::WebcamFrame(_)
         | F::WebcamState(_)
+        | F::MicAudio(_)
+        | F::MicState(_)
         | F::QrResult(_)
         | F::ActiveNotifications(_)
         | F::Wallpaper(_)

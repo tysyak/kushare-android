@@ -241,4 +241,13 @@
     <string name="qr_open">Abrir</string>
     <string name="qr_copy">Copiar</string>
     <string name="qr_again">Escanear otro</string>
+    <string name="channel_mic">Micrófono para el PC</string>
+    <string name="mic_request_title">El PC quiere usar el micrófono</string>
+    <string name="mic_request_text">Toca para empezar a mandarle el micrófono.</string>
+    <string name="mic_starting">Abriendo el micrófono…</string>
+    <string name="mic_active">Micrófono en el PC</string>
+    <string name="mic_active_detail">Lo que capta el micrófono del teléfono se oye en el PC como «Micrófono de este teléfono». Se para desde aquí o desde el PC.</string>
+    <string name="mic_stop">Parar el micrófono</string>
+    <string name="perm_mic">Micrófono</string>
+    <string name="perm_mic_detail">Opcional: usar el teléfono como micrófono del PC.</string>
 </resources>

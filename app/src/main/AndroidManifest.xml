@@ -43,6 +43,11 @@
     <!-- Webcam para el PC y escáner de QR. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <!-- El teléfono como micrófono del PC (solo cuando el PC lo pide). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <!-- Tonos DTMF: InCallService de app acompañante (no hace falta ser el marcador). -->
+    <uses-permission android:name="android.permission.CALL_COMPANION_APP" />
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -165,6 +170,32 @@
             android:name=".KushareService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
+
+        <!-- Micrófono para el PC (no exportados). -->
+        <service
+            android:name=".MicService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+        <activity
+            android:name=".MicActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="" />
+
+        <!-- Llamadas como app acompañante: solo Telecom puede enlazarlo. -->
+        <service
+            android:name=".KushareInCallService"
+            android:exported="true"
+            android:permission="android.permission.BIND_INCALL_SERVICE">
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_COMPANION_APP"
+                android:value="true" />
+            <intent-filter>
+                <action android:name="android.telecom.InCallService" />
+            </intent-filter>
+        </service>
 
         <!-- Webcam y escáner de QR (no exportados). -->
         <service

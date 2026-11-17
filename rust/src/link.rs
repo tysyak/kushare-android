@@ -204,6 +204,13 @@ pub trait LinkCallback: Send + Sync {
     fn on_webcam_ack(&self, device_id: String, seq: u32);
     /// Abrir el escáner de QR.
     fn on_qr_scan(&self, device_id: String);
+    /// Mandar el micrófono al PC con [`LinkService::send_mic_audio`] hasta
+    /// `on_mic_stop`. `adpcm`: comprimido (solo hay Bluetooth).
+    fn on_mic_start(&self, device_id: String, rate: u32, adpcm: bool);
+    fn on_mic_stop(&self, device_id: String);
+    /// Tonos DTMF en la llamada en curso; responder con
+    /// [`LinkService::send_command_result`].
+    fn on_dtmf(&self, device_id: String, request_id: u64, digits: String);
 }
 
 const TCP_DIAL_TIMEOUT: Duration = Duration::from_secs(4);
@@ -262,6 +269,8 @@ pub struct LinkService {
     tasks: std::sync::Mutex<Vec<tokio::task::AbortHandle>>,
     /// PCs que comprobaron que nos alcanzan por Wi-Fi (`LanStatus`).
     wifi_ready: WifiReady,
+    /// Predictor IMA-ADPCM del micrófono (solo Bluetooth).
+    mic_adpcm: std::sync::Mutex<kushare_core::audio::AdpcmState>,
 }
 
 type WifiReady = Arc<std::sync::Mutex<std::collections::HashSet<String>>>;
@@ -312,6 +321,7 @@ impl LinkService {
             manager,
             cache,
             wifi_ready,
+            mic_adpcm: Default::default(),
             tasks: std::sync::Mutex::new(vec![
                 events_task.abort_handle(),
                 reconnect_task.abort_handle(),
@@ -648,6 +658,65 @@ impl LinkService {
                 })),
             },
         );
+    }
+
+    /// Un bloque de micrófono (PCM de 16 bits LE, mono). Con `adpcm` se
+    /// comprime aquí (IMA-ADPCM) para que quepa por Bluetooth. Devuelve si
+    /// hay enlace de datos Wi-Fi (sin él, conviene pasar a ADPCM).
+    pub fn send_mic_audio(&self, device_id: String, seq: u32, pcm: Vec<u8>, adpcm: bool) -> bool {
+        let bulk = self.manager.has_bulk(&device_id);
+        let data = if adpcm {
+            let samples: Vec<i16> = pcm
+                .chunks_exact(2)
+                .map(|b| i16::from_le_bytes([b[0], b[1]]))
+                .collect();
+            let mut state = self.mic_adpcm.lock().expect("mutex envenenado");
+            kushare_core::audio::adpcm_encode(&mut state, &samples)
+        } else {
+            pcm
+        };
+        self.manager.send_feature(
+            &device_id,
+            pb::Feature {
+                kind: Some(F::MicAudio(pb::MicAudio { seq, data })),
+            },
+        );
+        bulk
+    }
+
+    /// Estado del micrófono para el PC que lo pidió.
+    pub fn report_mic_state(
+        &self,
+        device_id: String,
+        active: bool,
+        error: String,
+        adpcm: bool,
+        rate: u32,
+    ) {
+        if !active {
+            *self.mic_adpcm.lock().expect("mutex envenenado") = Default::default();
+        }
+        let codec = if adpcm {
+            pb::MicCodec::MicImaAdpcm
+        } else {
+            pb::MicCodec::MicPcm16
+        };
+        self.manager.send_feature(
+            &device_id,
+            pb::Feature {
+                kind: Some(F::MicState(pb::MicState {
+                    active,
+                    error,
+                    codec: codec as i32,
+                    rate,
+                })),
+            },
+        );
+    }
+
+    /// ¿Hay enlace de datos Wi-Fi con `device_id`?
+    pub fn has_bulk(&self, device_id: String) -> bool {
+        self.manager.has_bulk(&device_id)
     }
 
     /// Código leído con el escáner: a todos los PC conectados.

@@ -283,6 +283,7 @@ internal fun PhoneFeaturesCard() {
     var wallpaper by remember { mutableStateOf(PhoneData.hasWallpaperAccess()) }
     var fullScreen by remember { mutableStateOf(canFullScreen(context)) }
     var overlay by remember { mutableStateOf(Settings.canDrawOverlays(context)) }
+    var mic by remember { mutableStateOf(org.kushare.app.Mic.hasPermission(context)) }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer =
@@ -296,6 +297,7 @@ internal fun PhoneFeaturesCard() {
                     wallpaper = PhoneData.hasWallpaperAccess()
                     fullScreen = canFullScreen(context)
                     overlay = Settings.canDrawOverlays(context)
+                    mic = org.kushare.app.Mic.hasPermission(context)
                 }
             }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -315,6 +317,10 @@ internal fun PhoneFeaturesCard() {
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             callLog = PhoneData.hasCallLogPermissions(context)
             PhoneFeatures.onPermissionsChanged()
+        }
+    val micLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+            mic = org.kushare.app.Mic.hasPermission(context)
         }
     val photoLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -388,6 +394,12 @@ internal fun PhoneFeaturesCard() {
                 },
             )
         }
+        PermissionRow(
+            title = stringResource(R.string.perm_mic),
+            subtitle = stringResource(R.string.perm_mic_detail),
+            granted = mic,
+            onGrant = { micLauncher.launch(Manifest.permission.RECORD_AUDIO) },
+        )
         PermissionRow(
             title = stringResource(R.string.features_overlay),
             subtitle = stringResource(R.string.features_overlay_detail),

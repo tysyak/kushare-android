@@ -235,4 +235,13 @@
     <string name="qr_open">Open</string>
     <string name="qr_copy">Copy</string>
     <string name="qr_again">Scan another</string>
+    <string name="channel_mic">Microphone for the PC</string>
+    <string name="mic_request_title">The PC wants to use the microphone</string>
+    <string name="mic_request_text">Tap to start sending it the microphone.</string>
+    <string name="mic_starting">Opening the microphone…</string>
+    <string name="mic_active">Microphone on the PC</string>
+    <string name="mic_active_detail">What the phone microphone picks up is heard on the PC as “Micrófono de this phone”. Stop it here or from the PC.</string>
+    <string name="mic_stop">Stop the microphone</string>
+    <string name="perm_mic">Microphone</string>
+    <string name="perm_mic_detail">Optional: use the phone as the PC microphone.</string>
 </resources>

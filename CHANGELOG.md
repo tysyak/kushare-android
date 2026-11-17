@@ -6,6 +6,17 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+### Añadido
+- **Micrófono para el PC**: servicio en primer plano de tipo micrófono que
+  graba con el perfil de llamada (cancelación de eco y ruido) y manda bloques
+  de 40 ms: PCM de 48 kHz por Wi-Fi o IMA-ADPCM de 16 kHz por Bluetooth (si se
+  pierde la Wi-Fi, cambia solo). Como la webcam, se abre una pantalla para
+  empezar (Android lo exige) con «Parar» y «Seguir en segundo plano». Permiso
+  opcional nuevo en *Permisos*: Micrófono.
+- Tonos DTMF pedidos desde el PC: `InCallService` de app acompañante (se usa si
+  Android lo enlaza; en Android 16 sin configuración de pruebas no lo hace, y
+  el PC usa entonces Bluetooth manos libres).
+
 ## [0.7.0] - 2026-11-13
 
 ### Añadido
