@@ -6,6 +6,8 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.8.2] - 2026-11-16
+
 ### Corregido
 - **Faltaba el permiso `VIBRATE`**: «Encontrar teléfono» y el escáner de QR no
   vibraban (el error se ignoraba).
