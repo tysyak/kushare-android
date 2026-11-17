@@ -73,7 +73,11 @@ class KushareNotificationListener : NotificationListenerService() {
         if (sbn.notification.category == Notification.CATEGORY_CALL) {
             // Nombre o número del llamante para el aviso de llamada del PC.
             val caller = sbn.notification.extras.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty()
-            PhoneFeatures.onCallNotification(caller)
+            // El marcador enciende su cronómetro cuando la otra parte contesta:
+            // es la única señal de «llamada saliente conectada» sin permisos
+            // de sistema (TelephonyManager solo dice «descolgado»).
+            val connected = sbn.notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false)
+            PhoneFeatures.onCallNotification(caller, connected)
         }
         if (!shouldForward(sbn)) return
         active[sbn.key] = sbn

@@ -478,9 +478,11 @@ object PhoneFeatures {
     }
 
     /** La notificación del marcador cambió (nombre/número del llamante). */
-    fun onCallNotification(caller: String) {
-        if (caller == callerFromNotification) return
+    fun onCallNotification(caller: String, connected: Boolean) {
+        val answered = connected && lastCallPhase == "dialing"
+        if (caller == callerFromNotification && !answered) return
         callerFromNotification = caller
+        if (answered) lastCallPhase = "active"
         context?.let { publishCall(it) }
     }
 
