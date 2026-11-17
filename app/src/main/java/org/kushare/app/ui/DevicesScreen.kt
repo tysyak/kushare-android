@@ -493,7 +493,7 @@ private fun PeerCard(
                 container = if (peer.connected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
                 content = if (peer.connected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                 size = 60.dp,
-                active = peer.connected,
+                active = false,
             )
             Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {

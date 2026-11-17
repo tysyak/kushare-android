@@ -95,7 +95,8 @@ fun HomeScreen(
                     },
                     if (viaBt) Icons.Rounded.Bluetooth else Icons.Rounded.Wifi,
                     MaterialShapes.Cookie9Sided,
-                    true,
+                    // Estado estable: sin animación (gasta batería con la app abierta).
+                    false,
                 )
             }
             peers.isEmpty() -> LinkStatus(stringResource(R.string.home_unpaired), stringResource(R.string.home_unpaired_detail), Icons.Rounded.Devices, MaterialShapes.Pentagon, false)

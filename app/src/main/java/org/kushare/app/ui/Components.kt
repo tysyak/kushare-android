@@ -93,6 +93,27 @@ fun ShapeIcon(
     size: Dp = 56.dp,
     active: Boolean = false,
 ) {
+    val shape = polygon.toShape()
+    Box(modifier = modifier.size(size), contentAlignment = Alignment.Center) {
+        // La animación infinita solo existe mientras está activa: si se crea
+        // siempre, pide fotogramas sin parar aunque no se use (medido: ~64 %
+        // de un núcleo con cuatro iconos quietos en Inicio).
+        val motion = if (active) Modifier.spinning() else Modifier
+        Box(
+            modifier =
+                Modifier
+                    .size(size)
+                    .then(motion)
+                    .clip(shape)
+                    .background(container),
+        )
+        Icon(icon, contentDescription = null, tint = content, modifier = Modifier.size(size * 0.45f))
+    }
+}
+
+/** Giro lento y latido de [ShapeIcon] activo. */
+@Composable
+private fun Modifier.spinning(): Modifier {
     val transition = rememberInfiniteTransition(label = "shapeIcon")
     val rotation by transition.animateFloat(
         initialValue = 0f,
@@ -106,23 +127,10 @@ fun ShapeIcon(
         animationSpec = infiniteRepeatable(tween(1_400), RepeatMode.Reverse),
         label = "pulse",
     )
-    val shape = polygon.toShape()
-    Box(modifier = modifier.size(size), contentAlignment = Alignment.Center) {
-        Box(
-            modifier =
-                Modifier
-                    .size(size)
-                    .graphicsLayer {
-                        if (active) {
-                            rotationZ = rotation
-                            scaleX = pulse
-                            scaleY = pulse
-                        }
-                    }
-                    .clip(shape)
-                    .background(container),
-        )
-        Icon(icon, contentDescription = null, tint = content, modifier = Modifier.size(size * 0.45f))
+    return graphicsLayer {
+        rotationZ = rotation
+        scaleX = pulse
+        scaleY = pulse
     }
 }
 

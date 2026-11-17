@@ -49,7 +49,11 @@
     <!-- Tonos DTMF: InCallService de app acompañante (no hace falta ser el marcador). -->
     <uses-permission android:name="android.permission.CALL_COMPANION_APP" />
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <!-- Llamadas y SMS son opcionales: también se instala en tablets sin SIM. -->
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Vibrar al buscar el teléfono y al leer un QR (faltaba: no vibraba). -->
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Funciones extra (al estilo KDE Connect), cada una opcional:

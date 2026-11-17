@@ -13,7 +13,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.VibrationEffect
-import android.os.VibratorManager
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -245,7 +244,7 @@ class QrScanActivity : ComponentActivity() {
         if (result.value != null) return
         result.value = text to format
         runCatching {
-            getSystemService(VibratorManager::class.java).defaultVibrator.vibrate(VibrationEffect.createOneShot(60, VibrationEffect.DEFAULT_AMPLITUDE))
+            vibrator(this).vibrate(VibrationEffect.createOneShot(60, VibrationEffect.DEFAULT_AMPLITUDE))
         }
         KushareLink.service?.sendQrResult(text, format, System.currentTimeMillis())
     }

@@ -19,7 +19,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.VibrationEffect
-import android.os.VibratorManager
 import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -130,7 +129,7 @@ object FindPhone {
             runCatching { player?.stop() }
             runCatching { player?.release() }
             player = null
-            runCatching { app.getSystemService(VibratorManager::class.java).defaultVibrator.cancel() }
+            runCatching { vibrator(app).cancel() }
             torchId?.let { id -> runCatching { app.getSystemService(CameraManager::class.java).setTorchMode(id, false) } }
             torchOn = false
             val audio = app.getSystemService(AudioManager::class.java)
@@ -173,10 +172,7 @@ object FindPhone {
     private fun vibrate(app: Context) {
         runCatching {
             val pattern = longArrayOf(0, 800, 400)
-            app.getSystemService(VibratorManager::class.java).defaultVibrator.vibrate(
-                VibrationEffect.createWaveform(pattern, 0),
-                android.os.VibrationAttributes.createForUsage(android.os.VibrationAttributes.USAGE_ALARM),
-            )
+            vibrateAsAlarm(app, VibrationEffect.createWaveform(pattern, 0))
         }
     }
 

@@ -12,6 +12,15 @@ private const val TAG = "KushareInCall"
 private const val TONE_MS = 160L
 private const val GAP_MS = 90L
 
+/** Estado de la llamada (`Call.Details.state` es de Android 12). */
+private fun Call.stateCompat(): Int =
+    if (android.os.Build.VERSION.SDK_INT >= 31) {
+        details.state
+    } else {
+        @Suppress("DEPRECATION")
+        state
+    }
+
 /**
  * `InCallService` de **app acompañante** (`IN_CALL_SERVICE_COMPANION_APP`):
  * Telecom lo enlaza en cada llamada sin que kushare sea la app de teléfono
@@ -39,8 +48,8 @@ class KushareInCallService : InCallService() {
         /** La llamada en curso (activa o marcando), si Telecom nos enlazó. */
         private fun activeCall(): Call? {
             val calls = instance?.calls ?: return null
-            return calls.firstOrNull { it.details.state == Call.STATE_ACTIVE }
-                ?: calls.firstOrNull { it.details.state == Call.STATE_DIALING }
+            return calls.firstOrNull { it.stateCompat() == Call.STATE_ACTIVE }
+                ?: calls.firstOrNull { it.stateCompat() == Call.STATE_DIALING }
         }
 
         /**

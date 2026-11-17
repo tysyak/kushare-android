@@ -97,6 +97,7 @@ object PhoneCameras {
 
     /** Selector de CameraX para la cámara `id` de Camera2 (vacía = trasera por defecto). */
     @OptIn(ExperimentalCamera2Interop::class)
+    @androidx.annotation.OptIn(androidx.camera.camera2.interop.ExperimentalCamera2Interop::class)
     fun selector(id: String): CameraSelector =
         if (id.isEmpty()) {
             CameraSelector.DEFAULT_BACK_CAMERA

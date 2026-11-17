@@ -6,6 +6,21 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+### Corregido
+- **Faltaba el permiso `VIBRATE`**: «Encontrar teléfono» y el escáner de QR no
+  vibraban (el error se ignoraba).
+- Android 10 y 11: la vibración y el estado de llamada usaban APIs de Android
+  12/13 (`VibratorManager`, `VibrationAttributes`, `Call.Details.state`).
+
+### Rendimiento
+- Las formas animadas (`ShapeIcon`) creaban su animación infinita aunque
+  estuvieran quietas, y «Conectado» giraba sin parar: con la app abierta en
+  Inicio gastaba ≈64 % de un núcleo. Ahora solo se anima lo pasajero: ≈0,8 %.
+
+### Otros
+- `uses-feature` de telefonía opcional (se instala también en tablets sin SIM)
+  y `OptIn` de CameraX.
+
 ## [0.8.1] - 2026-11-16
 
 ### Corregido
