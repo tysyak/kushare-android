@@ -6,6 +6,8 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.8.3] - 2026-11-17
+
 ### Añadido
 - Permisos: fila opcional «Uso de batería sin restricciones», para las marcas que cierran las apps en segundo plano.
 - Aviso (temporal) sobre la verificación de desarrolladores de Google con
