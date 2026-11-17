@@ -6,6 +6,8 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.8.0] - 2026-11-16
+
 ### Añadido
 - **Micrófono para el PC**: servicio en primer plano de tipo micrófono que
   graba con el perfil de llamada (cancelación de eco y ruido) y manda bloques
