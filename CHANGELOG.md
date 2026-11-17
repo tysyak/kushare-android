@@ -6,6 +6,14 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.8.1] - 2026-11-16
+
+### Corregido
+- Las llamadas salientes pasan a «en llamada» cuando la otra parte contesta
+  (antes seguían como «llamando» hasta colgar): se detecta por el cronómetro de
+  la notificación del marcador, porque Android no lo dice sin permisos de
+  sistema.
+
 ## [0.8.0] - 2026-11-16
 
 ### Añadido
