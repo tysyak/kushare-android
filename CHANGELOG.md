@@ -6,6 +6,8 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.8.4] - 2026-11-19
+
 ### Añadido
 - **Volumen del PC** en *Dispositivos*: una barra y un botón de silencio bajo «Salida de audio». Si el volumen cambia en el PC, la barra se mueve sola. Necesita kushare 0.8.4 en el PC.
 
