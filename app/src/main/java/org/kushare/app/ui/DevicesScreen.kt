@@ -16,6 +16,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import android.os.SystemClock
+import kotlin.math.roundToInt
+import uniffi.kushare_mobile.MobileAudioOutput
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,6 +39,8 @@ import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.LinkOff
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Wifi
+import androidx.compose.material.icons.automirrored.rounded.VolumeOff
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -49,6 +57,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -464,6 +473,58 @@ private fun PeerControls(deviceId: String, extras: PeerExtras) {
                 Text(o.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
             }
         }
+        extras.outputs.firstOrNull { it.active && it.volume != null }?.let { PcVolume(deviceId, it) }
+    }
+}
+
+/** Intervalo mínimo entre órdenes de volumen mientras se arrastra (ms). */
+private const val VOLUME_SEND_MS = 150L
+
+/**
+ * Volumen y silencio de la salida activa del PC. Mientras se arrastra manda
+ * el valor como mucho cada [VOLUME_SEND_MS] y no hace caso de lo que llega
+ * del PC, para que el control no salte; al soltar manda el valor final.
+ */
+@Composable
+private fun PcVolume(deviceId: String, output: MobileAudioOutput) {
+    val link = KushareLink.service ?: return
+    val remote = (output.volume ?: return).toInt()
+    var dragging by remember { mutableStateOf<Float?>(null) }
+    var lastSent by remember { mutableStateOf(0L) }
+    val shown = dragging ?: remote.toFloat()
+    val max = maxOf(100, remote).toFloat()
+    val volumeLabel = stringResource(R.string.devices_volume)
+    fun send(volume: Float, muted: Boolean) =
+        link.sendSetAudioVolume(deviceId, output.id, volume.roundToInt().toUInt(), muted)
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        IconButton(onClick = { send(shown, !output.muted) }) {
+            Icon(
+                if (output.muted) Icons.AutoMirrored.Rounded.VolumeOff else Icons.AutoMirrored.Rounded.VolumeUp,
+                contentDescription = stringResource(if (output.muted) R.string.devices_unmute else R.string.devices_mute),
+            )
+        }
+        Slider(
+            value = shown.coerceIn(0f, max),
+            valueRange = 0f..max,
+            onValueChange = { v ->
+                dragging = v
+                val now = SystemClock.uptimeMillis()
+                if (now - lastSent >= VOLUME_SEND_MS) {
+                    lastSent = now
+                    send(v, false)
+                }
+            },
+            onValueChangeFinished = {
+                dragging?.let { send(it, false) }
+                dragging = null
+            },
+            modifier = Modifier.weight(1f).semantics { contentDescription = volumeLabel },
+        )
+        Text(
+            "${shown.roundToInt()} %",
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(start = 8.dp, end = 4.dp).widthIn(min = 44.dp),
+        )
     }
 }
 

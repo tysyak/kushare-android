@@ -1102,6 +1102,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_set_audio_output(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_send_set_audio_volume(
+    ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_sms_messages(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_send_sms_threads(
@@ -1327,6 +1329,8 @@ internal object UniffiLib {
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_qr_result(`ptr`: Long,`text`: RustBuffer.ByValue,`format`: RustBuffer.ByValue,`dateMs`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_set_audio_output(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outputId`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_send_set_audio_volume(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`outputId`: RustBuffer.ByValue,`volume`: Int,`muted`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_send_sms_messages(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`requestId`: Long,`threadId`: RustBuffer.ByValue,`messages`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,
     ): Long
@@ -1624,6 +1628,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_set_audio_output() and 0xFFFF) != 1181) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_set_audio_volume() and 0xFFFF) != 44964) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_send_sms_messages() and 0xFFFF) != 27152) {
@@ -2493,6 +2500,12 @@ public interface LinkServiceInterface {
     fun `sendQrResult`(`text`: kotlin.String, `format`: kotlin.String, `dateMs`: kotlin.Long)
     
     fun `sendSetAudioOutput`(`deviceId`: kotlin.String, `outputId`: kotlin.String)
+    
+    /**
+     * Volumen (en %) y silencio de una salida del peer (`output_id` vacío =
+     * la activa).
+     */
+    fun `sendSetAudioVolume`(`deviceId`: kotlin.String, `outputId`: kotlin.String, `volume`: kotlin.UInt, `muted`: kotlin.Boolean)
     
     suspend fun `sendSmsMessages`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `threadId`: kotlin.String, `messages`: List<MobileSms>, `error`: kotlin.String)
     
@@ -3430,6 +3443,26 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
     
 
     
+    /**
+     * Volumen (en %) y silencio de una salida del peer (`output_id` vacío =
+     * la activa).
+     */override fun `sendSetAudioVolume`(`deviceId`: kotlin.String, `outputId`: kotlin.String, `volume`: kotlin.UInt, `muted`: kotlin.Boolean)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_send_set_audio_volume(
+        it,
+        
+        FfiConverterString.lower(`deviceId`),
+        FfiConverterString.lower(`outputId`),
+        FfiConverterUInt.lower(`volume`),
+        FfiConverterBoolean.lower(`muted`),_status)
+}
+    }
+    
+    
+
+    
     @Throws(MobileException::class)
     @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
     override suspend fun `sendSmsMessages`(`deviceId`: kotlin.String, `requestId`: kotlin.ULong, `threadId`: kotlin.String, `messages`: List<MobileSms>, `error`: kotlin.String) {
@@ -4057,6 +4090,13 @@ data class MobileAudioOutput (
     var `name`: kotlin.String
     , 
     var `active`: kotlin.Boolean
+    , 
+    /**
+     * Volumen en % (puede pasar de 100); `None` si el peer no lo manda.
+     */
+    var `volume`: kotlin.UInt?
+    , 
+    var `muted`: kotlin.Boolean
     
 ){
     
@@ -4076,19 +4116,25 @@ public object FfiConverterTypeMobileAudioOutput: FfiConverterRustBuffer<MobileAu
             FfiConverterString.read(buf),
             FfiConverterString.read(buf),
             FfiConverterBoolean.read(buf),
+            FfiConverterOptionalUInt.read(buf),
+            FfiConverterBoolean.read(buf),
         )
     }
 
     override fun allocationSize(value: MobileAudioOutput) = (
             FfiConverterString.allocationSize(value.`id`) +
             FfiConverterString.allocationSize(value.`name`) +
-            FfiConverterBoolean.allocationSize(value.`active`)
+            FfiConverterBoolean.allocationSize(value.`active`) +
+            FfiConverterOptionalUInt.allocationSize(value.`volume`) +
+            FfiConverterBoolean.allocationSize(value.`muted`)
     )
 
     override fun write(value: MobileAudioOutput, buf: ByteBuffer) {
             FfiConverterString.write(value.`id`, buf)
             FfiConverterString.write(value.`name`, buf)
             FfiConverterBoolean.write(value.`active`, buf)
+            FfiConverterOptionalUInt.write(value.`volume`, buf)
+            FfiConverterBoolean.write(value.`muted`, buf)
     }
 }
 
@@ -5993,6 +6039,38 @@ internal object uniffiCallbackInterfaceSendProgressCallback {
  * @suppress
  */
 public object FfiConverterTypeSendProgressCallback: FfiConverterCallbackInterface<SendProgressCallback>()
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterOptionalUInt: FfiConverterRustBuffer<kotlin.UInt?> {
+    override fun read(buf: ByteBuffer): kotlin.UInt? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterUInt.read(buf)
+    }
+
+    override fun allocationSize(value: kotlin.UInt?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterUInt.allocationSize(value)
+        }
+    }
+
+    override fun write(value: kotlin.UInt?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterUInt.write(value, buf)
+        }
+    }
+}
 
 
 

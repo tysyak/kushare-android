@@ -31,6 +31,9 @@
     <string name="devices_off">kushare is off</string>
     <string name="devices_on_network">On this network</string>
     <string name="devices_output">Audio output</string>
+    <string name="devices_volume">PC volume</string>
+    <string name="devices_mute">Mute</string>
+    <string name="devices_unmute">Unmute</string>
     <string name="devices_pair">Pair</string>
     <string name="devices_pair_failed">Could not pair: %1$s</string>
     <string name="devices_pair_with">Pair with %1$s</string>

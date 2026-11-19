@@ -44,6 +44,9 @@ pub struct MobileAudioOutput {
     pub id: String,
     pub name: String,
     pub active: bool,
+    /// Volumen en % (puede pasar de 100); `None` si el peer no lo manda.
+    pub volume: Option<u32>,
+    pub muted: bool,
 }
 
 #[derive(Debug, Clone, uniffi::Record)]
@@ -319,6 +322,8 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
                     id: o.id,
                     name: o.name,
                     active: o.active,
+                    volume: o.has_volume.then_some(o.volume),
+                    muted: o.muted,
                 })
                 .collect(),
         ),
@@ -428,7 +433,9 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
         | F::Wallpaper(_)
         | F::CommandResult(_)
         | F::LanAddress(_)
-        | F::LanStatus(_) => {}
+        | F::LanStatus(_)
+        // El volumen del teléfono no se controla desde el PC.
+        | F::SetAudioVolume(_) => {}
     }
 }
 

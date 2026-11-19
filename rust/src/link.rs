@@ -746,6 +746,7 @@ impl LinkService {
                     id: o.id,
                     name: o.name,
                     active: o.active,
+                    ..Default::default()
                 })
                 .collect(),
         };
@@ -1134,6 +1135,28 @@ impl LinkService {
             &device_id,
             pb::Feature {
                 kind: Some(F::SetAudioOutput(set)),
+            },
+        );
+    }
+
+    /// Volumen (en %) y silencio de una salida del peer (`output_id` vacío =
+    /// la activa).
+    pub fn send_set_audio_volume(
+        &self,
+        device_id: String,
+        output_id: String,
+        volume: u32,
+        muted: bool,
+    ) {
+        let set = pb::SetAudioVolume {
+            id: output_id,
+            volume,
+            muted,
+        };
+        self.manager.send_feature(
+            &device_id,
+            pb::Feature {
+                kind: Some(F::SetAudioVolume(set)),
             },
         );
     }

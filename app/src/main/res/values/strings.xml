@@ -37,6 +37,9 @@
     <string name="devices_off">kushare está apagado</string>
     <string name="devices_on_network">En esta red</string>
     <string name="devices_output">Salida de audio</string>
+    <string name="devices_volume">Volumen del PC</string>
+    <string name="devices_mute">Silenciar</string>
+    <string name="devices_unmute">Quitar silencio</string>
     <string name="devices_pair">Emparejar</string>
     <string name="devices_pair_failed">No se pudo emparejar: %1$s</string>
     <string name="devices_pair_with">Emparejar con %1$s</string>

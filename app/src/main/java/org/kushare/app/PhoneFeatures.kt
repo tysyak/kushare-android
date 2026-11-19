@@ -281,7 +281,7 @@ object PhoneFeatures {
                 .distinctBy { outputName(it) }
                 .map {
                     val isActive = if (active.isNotEmpty()) it.id in active else it.id == fallback?.id
-                    MobileAudioOutput(it.id.toString(), outputName(it)!!, isActive)
+                    MobileAudioOutput(it.id.toString(), outputName(it)!!, isActive, volume = null, muted = false)
                 }
         // Android no deja a otra app mover el audio de las demás: solo informativo.
         svc()?.publishAudioOutputs(false, outputs)
