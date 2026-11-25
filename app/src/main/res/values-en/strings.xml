@@ -248,6 +248,12 @@
     <string name="qr_wifi">Wi-Fi network “%1$s”</string>
     <string name="qr_wifi_detail">Not sent to the PC: it contains the network password.</string>
     <string name="qr_wifi_connect">Connect</string>
+    <string name="channel_usb_tether">PC internet over USB</string>
+    <string name="usb_tether_title">PC internet over the cable</string>
+    <string name="usb_tether_text">Tap to allow the kushare VPN connection.</string>
+    <string name="usb_tether_session">PC internet (USB)</string>
+    <string name="usb_tether_denied">VPN permission was not granted.</string>
+    <string name="usb_tether_need_permission">The VPN must be allowed on the phone (open kushare and try again).</string>
     <string name="channel_mic">Microphone for the PC</string>
     <string name="mic_request_title">The PC wants to use the microphone</string>
     <string name="mic_request_text">Tap to start sending it the microphone.</string>

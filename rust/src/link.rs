@@ -214,6 +214,12 @@ pub trait LinkCallback: Send + Sync {
     /// El PC comparte su internet con una red Wi-Fi propia: ofrecer
     /// conectarse a ella.
     fn on_wifi_network(&self, device_id: String, ssid: String, password: String);
+    /// El PC comparte su internet por el cable USB: abrir la VPN y
+    /// conectarse a `127.0.0.1:port` (ya hay `adb reverse`), mandando antes
+    /// `token`. Responder con [`LinkService::report_usb_tether`].
+    fn on_usb_tether(&self, device_id: String, port: u32, token: Vec<u8>);
+    /// El PC dejó de compartir internet por USB: cerrar la VPN.
+    fn on_usb_tether_stop(&self, device_id: String);
 }
 
 const TCP_DIAL_TIMEOUT: Duration = Duration::from_secs(4);
@@ -730,6 +736,13 @@ impl LinkService {
                 format,
                 date_ms,
             })),
+        });
+    }
+
+    /// Estado de la VPN de internet por USB (`error` vacío si va bien).
+    pub fn report_usb_tether(&self, active: bool, error: String) {
+        self.manager.broadcast_feature(pb::Feature {
+            kind: Some(F::UsbTetherState(pb::UsbTetherState { active, error })),
         });
     }
 

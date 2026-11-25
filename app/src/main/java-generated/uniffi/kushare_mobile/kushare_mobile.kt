@@ -792,6 +792,12 @@ internal interface UniffiCallbackInterfaceLinkCallbackMethod36 : com.sun.jna.Cal
 internal interface UniffiCallbackInterfaceLinkCallbackMethod37 : com.sun.jna.Callback {
     fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`ssid`: RustBuffer.ByValue,`password`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
 }
+internal interface UniffiCallbackInterfaceLinkCallbackMethod38 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`port`: Int,`token`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
+internal interface UniffiCallbackInterfaceLinkCallbackMethod39 : com.sun.jna.Callback {
+    fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,)
+}
 @Structure.FieldOrder("uniffiFree", "uniffiClone", "onIncomingRequest", "onCompleted", "onFailed")
 internal open class UniffiVTableCallbackInterfaceReceiveCallback(
     @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
@@ -861,7 +867,7 @@ internal open class UniffiVTableCallbackInterfaceByteStreamIo(
     }
 
 }
-@Structure.FieldOrder("uniffiFree", "uniffiClone", "onPairingRequested", "onPairingFinished", "onPeersChanged", "onNotificationPosted", "onNotificationRemoved", "onDismissLocal", "onActionRequested", "onReplyRequested", "onPeerBattery", "onPeerPlayers", "onPeerAudioOutputs", "onMediaCommand", "onSetAudioOutput", "onSetRinger", "onCallCommand", "onPhotoListRequest", "onPhotoRequest", "onClipboard", "onSmsThreadsRequest", "onSmsMessagesRequest", "onSendSms", "onCallLogRequest", "onContactsRequest", "onContactPhotosRequest", "onDial", "onActiveNotificationsRequest", "onWallpaperRequest", "onPhotoDelete", "onFindPhone", "onCamerasRequest", "onWebcamStart", "onWebcamStop", "onWebcamAck", "onQrScan", "onMicStart", "onMicStop", "onDtmf", "onWifiNetwork")
+@Structure.FieldOrder("uniffiFree", "uniffiClone", "onPairingRequested", "onPairingFinished", "onPeersChanged", "onNotificationPosted", "onNotificationRemoved", "onDismissLocal", "onActionRequested", "onReplyRequested", "onPeerBattery", "onPeerPlayers", "onPeerAudioOutputs", "onMediaCommand", "onSetAudioOutput", "onSetRinger", "onCallCommand", "onPhotoListRequest", "onPhotoRequest", "onClipboard", "onSmsThreadsRequest", "onSmsMessagesRequest", "onSendSms", "onCallLogRequest", "onContactsRequest", "onContactPhotosRequest", "onDial", "onActiveNotificationsRequest", "onWallpaperRequest", "onPhotoDelete", "onFindPhone", "onCamerasRequest", "onWebcamStart", "onWebcamStop", "onWebcamAck", "onQrScan", "onMicStart", "onMicStop", "onDtmf", "onWifiNetwork", "onUsbTether", "onUsbTetherStop")
 internal open class UniffiVTableCallbackInterfaceLinkCallback(
     @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
     @JvmField internal var `uniffiClone`: UniffiCallbackInterfaceClone? = null,
@@ -903,6 +909,8 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
     @JvmField internal var `onMicStop`: UniffiCallbackInterfaceLinkCallbackMethod35? = null,
     @JvmField internal var `onDtmf`: UniffiCallbackInterfaceLinkCallbackMethod36? = null,
     @JvmField internal var `onWifiNetwork`: UniffiCallbackInterfaceLinkCallbackMethod37? = null,
+    @JvmField internal var `onUsbTether`: UniffiCallbackInterfaceLinkCallbackMethod38? = null,
+    @JvmField internal var `onUsbTetherStop`: UniffiCallbackInterfaceLinkCallbackMethod39? = null,
 ) : Structure() {
     class UniffiByValue(
         `uniffiFree`: UniffiCallbackInterfaceFree? = null,
@@ -945,7 +953,9 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
         `onMicStop`: UniffiCallbackInterfaceLinkCallbackMethod35? = null,
         `onDtmf`: UniffiCallbackInterfaceLinkCallbackMethod36? = null,
         `onWifiNetwork`: UniffiCallbackInterfaceLinkCallbackMethod37? = null,
-    ): UniffiVTableCallbackInterfaceLinkCallback(`uniffiFree`,`uniffiClone`,`onPairingRequested`,`onPairingFinished`,`onPeersChanged`,`onNotificationPosted`,`onNotificationRemoved`,`onDismissLocal`,`onActionRequested`,`onReplyRequested`,`onPeerBattery`,`onPeerPlayers`,`onPeerAudioOutputs`,`onMediaCommand`,`onSetAudioOutput`,`onSetRinger`,`onCallCommand`,`onPhotoListRequest`,`onPhotoRequest`,`onClipboard`,`onSmsThreadsRequest`,`onSmsMessagesRequest`,`onSendSms`,`onCallLogRequest`,`onContactsRequest`,`onContactPhotosRequest`,`onDial`,`onActiveNotificationsRequest`,`onWallpaperRequest`,`onPhotoDelete`,`onFindPhone`,`onCamerasRequest`,`onWebcamStart`,`onWebcamStop`,`onWebcamAck`,`onQrScan`,`onMicStart`,`onMicStop`,`onDtmf`,`onWifiNetwork`,), Structure.ByValue
+        `onUsbTether`: UniffiCallbackInterfaceLinkCallbackMethod38? = null,
+        `onUsbTetherStop`: UniffiCallbackInterfaceLinkCallbackMethod39? = null,
+    ): UniffiVTableCallbackInterfaceLinkCallback(`uniffiFree`,`uniffiClone`,`onPairingRequested`,`onPairingFinished`,`onPeersChanged`,`onNotificationPosted`,`onNotificationRemoved`,`onDismissLocal`,`onActionRequested`,`onReplyRequested`,`onPeerBattery`,`onPeerPlayers`,`onPeerAudioOutputs`,`onMediaCommand`,`onSetAudioOutput`,`onSetRinger`,`onCallCommand`,`onPhotoListRequest`,`onPhotoRequest`,`onClipboard`,`onSmsThreadsRequest`,`onSmsMessagesRequest`,`onSendSms`,`onCallLogRequest`,`onContactsRequest`,`onContactPhotosRequest`,`onDial`,`onActiveNotificationsRequest`,`onWallpaperRequest`,`onPhotoDelete`,`onFindPhone`,`onCamerasRequest`,`onWebcamStart`,`onWebcamStop`,`onWebcamAck`,`onQrScan`,`onMicStart`,`onMicStop`,`onDtmf`,`onWifiNetwork`,`onUsbTether`,`onUsbTetherStop`,), Structure.ByValue
 
    internal fun uniffiSetValue(other: UniffiVTableCallbackInterfaceLinkCallback) {
         `uniffiFree` = other.`uniffiFree`
@@ -988,6 +998,8 @@ internal open class UniffiVTableCallbackInterfaceLinkCallback(
         `onMicStop` = other.`onMicStop`
         `onDtmf` = other.`onDtmf`
         `onWifiNetwork` = other.`onWifiNetwork`
+        `onUsbTether` = other.`onUsbTether`
+        `onUsbTetherStop` = other.`onUsbTetherStop`
     }
 
 }
@@ -1079,6 +1091,8 @@ internal object IntegrityCheckingUniffiLib {
     external fun uniffi_kushare_mobile_checksum_method_linkservice_report_find_phone(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_report_mic_state(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkservice_report_usb_tether(
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkservice_report_webcam_state(
     ): Int
@@ -1222,6 +1236,10 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_wifi_network(
     ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_usb_tether(
+    ): Int
+    external fun uniffi_kushare_mobile_checksum_method_linkcallback_on_usb_tether_stop(
+    ): Int
     external fun ffi_kushare_mobile_uniffi_contract_version(
     ): Int
 
@@ -1309,6 +1327,8 @@ internal object UniffiLib {
     external fun uniffi_kushare_mobile_fn_method_linkservice_report_find_phone(`ptr`: Long,`ring`: Byte,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_report_mic_state(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`active`: Byte,`error`: RustBuffer.ByValue,`adpcm`: Byte,`rate`: Int,uniffi_out_err: UniffiRustCallStatus, 
+    ): Unit
+    external fun uniffi_kushare_mobile_fn_method_linkservice_report_usb_tether(`ptr`: Long,`active`: Byte,`error`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     external fun uniffi_kushare_mobile_fn_method_linkservice_report_webcam_state(`ptr`: Long,`deviceId`: RustBuffer.ByValue,`active`: Byte,`cameraId`: RustBuffer.ByValue,`error`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
@@ -1596,6 +1616,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_report_mic_state() and 0xFFFF) != 59201) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_report_usb_tether() and 0xFFFF) != 42611) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkservice_report_webcam_state() and 0xFFFF) != 56197) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1807,6 +1830,12 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_wifi_network() and 0xFFFF) != 51086) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_usb_tether() and 0xFFFF) != 42037) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if ((lib.uniffi_kushare_mobile_checksum_method_linkcallback_on_usb_tether_stop() and 0xFFFF) != 40028) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
 }
@@ -2453,6 +2482,11 @@ public interface LinkServiceInterface {
      * Estado del micrófono para el PC que lo pidió.
      */
     fun `reportMicState`(`deviceId`: kotlin.String, `active`: kotlin.Boolean, `error`: kotlin.String, `adpcm`: kotlin.Boolean, `rate`: kotlin.UInt)
+    
+    /**
+     * Estado de la VPN de internet por USB (`error` vacío si va bien).
+     */
+    fun `reportUsbTether`(`active`: kotlin.Boolean, `error`: kotlin.String)
     
     /**
      * Estado de la webcam para el PC que la pidió.
@@ -3121,6 +3155,23 @@ open class LinkService: Disposable, AutoCloseable, LinkServiceInterface
         FfiConverterString.lower(`error`),
         FfiConverterBoolean.lower(`adpcm`),
         FfiConverterUInt.lower(`rate`),_status)
+}
+    }
+    
+    
+
+    
+    /**
+     * Estado de la VPN de internet por USB (`error` vacío si va bien).
+     */override fun `reportUsbTether`(`active`: kotlin.Boolean, `error`: kotlin.String)
+        = 
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_kushare_mobile_fn_method_linkservice_report_usb_tether(
+        it,
+        
+        FfiConverterBoolean.lower(`active`),
+        FfiConverterString.lower(`error`),_status)
 }
     }
     
@@ -5317,6 +5368,18 @@ public interface LinkCallback {
      */
     fun `onWifiNetwork`(`deviceId`: kotlin.String, `ssid`: kotlin.String, `password`: kotlin.String)
     
+    /**
+     * El PC comparte su internet por el cable USB: abrir la VPN y
+     * conectarse a `127.0.0.1:port` (ya hay `adb reverse`), mandando antes
+     * `token`. Responder con [`LinkService::report_usb_tether`].
+     */
+    fun `onUsbTether`(`deviceId`: kotlin.String, `port`: kotlin.UInt, `token`: kotlin.ByteArray)
+    
+    /**
+     * El PC dejó de compartir internet por USB: cerrar la VPN.
+     */
+    fun `onUsbTetherStop`(`deviceId`: kotlin.String)
+    
     companion object
 }
 
@@ -5846,6 +5909,32 @@ internal object uniffiCallbackInterfaceLinkCallback {
             uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
         }
     }
+    internal object `onUsbTether`: UniffiCallbackInterfaceLinkCallbackMethod38 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`port`: Int,`token`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onUsbTether`(
+                    FfiConverterString.lift(`deviceId`),
+                    FfiConverterUInt.lift(`port`),
+                    FfiConverterByteArray.lift(`token`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
+    internal object `onUsbTetherStop`: UniffiCallbackInterfaceLinkCallbackMethod39 {
+        override fun callback(`uniffiHandle`: Long,`deviceId`: RustBuffer.ByValue,`uniffiOutReturn`: Pointer,uniffiCallStatus: UniffiRustCallStatus,) {
+            val uniffiObj = FfiConverterTypeLinkCallback.handleMap.get(uniffiHandle)
+            val makeCall = { ->
+                uniffiObj.`onUsbTetherStop`(
+                    FfiConverterString.lift(`deviceId`),
+                )
+            }
+            val writeReturn = { _: Unit -> Unit }
+            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
+        }
+    }
 
     internal object uniffiFree: UniffiCallbackInterfaceFree {
         override fun callback(handle: Long) {
@@ -5900,6 +5989,8 @@ internal object uniffiCallbackInterfaceLinkCallback {
         `onMicStop`,
         `onDtmf`,
         `onWifiNetwork`,
+        `onUsbTether`,
+        `onUsbTetherStop`,
     )
 
     // Registers the foreign callback with the Rust side.

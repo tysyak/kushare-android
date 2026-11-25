@@ -254,6 +254,12 @@
     <string name="qr_wifi">Red Wi-Fi «%1$s»</string>
     <string name="qr_wifi_detail">No se manda al PC: lleva la clave de la red.</string>
     <string name="qr_wifi_connect">Conectarse</string>
+    <string name="channel_usb_tether">Internet del PC por USB</string>
+    <string name="usb_tether_title">Internet del PC por el cable</string>
+    <string name="usb_tether_text">Toca para permitir la conexión VPN de kushare.</string>
+    <string name="usb_tether_session">Internet del PC (USB)</string>
+    <string name="usb_tether_denied">No se dio permiso para la VPN.</string>
+    <string name="usb_tether_need_permission">Hace falta permitir la VPN en el teléfono (abre kushare y vuelve a intentarlo).</string>
     <string name="channel_mic">Micrófono para el PC</string>
     <string name="mic_request_title">El PC quiere usar el micrófono</string>
     <string name="mic_request_text">Toca para empezar a mandarle el micrófono.</string>

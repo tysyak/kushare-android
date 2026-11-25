@@ -325,6 +325,11 @@ object KushareLink {
         override fun onWifiNetwork(deviceId: String, ssid: String, password: String) =
             WifiConnect.offer(appContext, ssid, password)
 
+        override fun onUsbTether(deviceId: String, port: UInt, token: ByteArray) =
+            UsbTether.start(appContext, port.toInt(), token)
+
+        override fun onUsbTetherStop(deviceId: String) = UsbTether.stop(appContext)
+
         override fun onMicStart(deviceId: String, rate: UInt, adpcm: Boolean) =
             Mic.requestStart(appContext, MicRequest(deviceId, rate.toInt(), adpcm))
 

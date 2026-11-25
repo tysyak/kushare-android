@@ -23,6 +23,7 @@ Del lado del PC (cliente [kushare](https://github.com/tysyak/kushare)): ver sus 
 - **Portapapeles compartido**: lo que copia el PC llega al instante; lo del teléfono se manda al abrir kushare, con *Enviar portapapeles* (en su notificación o en *Ajustes*), con el botón de ajustes rápidos *Portapapeles al PC* o con *Compartir → Copiar en el PC*. Android no deja leer el portapapeles en segundo plano.
 - **Menú lateral** (☰) al estilo de Enlace Móvil: PC vinculados con su estado, *Agregar PC*, *Portapapeles* (lo último copiado con el PC), *Permisos de la aplicación*, *Ajustes* y *Actualizaciones*.
 - **PC desde el teléfono**: su batería, sus reproductores (MPRIS), su salida de audio y su volumen (con silencio), en *Dispositivos*.
+- **Internet del PC por cable USB** (avanzado): con la depuración USB activada, el PC puede compartir su internet por el cable; la app abre una VPN (la primera vez pide permiso).
 - **Internet del PC**: si el PC comparte su internet con una red Wi-Fi propia (*Compartir internet* en kushare), te la manda y el teléfono pregunta si conectarse; también se puede escanear su QR con la cámara o con el escáner de la app.
 - **Actualizaciones** desde *Ajustes*: busca el último release en GitHub, lo descarga y lo instala con el instalador del sistema (que exige la misma firma).
 - **Botón en los ajustes rápidos** (la cortina de Wi-Fi, Bluetooth…):

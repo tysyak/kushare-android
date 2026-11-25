@@ -384,6 +384,8 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
         F::MicStop(_) => callback.on_mic_stop(device_id),
         F::Dtmf(d) => callback.on_dtmf(device_id, d.request_id, d.digits),
         F::WifiNetwork(w) => callback.on_wifi_network(device_id, w.ssid, w.password),
+        F::UsbTether(t) => callback.on_usb_tether(device_id, t.port, t.token),
+        F::UsbTetherStop(_) => callback.on_usb_tether_stop(device_id),
         F::SmsThreadsRequest(r) => {
             callback.on_sms_threads_request(device_id, r.request_id, r.offset, r.limit.min(100))
         }
@@ -436,7 +438,8 @@ pub fn dispatch(callback: &dyn LinkCallback, device_id: String, feature: pb::Fea
         | F::LanAddress(_)
         | F::LanStatus(_)
         // El volumen del teléfono no se controla desde el PC.
-        | F::SetAudioVolume(_) => {}
+        | F::SetAudioVolume(_)
+        | F::UsbTetherState(_) => {}
     }
 }
 

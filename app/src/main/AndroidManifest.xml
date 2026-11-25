@@ -120,6 +120,22 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!-- Compartir texto → portapapeles del PC (con confirmación). -->
+        <!-- Internet del PC por el cable USB (VPN; ver UsbTether.kt). -->
+        <service
+            android:name=".UsbTetherService"
+            android:exported="false"
+            android:permission="android.permission.BIND_VPN_SERVICE">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+        </service>
+        <activity
+            android:name=".UsbTetherActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".WifiConnectActivity"
             android:excludeFromRecents="true"
