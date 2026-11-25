@@ -6,6 +6,9 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+### Añadido
+- **Compartir internet del PC**: si el PC manda su red Wi-Fi por el enlace, el teléfono pregunta si conectarse (Android añade la red con su propio diálogo, con MAC aleatoria). El escáner de QR reconoce los QR de Wi-Fi: muestra el nombre (no la clave), ofrece «Conectarse» y no los manda al PC. Necesita kushare 0.8.5 en el PC.
+
 ## [0.8.4] - 2026-11-19
 
 ### Añadido

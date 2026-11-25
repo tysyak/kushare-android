@@ -322,6 +322,9 @@ object KushareLink {
 
         override fun onQrScan(deviceId: String) = QrScan.open(appContext)
 
+        override fun onWifiNetwork(deviceId: String, ssid: String, password: String) =
+            WifiConnect.offer(appContext, ssid, password)
+
         override fun onMicStart(deviceId: String, rate: UInt, adpcm: Boolean) =
             Mic.requestStart(appContext, MicRequest(deviceId, rate.toInt(), adpcm))
 

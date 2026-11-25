@@ -211,6 +211,9 @@ pub trait LinkCallback: Send + Sync {
     /// Tonos DTMF en la llamada en curso; responder con
     /// [`LinkService::send_command_result`].
     fn on_dtmf(&self, device_id: String, request_id: u64, digits: String);
+    /// El PC comparte su internet con una red Wi-Fi propia: ofrecer
+    /// conectarse a ella.
+    fn on_wifi_network(&self, device_id: String, ssid: String, password: String);
 }
 
 const TCP_DIAL_TIMEOUT: Duration = Duration::from_secs(4);

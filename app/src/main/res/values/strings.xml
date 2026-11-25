@@ -246,6 +246,14 @@
     <string name="qr_open">Abrir</string>
     <string name="qr_copy">Copiar</string>
     <string name="qr_again">Escanear otro</string>
+    <string name="channel_wifi">Compartir internet del PC</string>
+    <string name="wifi_title">El PC comparte internet</string>
+    <string name="wifi_text">¿Conectarse a la red «%1$s» del PC?</string>
+    <string name="wifi_connect">Conectarse</string>
+    <string name="wifi_cancel">Ahora no</string>
+    <string name="qr_wifi">Red Wi-Fi «%1$s»</string>
+    <string name="qr_wifi_detail">No se manda al PC: lleva la clave de la red.</string>
+    <string name="qr_wifi_connect">Conectarse</string>
     <string name="channel_mic">Micrófono para el PC</string>
     <string name="mic_request_title">El PC quiere usar el micrófono</string>
     <string name="mic_request_text">Toca para empezar a mandarle el micrófono.</string>

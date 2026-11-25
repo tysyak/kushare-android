@@ -7,6 +7,8 @@
          el aviso de que volvió la red (registerNetworkCallback). -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <!-- Android 10: añadir como sugerencia la red Wi-Fi que comparte el PC. -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <!-- Requerida desde Android 13 (API 33) para que NsdManager pueda
          descubrir/anunciar servicios por Wi-Fi. neverForLocation: kushare
          no usa esto para inferir ubicación, solo para hablar mDNS. -->
@@ -118,6 +120,13 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!-- Compartir texto → portapapeles del PC (con confirmación). -->
+        <activity
+            android:name=".WifiConnectActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.DeviceDefault.Dialog.NoActionBar" />
         <activity
             android:name=".ShareToPcActivity"
             android:excludeFromRecents="true"

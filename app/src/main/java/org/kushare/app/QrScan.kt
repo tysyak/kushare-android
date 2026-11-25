@@ -247,12 +247,15 @@ class QrScanActivity : ComponentActivity() {
         runCatching {
             vibrator(this).vibrate(VibrationEffect.createOneShot(60, VibrationEffect.DEFAULT_AMPLITUDE))
         }
+        // Una red Wi-Fi lleva su clave: no se manda al PC, se ofrece conectarse.
+        if (WifiConnect.parseQr(text) != null) return
         KushareLink.service?.sendQrResult(text, format, System.currentTimeMillis())
     }
 
     @Composable
     private fun ResultCard(text: String, format: String, modifier: Modifier) {
         val isUrl = text.startsWith("http://", true) || text.startsWith("https://", true)
+        val wifi = WifiConnect.parseQr(text)
         val sent = KushareLink.service != null
         Surface(
             modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp),
@@ -261,13 +264,29 @@ class QrScanActivity : ComponentActivity() {
         ) {
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(format.replace('_', ' '), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                Text(text, style = MaterialTheme.typography.bodyLarge, maxLines = 6)
+                // De una red Wi-Fi se enseña el nombre, no la clave.
                 Text(
-                    stringResource(if (sent) R.string.qr_sent else R.string.qr_not_sent),
+                    wifi?.let { stringResource(R.string.qr_wifi, it.first) } ?: text,
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 6,
+                )
+                Text(
+                    stringResource(
+                        when {
+                            wifi != null -> R.string.qr_wifi_detail
+                            sent -> R.string.qr_sent
+                            else -> R.string.qr_not_sent
+                        },
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.background(Color.Transparent),
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (wifi != null) {
+                        Button(onClick = { WifiConnect.connect(this@QrScanActivity, wifi.first, wifi.second) }) {
+                            Text(stringResource(R.string.qr_wifi_connect))
+                        }
+                    }
                     if (isUrl) {
                         Button(onClick = {
                             runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(text))) }

@@ -240,6 +240,14 @@
     <string name="qr_open">Open</string>
     <string name="qr_copy">Copy</string>
     <string name="qr_again">Scan another</string>
+    <string name="channel_wifi">PC internet sharing</string>
+    <string name="wifi_title">The PC is sharing its internet</string>
+    <string name="wifi_text">Connect to the PC network “%1$s”?</string>
+    <string name="wifi_connect">Connect</string>
+    <string name="wifi_cancel">Not now</string>
+    <string name="qr_wifi">Wi-Fi network “%1$s”</string>
+    <string name="qr_wifi_detail">Not sent to the PC: it contains the network password.</string>
+    <string name="qr_wifi_connect">Connect</string>
     <string name="channel_mic">Microphone for the PC</string>
     <string name="mic_request_title">The PC wants to use the microphone</string>
     <string name="mic_request_text">Tap to start sending it the microphone.</string>
