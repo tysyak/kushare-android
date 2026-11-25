@@ -12,8 +12,8 @@ android {
         applicationId = "org.kushare.app"
         minSdk = 29
         targetSdk = 36
-        versionCode = 15
-        versionName = "0.8.4"
+        versionCode = 16
+        versionName = "0.8.5"
     }
 
     // Firma de release: la clave y sus contraseñas viven FUERA del repo, en
