@@ -6,6 +6,8 @@ Todos los cambios notables de kushare-android. Formato basado en
 
 ## [Sin publicar]
 
+## [0.8.6] - 2026-11-25
+
 ### Cambiado
 - Sin cambios en la app: acompaña a kushare 0.8.6 (el PC cambia solo de antena al compartir internet si su canal no sirve).
 
